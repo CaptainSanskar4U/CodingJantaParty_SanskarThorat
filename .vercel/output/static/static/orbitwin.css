@@ -1560,3 +1560,30 @@ canvas { display: block; }
   border: 1px solid #22222a;
   margin-bottom: 8px;
 }
+.spectrum-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 42px;
+  padding: 2px 0;
+}
+.spectrum-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #ff2e43 0%, #f5c451 40%, #1c1c24 100%);
+  border-radius: 2px 2px 0 0;
+  height: 12%;
+  min-height: 3px;
+  transition: height 0.12s ease;
+}
+.spectrum-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  color: #6a6a75;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid #1a1a22;
+}
+
+

@@ -3704,4 +3704,39 @@
         if (mic.fr % 3 === 0) { var r = pitchOf(mic.buf, mic.ac.sampleRate); mic.voiced.push(r[0] > 0 ? 1 : 0); if (mic.voiced.length > 60) mic.voiced.shift(); if (r[0] > 0) { mic.pit.push(r[0]); if (mic.pit.length > 14) mic.pit.shift(); mic.cp = r[0] } }
         var el = t - mic.t0;
         if (!mic.base) {
-          if (mic.fr % 3 === 0 && mic.cp > 0 && mic.pit.length) mic.cal.push([
+          if (mic.fr % 3 === 0 && mic.cp > 0 && mic.pit.length) mic.cal.push([mic.pit[mic.pit.length - 1], rms]);
+          mst.textContent = 'Learning your baseline… speak normally (' + Math.max(0, Math.ceil(4 - el)) + 's)';
+          if (el > 4) { if (mic.cal.length >= 10) { var ps = mic.cal.map(function (x) { return x[0] }); mic.base = { p: med(ps), l: mic.cal.reduce(function (a, x) { return a + x[1] }, 0) / mic.cal.length, j: Math.max(.01, std(ps) / med(ps)) }; mst.textContent = 'Baseline learned. Now change how you sound' } else { mic.t0 = t; mic.cal = []; mst.textContent = 'Didn’t hear a voice. Speak a little louder…' } }
+        } else if (mic.fr % 4 === 0) {
+          var lv = mic.lev.slice(-24), l = lv.reduce(function (a, x) { return a + x }, 0) / lv.length, pitchNow = mic.pit.length > 3 ? med(mic.pit) : 0, jr = mic.pit.length > 5 ? std(mic.pit) / med(mic.pit) : 0, pz = 1 - mic.voiced.reduce(function (a, x) { return a + x }, 0) / Math.max(1, mic.voiced.length), b = mic.base;
+          var dp = pitchNow ? pitchNow / b.p - 1 : 0, dl = l / b.l - 1, jj = jr / b.j;
+          mm[0].textContent = pitchNow ? Math.round(pitchNow) + ' Hz ' + (dp >= 0 ? '+' : '') + Math.round(dp * 100) + '%' : '–';
+          mm[1].textContent = '×' + Math.max(0, (l / b.l)).toFixed(1); mm[2].textContent = jr ? (jj > 1.6 ? 'Uneven' : jj > 1.2 ? 'Slightly uneven' : 'Steady') : '–'; mm[3].textContent = Math.round(pz * 100) + '%';
+          var d = cl(.45 * Math.abs(dp) / .2 + .35 * Math.abs(dl) / .8 + .2 * Math.max(0, jj - 1) / 1.2, 0, 1); mic.d += (d - mic.d) * .5;
+          mdep.style.width = (mic.d * 100).toFixed(0) + '%'; mverd.textContent = mic.d < .3 ? 'Within your baseline' : mic.d < .6 ? 'A noticeable shift from your baseline' : 'Strong departure · this is where a call would be flagged for review';
+        }
+        drawMic();
+      }
+      function drawMic() {
+        var w = micc.width, h = micc.height, c = mcx, n = 90, bw = w / n; c.clearRect(0, 0, w, h);
+        var g = c.createLinearGradient(0, 0, w, 0);[['0', '#f4a05a'], ['.4', '#e5648f'], ['.75', '#bb71d6'], ['1', '#7e88f2']].forEach(function (a) { g.addColorStop(a[0], a[1]) });
+        var hot = mic.d > .55;
+        for (var i = 0; i < n; i++) { var v = mic.lev.length ? mic.lev[Math.max(0, mic.lev.length - n + i)] || 0 : 0, hh = Math.max(1.5, Math.min(1, v * 9) * h * .46); c.fillStyle = hot ? g : 'rgba(243,240,234,.85)'; c.fillRect(i * bw + bw * .2, h / 2 - hh, bw * .6, hh * 2) }
+        if (!mic.on) { c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(0, h / 2, w, 1) }
+      }
+      stripW.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); hov = true; tU = cl((hov ? tU : U) + (e.key === 'ArrowRight' ? .03 : -.03), 0, 1); stripW.setAttribute('aria-valuenow', Math.round(tU * 100)) } });
+      stripW.addEventListener('blur', function () { hov = false });
+      /* mobile menu */
+      var mb = $('#mb'), mnav = $('#mnav');
+      function menu(o) { mnav.classList.toggle('open', o); mb.setAttribute('aria-expanded', o); document.body.style.overflow = o ? 'hidden' : '' }
+      mb.addEventListener('click', function () { menu(!mnav.classList.contains('open')) }); $$('#mnav a').forEach(function (a) { a.addEventListener('click', function () { menu(false) }) });
+      addEventListener('keydown', function (e) { if (e.key === 'Escape') menu(false) });
+      drawMic();
+      sizeX(); pick(0); addEventListener('load', function () { sizeX(); upd() });
+      size(); upd(); if (reduce) { U = .66; tU = .66; drawStrip(0) } else requestAnimationFrame(loop);
+      if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }) }, { threshold: .15 }); $$('.rv2').forEach(function (el) { io.observe(el) }) } else $$('.rv2').forEach(function (el) { el.classList.add('in') });
+    })();
+  </script>
+</body>
+
+</html>

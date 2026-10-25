@@ -1,87 +1,94 @@
 /* ══════════════════════════════════════════════════════════════════
-   DHAVLI · धवली — ACOUSTIC LOADER ENGINE
-   Ultra-smooth, zero-lag lifecycle management
+   DHAVLI · धवली — 3.0-SECOND CINEMATIC INTRO ENGINE
+   Pure black screen, 3s choreography, seamless background prep
    ══════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  function initDhavliLoader() {
+  function launchDhavliIntro() {
     var loader = document.getElementById('dhavli-loader');
     if (!loader) {
-      // Auto-inject if not already present in HTML
       loader = document.createElement('div');
       loader.id = 'dhavli-loader';
       loader.setAttribute('role', 'status');
-      loader.setAttribute('aria-label', 'Loading Dhavli');
+      loader.setAttribute('aria-label', 'Initializing Dhavli');
       loader.innerHTML = [
-        '<div class="dl-backdrop"></div>',
-        '<div class="dl-content">',
-        '  <div class="dl-frame"><span class="dl-c tl"></span><span class="dl-c tr"></span><span class="dl-c bl"></span><span class="dl-c br"></span></div>',
-        '  <div class="dl-wave-wrap">',
-        '    <svg class="dl-wave" viewBox="0 0 360 48" fill="none">',
-        '      <path class="dl-line" d="M 0,24 Q 45,24 90,24 Q 115,8 140,24 Q 165,40 190,24 Q 205,4 220,24 Q 235,44 250,24 Q 275,24 360,24" />',
+        '<div class="dl-crosshair tl"></div><div class="dl-crosshair tr"></div>',
+        '<div class="dl-crosshair bl"></div><div class="dl-crosshair br"></div>',
+        '<div class="dl-motes">',
+        '  <span class="dl-mote" style="top:35%;left:25%;width:2px;height:2px;background:#00f0ff;animation-delay:0.3s"></span>',
+        '  <span class="dl-mote" style="top:60%;left:75%;width:3px;height:3px;background:#ffaa33;animation-delay:0.8s"></span>',
+        '  <span class="dl-mote" style="top:40%;left:80%;width:2px;height:2px;background:#ffffff;animation-delay:1.2s"></span>',
+        '  <span class="dl-mote" style="top:65%;left:20%;width:2.5px;height:2.5px;background:#00f0ff;animation-delay:0.6s"></span>',
+        '</div>',
+        '<div class="dl-stage">',
+        '  <div class="dl-soundwave-wrap">',
+        '    <svg class="dl-soundwave-svg" viewBox="0 0 380 48" fill="none">',
+        '      <path class="dl-soundwave-path" d="M 0,24 Q 45,24 90,24 Q 115,8 140,24 Q 165,40 190,24 Q 205,4 220,24 Q 235,44 250,24 Q 275,24 380,24" />',
         '    </svg>',
-        '    <div class="dl-scan-beam"></div>',
+        '    <div class="dl-anamorphic-streak"></div>',
         '  </div>',
-        '  <div class="dl-type">',
-        '    <div class="dl-hindi">धवली</div>',
-        '    <div class="dl-title">DHAVLI</div>',
-        '    <div class="dl-sub">ACOUSTIC FORENSIC INTELLIGENCE</div>',
+        '  <div class="dl-typography">',
+        '    <div class="dl-hindi-text">धवली</div>',
+        '    <div class="dl-english-text">DHAVLI</div>',
+        '    <div class="dl-designation-text">AUTONOMOUS ACOUSTIC INTELLIGENCE GRID</div>',
         '  </div>',
-        '  <div class="dl-telemetry">',
-        '    <span class="dl-pulse"></span>',
-        '    <span class="dl-status" id="dl-status-text">INITIALIZING 16.0 kHz MESH</span>',
-        '    <span class="dl-val" id="dl-status-val">[ 98.4% ]</span>',
+        '  <div class="dl-telemetry-panel">',
+        '    <span class="dl-telemetry-pulse"></span>',
+        '    <span class="dl-telemetry-status" id="dl-status-msg">INITIALIZING 16.0 kHz ACOUSTIC SENSORS</span>',
+        '    <span class="dl-telemetry-value" id="dl-status-metric">[ 380ms ]</span>',
         '  </div>',
         '</div>'
       ].join('');
       document.body.insertBefore(loader, document.body.firstChild);
     }
 
-    var statusText = document.getElementById('dl-status-text');
-    var statusVal = document.getElementById('dl-status-val');
+    var statusMsg = document.getElementById('dl-status-msg');
+    var statusMetric = document.getElementById('dl-status-metric');
 
-    // Smooth telemetry text progression
-    var t1 = setTimeout(function () {
-      if (statusText) statusText.textContent = 'CALIBRATING STEREO AZIMUTH...';
-      if (statusVal) statusVal.textContent = '[ 99.6% ]';
-    }, 450);
+    // Precision 3-Second Choreography Schedule
+    // Step 1: 0.9s - Frequency lock
+    var step1 = setTimeout(function () {
+      if (statusMsg) statusMsg.textContent = 'CALIBRATING STEREO TDOA AZIMUTH';
+      if (statusMetric) statusMetric.textContent = '[ 142.8° ]';
+    }, 950);
 
-    var t2 = setTimeout(function () {
-      if (statusText) statusText.textContent = 'ACOUSTIC GRID CALIBRATED';
-      if (statusVal) statusVal.textContent = '[ READY ]';
-    }, 900);
+    // Step 2: 1.9s - Sensor grid online
+    var step2 = setTimeout(function () {
+      if (statusMsg) statusMsg.textContent = 'NEURAL FORENSIC ENGINE READY';
+      if (statusMetric) statusMetric.textContent = '[ 100% ]';
+    }, 1950);
 
-    var dismissed = false;
-    function dismiss() {
-      if (dismissed) return;
-      dismissed = true;
-      clearTimeout(t1);
-      clearTimeout(t2);
+    // Step 3: Exactly 3.0 Seconds - Dissolve pitch-black curtain into loaded website
+    var finished = false;
+    function revealWebsite() {
+      if (finished) return;
+      finished = true;
+      clearTimeout(step1);
+      clearTimeout(step2);
+
+      // Begin cinematic iris blur & scale dissolve
       loader.classList.add('dl-fade-out');
+
+      // Unmount after transition completes
       setTimeout(function () {
         if (loader && loader.parentNode) {
           loader.parentNode.removeChild(loader);
         }
-      }, 550);
+      }, 700);
     }
 
-    // Dismiss on load or after smooth 1.25s duration
-    window.addEventListener('load', function () {
-      setTimeout(dismiss, 600);
-    });
+    // Play for 3 full seconds (3000ms)
+    setTimeout(revealWebsite, 3000);
 
-    // Fallback maximum duration (1.35s) so it never hangs
-    setTimeout(dismiss, 1350);
-
-    // Instant bypass on user interaction
-    loader.addEventListener('click', dismiss);
-    window.addEventListener('keydown', dismiss, { once: true });
+    // Immediate skip on user click / tap / keydown
+    loader.addEventListener('click', revealWebsite);
+    window.addEventListener('keydown', revealWebsite, { once: true });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDhavliLoader);
+    document.addEventListener('DOMContentLoaded', launchDhavliIntro);
   } else {
-    initDhavliLoader();
+    launchDhavliIntro();
   }
 })();
