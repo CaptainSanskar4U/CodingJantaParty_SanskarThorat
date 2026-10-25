@@ -1,0 +1,240 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="48%" r="65%">
+      <stop offset="0%" stop-color="#2a050b" stop-opacity="1" />
+      <stop offset="45%" stop-color="#120205" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#050305" stop-opacity="1" />
+    </radialGradient>
+
+    <!-- Crimson Neon Gradients -->
+    <linearGradient id="neonRed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff1744" />
+      <stop offset="50%" stop-color="#ff5252" />
+      <stop offset="100%" stop-color="#ff1744" />
+    </linearGradient>
+
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="60%" stop-color="#ffcdd2" />
+      <stop offset="100%" stop-color="#ff5252" />
+    </linearGradient>
+
+    <linearGradient id="hindiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="35%" stop-color="#ffebee" />
+      <stop offset="70%" stop-color="#ff1744" />
+      <stop offset="100%" stop-color="#b71c1c" />
+    </linearGradient>
+
+    <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff1744" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ff1744" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#ff1744" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Glow Filters -->
+    <filter id="ultraGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur1" />
+      <feGaussianBlur stdDeviation="16" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Grid Pattern -->
+    <pattern id="tacticalGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ff1744" stroke-width="0.75" stroke-opacity="0.08" />
+      <circle cx="40" cy="40" r="1" fill="#ff1744" fill-opacity="0.18" />
+    </pattern>
+
+    <style>
+      @keyframes pulseRing {
+        0% { r: 50px; opacity: 0.9; stroke-width: 2.5px; }
+        50% { opacity: 0.4; }
+        100% { r: 190px; opacity: 0; stroke-width: 0.5px; }
+      }
+      @keyframes pulseRing2 {
+        0% { r: 40px; opacity: 0.7; }
+        100% { r: 240px; opacity: 0; }
+      }
+      @keyframes scanline {
+        0% { transform: translateY(0px); opacity: 0; }
+        15% { opacity: 0.9; }
+        85% { opacity: 0.9; }
+        100% { transform: translateY(370px); opacity: 0; }
+      }
+      @keyframes glowBreath {
+        0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 23, 68, 0.65)) drop-shadow(0 0 35px rgba(255, 23, 68, 0.3)); }
+        50% { filter: drop-shadow(0 0 30px rgba(255, 23, 68, 0.95)) drop-shadow(0 0 65px rgba(255, 82, 82, 0.5)); }
+      }
+      @keyframes textShimmer {
+        0%, 100% { opacity: 0.92; letter-spacing: 14px; }
+        50% { opacity: 1; letter-spacing: 16px; text-shadow: 0 0 25px #ff1744; }
+      }
+      @keyframes radarSweep {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes blinkDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.2; transform: scale(0.85); }
+      }
+      @keyframes eq1 { 0%, 100% { height: 18px; y: 171px; } 50% { height: 58px; y: 151px; } }
+      @keyframes eq2 { 0%, 100% { height: 42px; y: 159px; } 50% { height: 14px; y: 173px; } }
+      @keyframes eq3 { 0%, 100% { height: 26px; y: 167px; } 50% { height: 72px; y: 144px; } }
+      @keyframes eq4 { 0%, 100% { height: 60px; y: 150px; } 50% { height: 22px; y: 169px; } }
+      @keyframes eq5 { 0%, 100% { height: 35px; y: 162px; } 50% { height: 85px; y: 137px; } }
+
+      .ring1 { animation: pulseRing 3.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+      .ring2 { animation: pulseRing 3.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; animation-delay: 1.1s; }
+      .ring3 { animation: pulseRing2 4.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; animation-delay: 2.1s; }
+      .scan { animation: scanline 4.8s linear infinite; }
+      .hindi-title { animation: glowBreath 3s ease-in-out infinite; font-family: 'Noto Sans Devanagari', 'Mukta', 'Yatra One', 'Arial Unicode MS', sans-serif; font-weight: 900; }
+      .english-title { animation: textShimmer 4s ease-in-out infinite; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 900; }
+      .sweep { transform-origin: 500px 180px; animation: radarSweep 6s linear infinite; }
+      .live-dot { animation: blinkDot 1.4s ease-in-out infinite; }
+      
+      .b1 { animation: eq1 1.2s ease-in-out infinite; }
+      .b2 { animation: eq2 0.9s ease-in-out infinite; }
+      .b3 { animation: eq3 1.5s ease-in-out infinite; }
+      .b4 { animation: eq4 1.1s ease-in-out infinite; }
+      .b5 { animation: eq5 1.3s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Deep Cyber Backdrop -->
+  <rect width="1000" height="380" rx="16" fill="url(#bgGlow)" />
+  <rect width="1000" height="380" rx="16" fill="url(#tacticalGrid)" />
+
+  <!-- Outer Tech HUD Border -->
+  <rect x="14" y="14" width="972" height="352" rx="12" fill="none" stroke="#ff1744" stroke-width="1.2" stroke-opacity="0.35" />
+  <rect x="22" y="22" width="956" height="336" rx="8" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.1" />
+
+  <!-- Corner Brackets (Military Targeting Style) -->
+  <path d="M 14 44 L 14 14 L 44 14" fill="none" stroke="#ff1744" stroke-width="3.5" />
+  <path d="M 986 44 L 986 14 L 956 14" fill="none" stroke="#ff1744" stroke-width="3.5" />
+  <path d="M 14 336 L 14 366 L 44 366" fill="none" stroke="#ff1744" stroke-width="3.5" />
+  <path d="M 986 336 L 986 366 L 956 366" fill="none" stroke="#ff1744" stroke-width="3.5" />
+
+  <!-- Subtly Animated Horizontal Laser Scanline -->
+  <line x1="20" y1="0" x2="980" y2="0" stroke="url(#laserGrad)" stroke-width="2.5" class="scan" />
+
+  <!-- Center Radar / Acoustic Pulse Emitter -->
+  <g transform="translate(0, 0)">
+    <circle cx="500" cy="180" r="140" fill="none" stroke="#ff1744" stroke-width="0.8" stroke-dasharray="4 6" stroke-opacity="0.25" />
+    <circle cx="500" cy="180" r="100" fill="none" stroke="#ff1744" stroke-width="0.8" stroke-opacity="0.2" />
+    <circle cx="500" cy="180" r="60" fill="#ff1744" fill-opacity="0.04" />
+    
+    <!-- Expanding Shockwave Rings -->
+    <circle cx="500" cy="180" r="50" fill="none" stroke="#ff1744" class="ring1" />
+    <circle cx="500" cy="180" r="50" fill="none" stroke="#ff5252" class="ring2" />
+    <circle cx="500" cy="180" r="40" fill="none" stroke="#ff8a80" class="ring3" />
+
+    <!-- Radar Crosshairs -->
+    <line x1="500" y1="50" x2="500" y2="310" stroke="#ff1744" stroke-width="0.6" stroke-opacity="0.2" stroke-dasharray="3 4" />
+    <line x1="330" y1="180" x2="670" y2="180" stroke="#ff1744" stroke-width="0.6" stroke-opacity="0.2" stroke-dasharray="3 4" />
+
+    <!-- Revolving Radar Sweep Beam -->
+    <g class="sweep">
+      <path d="M 500 180 L 630 140 A 136 136 0 0 1 636 180 Z" fill="url(#laserGrad)" opacity="0.35" />
+    </g>
+  </g>
+
+  <!-- Left Symmetrical Equalizer Audio Bars -->
+  <g fill="#ff1744" opacity="0.85">
+    <rect x="75" y="171" width="4" height="18" rx="2" class="b1" />
+    <rect x="85" y="159" width="4" height="42" rx="2" class="b2" />
+    <rect x="95" y="167" width="4" height="26" rx="2" class="b3" />
+    <rect x="105" y="150" width="4" height="60" rx="2" class="b4" />
+    <rect x="115" y="162" width="4" height="35" rx="2" class="b5" />
+    <rect x="125" y="155" width="4" height="50" rx="2" class="b2" />
+    <rect x="135" y="165" width="4" height="30" rx="2" class="b1" />
+    <rect x="145" y="148" width="4" height="64" rx="2" class="b4" />
+    <rect x="155" y="160" width="4" height="40" rx="2" class="b3" />
+    <rect x="165" y="140" width="4" height="80" rx="2" class="b5" />
+    <rect x="175" y="152" width="4" height="56" rx="2" class="b2" />
+    <rect x="185" y="166" width="4" height="28" rx="2" class="b1" />
+  </g>
+
+  <!-- Right Symmetrical Equalizer Audio Bars -->
+  <g fill="#ff1744" opacity="0.85">
+    <rect x="811" y="166" width="4" height="28" rx="2" class="b1" />
+    <rect x="821" y="152" width="4" height="56" rx="2" class="b2" />
+    <rect x="831" y="140" width="4" height="80" rx="2" class="b5" />
+    <rect x="841" y="160" width="4" height="40" rx="2" class="b3" />
+    <rect x="851" y="148" width="4" height="64" rx="2" class="b4" />
+    <rect x="861" y="165" width="4" height="30" rx="2" class="b1" />
+    <rect x="871" y="155" width="4" height="50" rx="2" class="b2" />
+    <rect x="881" y="162" width="4" height="35" rx="2" class="b5" />
+    <rect x="891" y="150" width="4" height="60" rx="2" class="b4" />
+    <rect x="901" y="167" width="4" height="26" rx="2" class="b3" />
+    <rect x="911" y="159" width="4" height="42" rx="2" class="b2" />
+    <rect x="921" y="171" width="4" height="18" rx="2" class="b1" />
+  </g>
+
+  <!-- Top Status Bar Inside Card -->
+  <g font-family="'JetBrains Mono', Consolas, monospace" font-size="11" letter-spacing="2">
+    <circle cx="50" cy="46" r="4.5" fill="#ff1744" class="live-dot" filter="url(#softGlow)" />
+    <text x="64" y="50" fill="#ff5252" font-weight="700">GRID ACTIVE · LEVEL-19 ESRI SATELLITE</text>
+    
+    <text x="500" y="50" fill="#ffffff" fill-opacity="0.6" text-anchor="middle">DEFENSE CLASSIFIED · 16kHz PCM</text>
+    
+    <text x="946" y="50" fill="#ff5252" font-weight="700" text-anchor="end">TRIAGE: &lt; 1.4s</text>
+  </g>
+
+  <!-- CENTERPIECE 1: HINDI SACRED SCRIPT "ध्वनि" -->
+  <text x="500" y="158" 
+        text-anchor="middle" 
+        font-size="82" 
+        letter-spacing="6"
+        fill="url(#hindiGrad)" 
+        class="hindi-title"
+        filter="url(#ultraGlow)">ध्वनि</text>
+
+  <!-- CENTERPIECE 2: ENGLISH LOGOTYPE "D H V A N I" -->
+  <text x="508" y="222" 
+        text-anchor="middle" 
+        font-size="34" 
+        fill="url(#goldText)" 
+        font-weight="900"
+        class="english-title"
+        filter="url(#softGlow)">DHVANI</text>
+
+  <!-- Decorative Separator Line with Diamond -->
+  <g transform="translate(0, 240)">
+    <line x1="320" y1="0" x2="470" y2="0" stroke="url(#neonRed)" stroke-width="1.8" />
+    <polygon points="500,-5 505,0 500,5 495,0" fill="#ff1744" filter="url(#softGlow)" />
+    <line x1="530" y1="0" x2="680" y2="0" stroke="url(#neonRed)" stroke-width="1.8" />
+  </g>
+
+  <!-- Subtitle Tagline Badge -->
+  <g transform="translate(500, 280)">
+    <!-- Pill Background -->
+    <rect x="-240" y="-15" width="480" height="30" rx="15" fill="#0d0204" stroke="#ff1744" stroke-width="1.2" stroke-opacity="0.8" />
+    <text x="0" y="5" 
+          text-anchor="middle" 
+          font-family="'JetBrains Mono', Consolas, monospace" 
+          font-size="11.5" 
+          font-weight="700" 
+          fill="#ff8a80" 
+          letter-spacing="3.2">COVERT DISTRESS INTELLIGENCE GRID</text>
+  </g>
+
+  <!-- Bottom Technical Metrics Line -->
+  <g font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5" fill="#ffffff" fill-opacity="0.55" letter-spacing="1.5">
+    <text x="50" y="342">ASR: FASTER-WHISPER [INT8]</text>
+    <text x="500" y="342" text-anchor="middle">FORENSICS: MIT AUDIOSET AST + WAV2VEC2</text>
+    <text x="946" y="342" text-anchor="end">GEO: TACTICAL GAZETTEER</text>
+  </g>
+</svg>
