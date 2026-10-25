@@ -8,7 +8,7 @@
 [![Faster-Whisper](https://img.shields.io/badge/Faster--Whisper-ASR-FF6F00.svg?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/SYSTRAN/faster-whisper)
 [![Leaflet Satellite](https://img.shields.io/badge/Esri-World_Satellite_Imagery-2C7BB6.svg?style=for-the-badge&logo=leaflet&logoColor=white)](https://www.esri.com/)
 [![HuggingFace](https://img.shields.io/badge/HuggingFace-AST_&_Wav2Vec2-FFD21E.svg?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/)
-[![Gemini Live](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4.svg?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Live Demo](https://img.shields.io/badge/Live_Deployment-Vercel-000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://public-two-xi-62.vercel.app/console)
 [![Status](https://img.shields.io/badge/Hackathon_Build-CodingJantaParty-E02424.svg?style=for-the-badge)](#)
 
 <p align="center">
