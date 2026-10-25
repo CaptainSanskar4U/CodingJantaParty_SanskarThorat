@@ -15,3 +15,5 @@ node_modules/
 *.log
 *.bak
 temp_demo.wav
+
+.vercel

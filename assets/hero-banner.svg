@@ -1,148 +1,170 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="100%" height="100%">
   <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0a0d" />
-      <stop offset="50%" stop-color="#050508" />
-      <stop offset="100%" stop-color="#0e0709" />
+    <!-- Dark Matte Obsidian Chassis -->
+    <linearGradient id="chassisBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#121318" />
+      <stop offset="100%" stop-color="#090a0d" />
     </linearGradient>
 
-    <!-- Glowing Red Gradient -->
-    <linearGradient id="redGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#ff2e43" />
-      <stop offset="100%" stop-color="#ff6b6b" />
+    <!-- Scope Screen Gradient -->
+    <linearGradient id="scopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c0e14" />
+      <stop offset="100%" stop-color="#06070a" />
     </linearGradient>
 
-    <!-- Scanline Gradient -->
-    <linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ff2e43" stop-opacity="0" />
-      <stop offset="50%" stop-color="#ff2e43" stop-opacity="0.35" />
-      <stop offset="100%" stop-color="#ff2e43" stop-opacity="0" />
+    <!-- Wave Beam 1 (Signal Vermillion) -->
+    <linearGradient id="waveVermillion" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff3b30" stop-opacity="0.1" />
+      <stop offset="20%" stop-color="#ff453a" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#ff9f0a" stop-opacity="1" />
+      <stop offset="80%" stop-color="#ff453a" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#ff3b30" stop-opacity="0.1" />
     </linearGradient>
 
-    <!-- Grid Pattern -->
-    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 46, 67, 0.07)" stroke-width="1" />
-      <circle cx="0" cy="0" r="1.5" fill="rgba(255, 46, 67, 0.2)" />
+    <!-- Wave Beam 2 (Secondary Subharmonic) -->
+    <linearGradient id="waveAmber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff9f0a" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ffd60a" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#ff9f0a" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Precision Dot Matrix Pattern -->
+    <pattern id="dotGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.8" fill="#27272a" opacity="0.6" />
     </pattern>
 
-    <!-- Glow Filter -->
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-
     <style>
-      @keyframes scan {
-        0% { transform: translateY(-100px); }
-        100% { transform: translateY(300px); }
+      @keyframes waveScroll1 {
+        0% { stroke-dashoffset: 0; }
+        100% { stroke-dashoffset: -720; }
       }
-      @keyframes pulse {
-        0%, 100% { opacity: 0.3; transform: scale(0.98); }
-        50% { opacity: 0.9; transform: scale(1.02); }
+      @keyframes waveScroll2 {
+        0% { stroke-dashoffset: 0; }
+        100% { stroke-dashoffset: 720; }
       }
-      @keyframes wave {
-        0%, 100% { height: 8px; }
-        50% { height: 42px; }
+      @keyframes ledPulse {
+        0%, 100% { opacity: 1; filter: drop-shadow(0 0 4px #ff453a); }
+        50% { opacity: 0.35; filter: none; }
       }
-      @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.2; }
+      @keyframes phosphorSweep {
+        0%, 100% { opacity: 0.85; }
+        50% { opacity: 1; }
       }
-      @keyframes textGlow {
-        0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 46, 67, 0.6)); }
-        50% { filter: drop-shadow(0 0 20px rgba(255, 46, 67, 0.95)); }
+      @keyframes organicBreathing {
+        0%, 100% { transform: scaleY(0.96); opacity: 0.92; }
+        50% { transform: scaleY(1.08); opacity: 1; }
       }
-      .scanner { animation: scan 4s linear infinite; }
-      .rec-dot { animation: blink 1.2s ease-in-out infinite; }
-      .brand-title { animation: textGlow 3s ease-in-out infinite; }
-      .hud-text { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 11px; fill: #8b949e; letter-spacing: 1.5px; }
-      .hud-val { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 11px; fill: #ff4d5e; font-weight: bold; }
-      .mono-tag { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 10px; fill: #e6edf3; letter-spacing: 2px; }
-      .w-bar { transform-origin: bottom; animation: wave 1.4s ease-in-out infinite; }
+      .wave-primary {
+        stroke-dasharray: 360 360;
+        transform-origin: 414px 57.5px;
+        animation: waveScroll1 7s linear infinite, organicBreathing 3.2s ease-in-out infinite;
+      }
+      .wave-secondary {
+        stroke-dasharray: 240 240;
+        transform-origin: 414px 57.5px;
+        animation: waveScroll2 10s linear infinite, organicBreathing 4.5s ease-in-out infinite reverse;
+      }
+      .indicator-led { animation: ledPulse 1.8s ease-in-out infinite; }
+      .screen-glow { animation: phosphorSweep 4s ease-in-out infinite; }
+
+      .mono { font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace; }
+      .sans { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; }
     </style>
   </defs>
 
-  <!-- Background Base -->
-  <rect width="880" height="280" rx="12" fill="url(#bgGrad)" stroke="rgba(255, 46, 67, 0.3)" stroke-width="1.5" />
-  <rect width="880" height="280" rx="12" fill="url(#grid)" />
+  <!-- Industrial Outer Chassis -->
+  <rect width="900" height="300" rx="14" fill="url(#chassisBg)" stroke="#27272a" stroke-width="1.5" />
 
-  <!-- Scanning Laser Line -->
-  <rect class="scanner" x="0" y="0" width="880" height="40" fill="url(#scanGrad)" pointer-events="none" />
+  <!-- Hardware Screws (Tactile Industrial Feel) -->
+  <circle cx="16" cy="16" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <line x1="14" y1="16" x2="18" y2="16" stroke="#52525b" stroke-width="0.8" />
+  <circle cx="884" cy="16" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <line x1="882" y1="16" x2="886" y2="16" stroke="#52525b" stroke-width="0.8" />
+  <circle cx="16" cy="284" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <line x1="14" y1="284" x2="18" y2="284" stroke="#52525b" stroke-width="0.8" />
+  <circle cx="884" cy="284" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <line x1="882" y1="284" x2="886" y2="284" stroke="#52525b" stroke-width="0.8" />
 
-  <!-- Corner Brackets (HUD Styling) -->
-  <path d="M 16 36 L 16 16 L 36 16" fill="none" stroke="#ff2e43" stroke-width="2.5" />
-  <path d="M 864 36 L 864 16 L 844 16" fill="none" stroke="#ff2e43" stroke-width="2.5" />
-  <path d="M 16 244 L 16 264 L 36 264" fill="none" stroke="#ff2e43" stroke-width="2.5" />
-  <path d="M 864 244 L 864 264 L 844 264" fill="none" stroke="#ff2e43" stroke-width="2.5" />
+  <!-- Top Header Deck -->
+  <g transform="translate(36, 32)">
+    <!-- Hardware Status LED -->
+    <circle class="indicator-led" cx="6" cy="6" r="4" fill="#ff453a" />
+    <circle cx="6" cy="6" r="8" fill="none" stroke="#ff453a" stroke-opacity="0.3" stroke-width="1" />
+    <text x="22" y="10" class="mono" font-size="10" font-weight="600" fill="#f4f4f5" letter-spacing="1.5">UNIT // DHVANI-DSP-911</text>
+    <text x="240" y="10" class="mono" font-size="10" fill="#71717a">SAMPLING: <tspan fill="#d4d4d8">16,000 Hz · 16-BIT PCM</tspan></text>
+    <text x="540" y="10" class="mono" font-size="10" fill="#71717a">LATENT WINDOW: <tspan fill="#d4d4d8">10.0s AST</tspan></text>
+    <text x="750" y="10" class="mono" font-size="10" fill="#34c759">● ONLINE · READY</text>
+  </g>
 
-  <!-- Top Status Bar -->
-  <circle class="rec-dot" cx="36" cy="38" r="4.5" fill="#ff2e43" />
-  <text x="50" y="42" class="hud-text" font-weight="bold">SYSTEM ACTIVE</text>
-  <text x="210" y="42" class="hud-text">GRID: <tspan class="hud-val">ESRI SATELLITE 19x</tspan></text>
-  <text x="440" y="42" class="hud-text">SAMPLING: <tspan class="hud-val">16,000Hz PCM</tspan></text>
-  <text x="680" y="42" class="hud-text">LATENCY: <tspan class="hud-val">&lt; 1.4s</tspan></text>
+  <line x1="32" y1="50" x2="868" y2="50" stroke="#27272a" stroke-width="1" />
 
-  <line x1="26" y1="56" x2="854" y2="56" stroke="rgba(255, 46, 67, 0.2)" stroke-width="1" />
-
-  <!-- Main Hero Brand Title -->
-  <g class="brand-title">
-    <text x="440" y="125" text-anchor="middle" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="52" fill="#ffffff" letter-spacing="8">
-      DHVANI <tspan fill="#ff2e43">·</tspan> ध्वनि
+  <!-- Brand Typography (Swiss Modernist Layout) -->
+  <g transform="translate(36, 75)">
+    <text x="0" y="38" class="sans" font-size="38" font-weight="800" fill="#ffffff" letter-spacing="-0.5">
+      DHVANI <tspan font-weight="300" fill="#ff453a">ध्वनि</tspan>
+    </text>
+    <text x="0" y="58" class="mono" font-size="10.5" font-weight="500" fill="#a1a1aa" letter-spacing="2">
+      COVERT DISTRESS INTELLIGENCE &amp; TACTICAL GEOLOCATION SYSTEM
     </text>
   </g>
 
-  <!-- Subtitle Tagline -->
-  <text x="440" y="158" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" fill="#ff7584" letter-spacing="3.5">
-    AUTONOMOUS EMERGENCY TRIAGE &amp; COVERT DISTRESS INTELLIGENCE
-  </text>
-  <text x="440" y="180" text-anchor="middle" font-family="'Inter', sans-serif" font-size="12" fill="#8b949e">
-    Decoding hidden distress in disguised emergency calls with real-time acoustic neural forensics
-  </text>
+  <!-- Embedded Precision Oscilloscope Screen -->
+  <g class="screen-glow" transform="translate(36, 145)">
+    <!-- Screen Frame -->
+    <rect width="828" height="115" rx="8" fill="url(#scopeGrad)" stroke="#27272a" stroke-width="1.2" />
+    <!-- Grid Overlay -->
+    <rect width="828" height="115" rx="8" fill="url(#dotGrid)" />
 
-  <!-- Live Animated Equalizer Waveform Bars -->
-  <g transform="translate(240, 245)">
-    <rect class="w-bar" style="animation-delay: 0.1s" x="0" y="-30" width="4" height="24" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.4s" x="12" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.2s" x="24" y="-30" width="4" height="34" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.7s" x="36" y="-30" width="4" height="12" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.3s" x="48" y="-30" width="4" height="42" rx="2" fill="#ff6b6b" />
-    <rect class="w-bar" style="animation-delay: 0.5s" x="60" y="-30" width="4" height="28" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.9s" x="72" y="-30" width="4" height="16" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.2s" x="84" y="-30" width="4" height="38" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.6s" x="96" y="-30" width="4" height="22" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.1s" x="108" y="-30" width="4" height="32" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.8s" x="120" y="-30" width="4" height="14" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.3s" x="132" y="-30" width="4" height="40" rx="2" fill="#ff6b6b" />
-    <rect class="w-bar" style="animation-delay: 0.5s" x="144" y="-30" width="4" height="26" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.2s" x="156" y="-30" width="4" height="36" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.7s" x="168" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.4s" x="180" y="-30" width="4" height="30" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.6s" x="192" y="-30" width="4" height="20" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.1s" x="204" y="-30" width="4" height="44" rx="2" fill="#ff6b6b" />
-    <rect class="w-bar" style="animation-delay: 0.8s" x="216" y="-30" width="4" height="15" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.3s" x="228" y="-30" width="4" height="35" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.5s" x="240" y="-30" width="4" height="25" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.9s" x="252" y="-30" width="4" height="12" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.2s" x="264" y="-30" width="4" height="38" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.4s" x="276" y="-30" width="4" height="22" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.7s" x="288" y="-30" width="4" height="16" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.1s" x="300" y="-30" width="4" height="42" rx="2" fill="#ff6b6b" />
-    <rect class="w-bar" style="animation-delay: 0.5s" x="312" y="-30" width="4" height="28" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.3s" x="324" y="-30" width="4" height="36" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.8s" x="336" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.2s" x="348" y="-30" width="4" height="30" rx="2" fill="#ff4d5e" />
-    <rect class="w-bar" style="animation-delay: 0.6s" x="360" y="-30" width="4" height="24" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.4s" x="372" y="-30" width="4" height="38" rx="2" fill="#ff6b6b" />
-    <rect class="w-bar" style="animation-delay: 0.1s" x="384" y="-30" width="4" height="20" rx="2" fill="#ff2e43" />
-    <rect class="w-bar" style="animation-delay: 0.7s" x="396" y="-30" width="4" height="34" rx="2" fill="#ff4d5e" />
+    <!-- Calibration Hairlines -->
+    <line x1="0" y1="57.5" x2="828" y2="57.5" stroke="#1f242d" stroke-width="1" />
+    <line x1="207" y1="0" x2="207" y2="115" stroke="#1f242d" stroke-width="0.8" stroke-dasharray="2 4" />
+    <line x1="414" y1="0" x2="414" y2="115" stroke="#1f242d" stroke-width="0.8" stroke-dasharray="2 4" />
+    <line x1="621" y1="0" x2="621" y2="115" stroke="#1f242d" stroke-width="0.8" stroke-dasharray="2 4" />
+
+    <!-- Screen Scale Legend -->
+    <text x="12" y="16" class="mono" font-size="8.5" fill="#52525b">+12 dBFS</text>
+    <text x="12" y="60" class="mono" font-size="8.5" fill="#71717a">0 dBFS (REF)</text>
+    <text x="12" y="104" class="mono" font-size="8.5" fill="#52525b">-48 dBFS</text>
+
+    <text x="212" y="16" class="mono" font-size="8" fill="#52525b">100 Hz</text>
+    <text x="419" y="16" class="mono" font-size="8" fill="#52525b">1.0 kHz</text>
+    <text x="626" y="16" class="mono" font-size="8" fill="#52525b">8.0 kHz</text>
+    <text x="770" y="16" class="mono" font-size="8" fill="#ff9f0a">16.0 kHz NYQ</text>
+
+    <!-- Secondary Harmonic Waveform (Subtle Golden Sine Envelope) -->
+    <path class="wave-secondary" d="
+      M 0 57.5 
+      Q 50 42, 100 57.5 T 200 57.5 T 300 57.5 T 400 57.5 T 500 57.5 T 600 57.5 T 700 57.5 T 828 57.5
+      M 828 57.5 
+      Q 778 72, 728 57.5 T 628 57.5 T 528 57.5 T 428 57.5 T 328 57.5 T 228 57.5 T 128 57.5 T 0 57.5
+    " fill="none" stroke="url(#waveAmber)" stroke-width="1.6" />
+
+    <!-- Primary Complex Harmonic Waveform (Vocal Distress Signature) -->
+    <path class="wave-primary" d="
+      M 0 57.5
+      C 40 57.5, 60 20, 100 20
+      C 130 20, 150 92, 190 92
+      C 230 92, 250 35, 290 35
+      C 320 35, 340 78, 380 78
+      C 420 78, 440 28, 480 28
+      C 510 28, 530 84, 570 84
+      C 610 84, 630 38, 670 38
+      C 710 38, 730 72, 770 72
+      C 800 72, 815 57.5, 828 57.5
+      C 840 57.5, 860 20, 900 20
+      C 930 20, 950 92, 990 92
+      C 1030 92, 1050 35, 1090 35
+    " fill="none" stroke="url(#waveVermillion)" stroke-width="2.2" stroke-linecap="round" />
+
+    <!-- Live Telemetry Tag (Bottom Right inside Scope) -->
+    <rect x="670" y="86" width="146" height="20" rx="4" fill="#18181b" stroke="#3f3f46" stroke-width="0.8" />
+    <circle cx="682" cy="96" r="3" fill="#34c759" />
+    <text x="692" y="99" class="mono" font-size="8.5" font-weight="600" fill="#e4e4e7">SPEECH DETECTED: 98%</text>
   </g>
 
-  <!-- Live Pulse Waves Bottom Border -->
-  <line x1="26" y1="220" x2="854" y2="220" stroke="rgba(255, 46, 67, 0.15)" stroke-width="1" />
-  <text x="36" y="248" class="hud-text">PIPELINE: <tspan fill="#e6edf3">WHISPER ASR + MIT AUDIOSET + ESRI SAT</tspan></text>
-  <text x="844" y="248" text-anchor="end" class="hud-text">TACTICAL BUILD: <tspan class="hud-val">v1.0.0-PROD</tspan></text>
+  <!-- Bottom Calibrated Metadata Strip -->
+  <g transform="translate(36, 282)">
+    <text x="0" y="0" class="mono" font-size="8.5" fill="#52525b">ARCHITECTURE: TRANSFORMER-ASR // AUDIOSET-AST // WAV2VEC2 // ESRI-SAT</text>
+    <text x="828" y="0" text-anchor="end" class="mono" font-size="8.5" fill="#71717a">AUTONOMOUS DISPATCH LATENCY: <tspan fill="#ff453a" font-weight="bold">1.4 SECONDS</tspan></text>
+  </g>
 </svg>

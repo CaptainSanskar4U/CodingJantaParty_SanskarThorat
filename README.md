@@ -7,7 +7,7 @@
 
 <!-- LIVE TYPING EFFECT -->
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=16&pause=1200&color=FF2E43&center=true&vCenter=true&width=750&lines=🚨+Decoding+Covert+Distress+Signals+in+Under+1.4s...;🛰️+Pinpointing+Spoken+Landmarks+on+Esri+Level-19+Satellite...;🧠+MIT+AudioSet+Neural+Acoustic+Event+Classification...;⚖️+Generating+Court-Admissible+Cryptographic+Evidence+Dossiers..." alt="Live HUD Telemetry" />
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=14&pause=1400&color=FF453A&center=true&vCenter=true&width=840&lines=%5BTELEMETRY%5D+AUTONOMOUSLY+DECODING+COVERT+DISTRESS+CALLS+%5B%3C1.4s%5D;%5BACOUSTICS%5D+MIT+AUDIOSET+AST+%2B+WAV2VEC2+F0+TREMOR+CLASSIFICATION;%5BSATELLITE%5D+ESRI+LEVEL-19+GROUND+RESOLVER+%5B0.3m%2FPIXEL+TACTICAL+GRID%5D;%5BFORENSICS%5D+SHA-256+BIT-PERFECT+AUDIT+CHAIN+FOR+LEGAL+COURT+DOSSIERS..." alt="Live HUD Telemetry" />
 </p>
 
 ---
