@@ -1,87 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="1200" height="480">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420">
   <defs>
     <!-- ══════════════════════════════════════════════════════════════════════
-         DHVANI (ध्वनि) — CINEMATIC ACOUSTIC INTELLIGENCE &amp; FORENSIC GRID
-         Hollywood Anamorphic VFX / High-Tech Acoustic Telemetry Masterwork
-         100% SVG 1.1 / W3C &amp; GitHub Camo Compliant
+         DHAVLI · धवली (DHVANI ध्वनि)
+         Acoustic Intelligence & Autonomous Forensic Triage Grid
+         Minimalist Cinemascope 2.39:1 Presentation — 100% Vector & High-FPS
          ══════════════════════════════════════════════════════════════════════ -->
 
-    <!-- BACKGROUND: Deep cinematic anamorphic void -->
-    <radialGradient id="cinemaVoid" cx="50%" cy="50%" r="75%">
-      <stop offset="0%"   stop-color="#0c121e"/>
-      <stop offset="45%"  stop-color="#05080f"/>
+    <!-- BACKGROUND: Deep obsidian velvet cinema space -->
+    <radialGradient id="deepSpace" cx="50%" cy="50%" r="70%">
+      <stop offset="0%"   stop-color="#0b101b"/>
+      <stop offset="50%"  stop-color="#05070d"/>
       <stop offset="100%" stop-color="#020306"/>
     </radialGradient>
 
-    <!-- ANAMORPHIC FLARE GRADIENT: Electric photonic blue to core white -->
-    <linearGradient id="flareStreak" x1="0%" y1="0%" x2="100%" y2="0%">
+    <!-- ANAMORPHIC OPTICAL STREAK (Panavision Blue to Core Laser White) -->
+    <linearGradient id="anamorphicStreak" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%"   stop-color="#00d2ff" stop-opacity="0"/>
-      <stop offset="25%"  stop-color="#00d2ff" stop-opacity="0.4"/>
-      <stop offset="48%"  stop-color="#80e5ff" stop-opacity="0.95"/>
+      <stop offset="30%"  stop-color="#00d2ff" stop-opacity="0.35"/>
+      <stop offset="49%"  stop-color="#80e5ff" stop-opacity="0.95"/>
       <stop offset="50%"  stop-color="#ffffff" stop-opacity="1.0"/>
-      <stop offset="52%"  stop-color="#80e5ff" stop-opacity="0.95"/>
-      <stop offset="75%"  stop-color="#0066cc" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#002244" stop-opacity="0"/>
+      <stop offset="51%"  stop-color="#80e5ff" stop-opacity="0.95"/>
+      <stop offset="70%"  stop-color="#0055bb" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#001833" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- TITANIUM SPECULAR: Monolithic metal gradient for DHVANI -->
-    <linearGradient id="titaniumMetal" x1="0%" y1="0%" x2="0%" y2="100%">
+    <!-- TITANIUM SPECULAR: Monolithic metal gradient for DHAVLI -->
+    <linearGradient id="titaniumSpec" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%"   stop-color="#ffffff"/>
-      <stop offset="25%"  stop-color="#e2e8f0"/>
-      <stop offset="50%"  stop-color="#8a99ad"/>
-      <stop offset="52%"  stop-color="#3d4959"/>
-      <stop offset="80%"  stop-color="#64748b"/>
+      <stop offset="28%"  stop-color="#e2e8f0"/>
+      <stop offset="50%"  stop-color="#94a3b8"/>
+      <stop offset="52%"  stop-color="#475569"/>
+      <stop offset="82%"  stop-color="#64748b"/>
       <stop offset="100%" stop-color="#1e293b"/>
     </linearGradient>
 
-    <!-- DEVANAGARI INCANDESCENT GLOW: Radiant gold into hyper-luminescent amber -->
-    <linearGradient id="devaFlame" x1="0%" y1="0%" x2="0%" y2="100%">
+    <!-- DEVANAGARI INCANDESCENT GLOW: Pure gold-amber luminescence -->
+    <linearGradient id="devaGold" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%"   stop-color="#ffffff"/>
-      <stop offset="25%"  stop-color="#ffe4b8"/>
-      <stop offset="55%"  stop-color="#ff9933"/>
-      <stop offset="85%"  stop-color="#ff3b30"/>
-      <stop offset="100%" stop-color="#8a1010"/>
+      <stop offset="30%"  stop-color="#ffe6b8"/>
+      <stop offset="65%"  stop-color="#ff9933"/>
+      <stop offset="90%"  stop-color="#ff3b30"/>
+      <stop offset="100%" stop-color="#8c1010"/>
     </linearGradient>
 
     <!-- ACOUSTIC WAVE GLOW GRADIENT -->
-    <linearGradient id="waveEnergy" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="waveRibbon" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%"   stop-color="#00f0ff" stop-opacity="0"/>
-      <stop offset="20%"  stop-color="#00f0ff" stop-opacity="0.7"/>
-      <stop offset="45%"  stop-color="#ff3344" stop-opacity="0.95"/>
-      <stop offset="55%"  stop-color="#ffb844" stop-opacity="0.95"/>
-      <stop offset="80%"  stop-color="#00f0ff" stop-opacity="0.7"/>
+      <stop offset="20%"  stop-color="#00f0ff" stop-opacity="0.5"/>
+      <stop offset="48%"  stop-color="#ff3344" stop-opacity="0.95"/>
+      <stop offset="52%"  stop-color="#ffaa33" stop-opacity="0.95"/>
+      <stop offset="80%"  stop-color="#00f0ff" stop-opacity="0.5"/>
       <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- SPECTROGRAPH BAR GRADIENT -->
-    <linearGradient id="spectroGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%"   stop-color="#004466" stop-opacity="0.7"/>
-      <stop offset="55%"  stop-color="#00d2ff" stop-opacity="0.9"/>
-      <stop offset="80%"  stop-color="#ffb844" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#ff3344" stop-opacity="1.0"/>
-    </linearGradient>
-
-    <!-- CRT SCANLINE RASTER PATTERN -->
-    <pattern id="scanlines" width="100" height="4" patternUnits="userSpaceOnUse">
-      <line x1="0" y1="0" x2="100" y2="0" stroke="#000000" stroke-width="1.2" opacity="0.4"/>
-    </pattern>
-
-    <!-- OPTICAL GRID PATTERN -->
-    <pattern id="opticalGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#142032" stroke-width="0.5" opacity="0.45"/>
-      <circle cx="0" cy="0" r="0.8" fill="#00d2ff" opacity="0.25"/>
-    </pattern>
-
-    <!-- ROBUST VOLUMETRIC GLOW FILTERS (Cross-Browser Verified) -->
-    <filter id="hyperGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="6" in="SourceGraphic" result="blur"/>
+    <!-- VOLUMETRIC GLOW FILTER -->
+    <filter id="vectorGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" in="SourceGraphic" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
 
-    <filter id="softAura" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="softHalo" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="16" in="SourceGraphic" result="aura"/>
       <feMerge>
         <feMergeNode in="aura"/>
@@ -91,111 +72,54 @@
 
     <style><![CDATA[
       /* ══════════════════════════════════════════════════════════════════
-         HOLLYWOOD CINEMATIC ANIMATIONS — CO-PRIME DYNAMIC CYCLES
+         MINIMALIST HIGH-PRECISION MOTION DESIGN (60FPS HARDWARE ACCELERATED)
          ══════════════════════════════════════════════════════════════════ */
 
       /* 1. PANAVISION ANAMORPHIC FLARE SWEEP */
-      @keyframes flareGlide {
-        0%   { transform: translateX(-600px); opacity: 0; }
+      @keyframes flareSweep {
+        0%   { transform: translateX(-580px); opacity: 0; }
         15%  { opacity: 0.95; }
         50%  { transform: translateX(0px); opacity: 1; }
         85%  { opacity: 0.95; }
-        100% { transform: translateX(600px); opacity: 0; }
+        100% { transform: translateX(580px); opacity: 0; }
       }
 
-      /* 2. ATMOSPHERIC HALO PULSE */
-      @keyframes haloBreathe {
-        0%, 100% { opacity: 0.16; transform: scale(0.98); }
-        50%      { opacity: 0.32; transform: scale(1.04); }
+      /* 2. ATMOSPHERIC PULSE */
+      @keyframes atmoBreathe {
+        0%, 100% { opacity: 0.18; transform: scale(0.98); }
+        50%      { opacity: 0.34; transform: scale(1.03); }
       }
 
-      /* 3. LISSAJOUS PHASE SCOPE ROTATION & DRIFT */
-      @keyframes phaseSpin {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      @keyframes lissajousMorph {
-        0%, 100% { stroke-dashoffset: 0; opacity: 0.85; }
-        50%      { stroke-dashoffset: 140; opacity: 0.45; }
-      }
-
-      /* 4. RADAR AZIMUTH SWEEPER */
-      @keyframes radarSweep {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      /* 5. ORGANIC FLUID WAVE OSCILLATION */
-      @keyframes waveDrift1 {
+      /* 3. FLUID HARMONIC ACOUSTIC WAVEFLOW */
+      @keyframes waveScroll1 {
         0%   { transform: translateX(0px); }
-        100% { transform: translateX(-480px); }
+        100% { transform: translateX(-400px); }
       }
-      @keyframes waveDrift2 {
+      @keyframes waveScroll2 {
         0%   { transform: translateX(0px); }
-        100% { transform: translateX(-320px); }
+        100% { transform: translateX(-280px); }
       }
 
-      /* 6. SPECTROGRAPH AUDIO CHANNELS (ScaleY from Base) */
-      @keyframes scaleEq1  { 0%,100%{transform:scaleY(0.35)} 50%{transform:scaleY(0.95)} }
-      @keyframes scaleEq2  { 0%,100%{transform:scaleY(0.50)} 40%{transform:scaleY(1.00)} 80%{transform:scaleY(0.30)} }
-      @keyframes scaleEq3  { 0%,100%{transform:scaleY(0.75)} 30%{transform:scaleY(0.35)} 70%{transform:scaleY(0.98)} }
-      @keyframes scaleEq4  { 0%,100%{transform:scaleY(0.40)} 60%{transform:scaleY(0.88)} }
-      @keyframes scaleEq5  { 0%,100%{transform:scaleY(0.90)} 45%{transform:scaleY(0.25)} }
-      @keyframes scaleEq6  { 0%,100%{transform:scaleY(0.38)} 55%{transform:scaleY(0.85)} }
-      @keyframes scaleEq7  { 0%,100%{transform:scaleY(0.65)} 35%{transform:scaleY(1.00)} }
-      @keyframes scaleEq8  { 0%,100%{transform:scaleY(0.45)} 65%{transform:scaleY(0.28)} }
-      @keyframes scaleEq9  { 0%,100%{transform:scaleY(0.92)} 25%{transform:scaleY(0.55)} 75%{transform:scaleY(1.00)} }
-      @keyframes scaleEq10 { 0%,100%{transform:scaleY(0.42)} 50%{transform:scaleY(0.85)} }
-
-      /* 7. CINEMATIC RETICLE & METRIC PULSE */
-      @keyframes livePulse {
+      /* 4. LIVE TELEMETRY PULSE */
+      @keyframes liveDot {
         0%, 100% { opacity: 1; transform: scale(1); }
-        50%      { opacity: 0.35; transform: scale(1.35); }
-      }
-      @keyframes telemetryGlitch {
-        0%, 93%, 100% { opacity: 0.9; transform: translateX(0); }
-        94%           { opacity: 0.4; transform: translateX(2px); }
-        96%           { opacity: 1.0; transform: translateX(-1px); }
+        50%      { opacity: 0.3; transform: scale(1.4); }
       }
 
-      /* 8. PARTICULATE DRIFT IN CINEMA LIGHT BEAM */
-      @keyframes dustDriftA {
+      /* 5. AMBIENT DRIFT PARTICLES */
+      @keyframes moteDrift {
         0%   { transform: translate(0, 0); opacity: 0; }
-        20%  { opacity: 0.6; }
-        80%  { opacity: 0.4; }
-        100% { transform: translate(45px, -60px); opacity: 0; }
-      }
-      @keyframes dustDriftB {
-        0%   { transform: translate(0, 0); opacity: 0; }
-        25%  { opacity: 0.5; }
-        75%  { opacity: 0.3; }
-        100% { transform: translate(-35px, -75px); opacity: 0; }
+        25%  { opacity: 0.55; }
+        75%  { opacity: 0.35; }
+        100% { transform: translate(35px, -50px); opacity: 0; }
       }
 
-      /* CLASS MAPPINGS */
-      .anim-flare     { animation: flareGlide 6.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-      .anim-halo      { animation: haloBreathe 5.2s ease-in-out infinite; transform-origin: 600px 220px; }
-      .anim-spin-slow { animation: phaseSpin 24s linear infinite; transform-origin: 150px 230px; }
-      .anim-radar     { animation: radarSweep 4.2s linear infinite; transform-origin: 150px 230px; }
-      .anim-lissajous { animation: lissajousMorph 6.7s ease-in-out infinite; }
-      .anim-wave1     { animation: waveDrift1 8.9s linear infinite; }
-      .anim-wave2     { animation: waveDrift2 6.1s linear infinite; }
-      .anim-live      { animation: livePulse 1.8s ease-in-out infinite; transform-origin: 48px 42px; }
-      .anim-tele      { animation: telemetryGlitch 7.3s steps(1) infinite; }
-      .anim-dust-a    { animation: dustDriftA 9.4s ease-out infinite; }
-      .anim-dust-b    { animation: dustDriftB 11.8s ease-out infinite; }
-
-      /* EQ BARS (transform-origin at baseline y=280) */
-      .b1 { animation: scaleEq1 1.4s ease-in-out infinite; transform-origin: 1003px 280px; }
-      .b2 { animation: scaleEq2 1.8s ease-in-out infinite; transform-origin: 1017px 280px; }
-      .b3 { animation: scaleEq3 1.2s ease-in-out infinite; transform-origin: 1031px 280px; }
-      .b4 { animation: scaleEq4 2.1s ease-in-out infinite; transform-origin: 1045px 280px; }
-      .b5 { animation: scaleEq5 1.6s ease-in-out infinite; transform-origin: 1059px 280px; }
-      .b6 { animation: scaleEq6 1.9s ease-in-out infinite; transform-origin: 1073px 280px; }
-      .b7 { animation: scaleEq7 1.3s ease-in-out infinite; transform-origin: 1087px 280px; }
-      .b8 { animation: scaleEq8 2.3s ease-in-out infinite; transform-origin: 1101px 280px; }
-      .b9 { animation: scaleEq9 1.5s ease-in-out infinite; transform-origin: 1115px 280px; }
-      .b10{ animation: scaleEq10 1.7s ease-in-out infinite; transform-origin: 1129px 280px; }
+      .anim-flare   { animation: flareSweep 6.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .anim-halo    { animation: atmoBreathe 5.4s ease-in-out infinite; transform-origin: 600px 200px; }
+      .anim-wave1   { animation: waveScroll1 8.2s linear infinite; }
+      .anim-wave2   { animation: waveScroll2 5.8s linear infinite; }
+      .anim-live    { animation: liveDot 1.8s ease-in-out infinite; transform-origin: 48px 40px; }
+      .anim-mote    { animation: moteDrift 8.6s ease-out infinite; }
 
       text {
         font-synthesis: none;
@@ -206,335 +130,213 @@
   </defs>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 0: CINEMATIC ANAMORPHIC LETTERBOX CANVAS
+       LAYER 0: CINEMATIC LETTERBOX BASE
        ══════════════════════════════════════════════════════════════════ -->
-  <rect width="1200" height="480" fill="url(#cinemaVoid)"/>
-  <rect width="1200" height="480" fill="url(#opticalGrid)"/>
+  <rect width="1200" height="420" fill="url(#deepSpace)"/>
+
+  <!-- Subtle Anamorphic Matte Lines (Top & Bottom Edge) -->
+  <line x1="0" y1="1" x2="1200" y2="1" stroke="#00f0ff" stroke-width="0.75" opacity="0.3"/>
+  <line x1="0" y1="419" x2="1200" y2="419" stroke="#00f0ff" stroke-width="0.75" opacity="0.3"/>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 1: VOLUMETRIC BACKGROUND ATMOSPHERE &amp; LIGHTING
+       LAYER 1: VOLUMETRIC ATMOSPHERE & FLARE
        ══════════════════════════════════════════════════════════════════ -->
-  <!-- Deep Sapphire/Crimson Center Ambient Glow -->
   <g class="anim-halo">
-    <ellipse cx="600" cy="220" rx="380" ry="120" fill="#003b6f" opacity="0.22" filter="url(#softAura)"/>
-    <ellipse cx="600" cy="220" rx="220" ry="80"  fill="#a81a28" opacity="0.18" filter="url(#softAura)"/>
+    <ellipse cx="600" cy="195" rx="340" ry="90" fill="#003b6f" opacity="0.22" filter="url(#softHalo)"/>
+    <ellipse cx="600" cy="195" rx="180" ry="60" fill="#991522" opacity="0.20" filter="url(#softHalo)"/>
   </g>
 
-  <!-- Horizontal Anamorphic Optical Flare Beam (Sweeping) -->
-  <g transform="translate(600, 225)">
+  <!-- Anamorphic Lens Flare Beam (Sweeps continuously across title) -->
+  <g transform="translate(600, 205)">
     <g class="anim-flare">
-      <!-- Intense horizontal core streak -->
-      <line x1="-360" y1="0" x2="360" y2="0" stroke="url(#flareStreak)" stroke-width="2.5" opacity="0.95"/>
-      <ellipse cx="0" cy="0" rx="140" ry="3.5" fill="url(#flareStreak)" opacity="0.7"/>
-      <circle cx="0" cy="0" r="4.5" fill="#ffffff" filter="url(#hyperGlow)"/>
+      <line x1="-320" y1="0" x2="320" y2="0" stroke="url(#anamorphicStreak)" stroke-width="2.2" opacity="0.95"/>
+      <ellipse cx="0" cy="0" rx="120" ry="3.0" fill="url(#anamorphicStreak)" opacity="0.7"/>
+      <circle cx="0" cy="0" r="4.0" fill="#ffffff" filter="url(#vectorGlow)"/>
     </g>
   </g>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 2: LEFT TACTICAL FLANK — ACOUSTIC PHASE SCOPE &amp; TDOA AZIMUTH
+       LAYER 2: MINIMALIST TACTICAL FRAME & GROUND-GLASS RETICLES
        ══════════════════════════════════════════════════════════════════ -->
-  <g transform="translate(10, 0)">
-    <!-- Scope Outer Bezel &amp; Milliradian Ticks -->
-    <circle cx="150" cy="230" r="76" fill="#03060c" stroke="#1c2d44" stroke-width="1.2" opacity="0.85"/>
-    <circle cx="150" cy="230" r="70" fill="none" stroke="#00f0ff" stroke-width="0.8" stroke-dasharray="2 6" opacity="0.35"/>
-    <circle cx="150" cy="230" r="48" fill="none" stroke="#16263b" stroke-width="0.6"/>
-    <circle cx="150" cy="230" r="26" fill="none" stroke="#16263b" stroke-width="0.6"/>
+  <!-- Outer Chamfered Border -->
+  <rect x="24" y="20" width="1152" height="380" rx="4" fill="none" stroke="#162232" stroke-width="1.0"/>
 
-    <!-- Crosshair Axes -->
-    <line x1="68" y1="230" x2="232" y2="230" stroke="#1c2d44" stroke-width="0.7" stroke-dasharray="4 4"/>
-    <line x1="150" y1="148" x2="150" y2="312" stroke="#1c2d44" stroke-width="0.7" stroke-dasharray="4 4"/>
-
-    <!-- Rotating Radar Triangulation Vector -->
-    <g class="anim-radar">
-      <line x1="150" y1="230" x2="150" y2="158" stroke="#00f0ff" stroke-width="1.6" opacity="0.8" filter="url(#hyperGlow)"/>
-      <polygon points="150,230 144,170 156,170" fill="#00f0ff" opacity="0.12"/>
-    </g>
-
-    <!-- Dynamic Lissajous Acoustic Phase Scope (Harmonic 3:2 Stereo Correlation) -->
-    <g class="anim-spin-slow">
-      <path d="M 150,195 
-               C 178,195 188,212 188,230 
-               C 188,248 178,265 150,265 
-               C 122,265 112,248 112,230 
-               C 112,212 122,195 150,195 Z
-               M 125,205 
-               C 142,218 158,242 175,255
-               M 175,205 
-               C 158,218 142,242 125,255"
-            fill="none" stroke="#00f0ff" stroke-width="1.4" stroke-linecap="round"
-            stroke-dasharray="160" class="anim-lissajous" filter="url(#hyperGlow)" opacity="0.75"/>
-    </g>
-
-    <!-- Scope Telemetry Labels -->
-    <text x="150" y="142" font-family="'Courier New', monospace" font-size="8.5" fill="#00d2ff" opacity="0.75" text-anchor="middle" letter-spacing="1.5">DOA BEARING: 142.8°</text>
-    <text x="150" y="324" font-family="'Courier New', monospace" font-size="8" fill="#88a0b8" opacity="0.65" text-anchor="middle" letter-spacing="1">TDOA: Δt = 12.4ms [LOCK]</text>
-    <text x="150" y="338" font-family="'Courier New', monospace" font-size="7.5" fill="#ff4455" opacity="0.9" text-anchor="middle" letter-spacing="1.5">ACOUSTIC TRIANGULATION</text>
+  <!-- Corner Registration Crosshairs (Camera Optical Markers) -->
+  <g stroke="#00d2ff" stroke-width="1.5" opacity="0.75">
+    <!-- Top-Left Cross -->
+    <line x1="38" y1="34" x2="52" y2="34"/>
+    <line x1="45" y1="27" x2="45" y2="41"/>
+    <!-- Top-Right Cross -->
+    <line x1="1148" y1="34" x2="1162" y2="34"/>
+    <line x1="1155" y1="27" x2="1155" y2="41"/>
+    <!-- Bottom-Left Cross -->
+    <line x1="38" y1="386" x2="52" y2="386"/>
+    <line x1="45" y1="379" x2="45" y2="393"/>
+    <!-- Bottom-Right Cross -->
+    <line x1="1148" y1="386" x2="1162" y2="386"/>
+    <line x1="1155" y1="379" x2="1155" y2="393"/>
   </g>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 3: RIGHT TACTICAL FLANK — MULTI-BAND SPECTROGRAPHIC TELEMETRY
+       LAYER 3: CORE BRAND TYPOGRAPHY — DHAVLI · धवली (DHVANI)
        ══════════════════════════════════════════════════════════════════ -->
-  <g transform="translate(15, 0)">
-    <!-- Spectrograph Bezel Box -->
-    <rect x="980" y="152" width="168" height="156" rx="4" fill="#03060c" stroke="#1c2d44" stroke-width="1.2" opacity="0.85"/>
-    
-    <!-- Grid Reference Lines -->
-    <line x1="990" y1="180" x2="1138" y2="180" stroke="#16263b" stroke-width="0.6" stroke-dasharray="2 3"/>
-    <line x1="990" y1="210" x2="1138" y2="210" stroke="#16263b" stroke-width="0.6" stroke-dasharray="2 3"/>
-    <line x1="990" y1="240" x2="1138" y2="240" stroke="#16263b" stroke-width="0.6" stroke-dasharray="2 3"/>
-    <line x1="990" y1="270" x2="1138" y2="270" stroke="#16263b" stroke-width="0.6" stroke-dasharray="2 3"/>
 
-    <!-- dB Axis Markers -->
-    <text x="986" y="174" font-family="'Courier New', monospace" font-size="6.5" fill="#ff4455" opacity="0.75" text-anchor="end">0dB</text>
-    <text x="986" y="213" font-family="'Courier New', monospace" font-size="6.5" fill="#88a0b8" opacity="0.5" text-anchor="end">-18dB</text>
-    <text x="986" y="273" font-family="'Courier New', monospace" font-size="6.5" fill="#88a0b8" opacity="0.5" text-anchor="end">-42dB</text>
-
-    <!-- Base track line -->
-    <line x1="996" y1="280" x2="1132" y2="280" stroke="#223650" stroke-width="1.2"/>
-
-    <!-- 10 Live Spectrographic Energy Channels (20Hz - 16kHz) -->
-    <!-- Each bar is explicitly defined with x, y, width, height, and scales from bottom -->
-    <rect x="999"  y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b1"/>
-    <rect x="1013" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b2"/>
-    <rect x="1027" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b3"/>
-    <rect x="1041" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b4"/>
-    <rect x="1055" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b5"/>
-    <rect x="1069" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b6"/>
-    <rect x="1083" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b7"/>
-    <rect x="1097" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b8"/>
-    <rect x="1111" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b9"/>
-    <rect x="1125" y="200" width="8" height="80" rx="2" fill="url(#spectroGrad)" class="b10"/>
-
-    <!-- Frequency Band Callouts -->
-    <text x="1000" y="295" font-family="'Courier New', monospace" font-size="7" fill="#68809a" text-anchor="middle">20Hz</text>
-    <text x="1064" y="295" font-family="'Courier New', monospace" font-size="7" fill="#68809a" text-anchor="middle">1.2kHz</text>
-    <text x="1128" y="295" font-family="'Courier New', monospace" font-size="7" fill="#68809a" text-anchor="middle">16kHz</text>
-
-    <!-- Telemetry Header &amp; Forensic Classification -->
-    <text x="1064" y="142" font-family="'Courier New', monospace" font-size="8.5" fill="#00d2ff" opacity="0.8" text-anchor="middle" letter-spacing="1.5">SPECTROGRAM / FFT</text>
-    <text x="1064" y="324" font-family="'Courier New', monospace" font-size="8" fill="#ffb844" opacity="0.9" text-anchor="middle" letter-spacing="1">DISTRESS SIGNATURE: 94.2%</text>
-    <text x="1064" y="338" font-family="'Courier New', monospace" font-size="7.5" fill="#88a0b8" opacity="0.65" text-anchor="middle" letter-spacing="1.5">BAND: 300-3400Hz VOCAL</text>
+  <!-- Top Acoustic Caliper Marks -->
+  <g stroke="#ff3b30" stroke-width="0.8" opacity="0.7">
+    <line x1="430" y1="105" x2="480" y2="105"/>
+    <line x1="720" y1="105" x2="770" y2="105"/>
+    <circle cx="600" cy="105" r="2.2" fill="#ff3b30"/>
   </g>
 
+  <!-- Sacred Devanagari Illuminated Script: धवली · ध्वनि -->
+  <!-- Subtle Amber Halo -->
+  <text x="600" y="168"
+        text-anchor="middle"
+        font-family="'Noto Sans Devanagari','Mukta','Tiro Devanagari Hindi','Arial Unicode MS',sans-serif"
+        font-size="78" font-weight="900" letter-spacing="6"
+        fill="#ff3b30" opacity="0.32" filter="url(#vectorGlow)">धवली  ·  ध्वनि</text>
+
+  <!-- Incandescent Core Vector -->
+  <text x="600" y="168"
+        text-anchor="middle"
+        font-family="'Noto Sans Devanagari','Mukta','Tiro Devanagari Hindi','Arial Unicode MS',sans-serif"
+        font-size="78" font-weight="900" letter-spacing="6"
+        fill="url(#devaGold)">धवली  ·  ध्वनि</text>
+
+  <!-- Precision Optical Caliper Brackets -->
+  <text x="340" y="156" font-family="'Courier New', monospace" font-size="16" fill="#00d2ff" opacity="0.85" font-weight="bold">「</text>
+  <text x="850" y="156" font-family="'Courier New', monospace" font-size="16" fill="#00d2ff" opacity="0.85" font-weight="bold">」</text>
+
+  <!-- Monolithic English Wordmark: DHAVLI -->
+  <!-- Deep Drop Shadow -->
+  <text x="600" y="238"
+        text-anchor="middle"
+        font-family="'Cinzel','Trajan Pro','Eurostile','Helvetica Neue','Arial Black',sans-serif"
+        font-size="56" font-weight="900" letter-spacing="26"
+        fill="#030508" opacity="0.95">DHAVLI</text>
+
+  <!-- Specular Titanium Finish -->
+  <text x="600" y="238"
+        text-anchor="middle"
+        font-family="'Cinzel','Trajan Pro','Eurostile','Helvetica Neue','Arial Black',sans-serif"
+        font-size="56" font-weight="900" letter-spacing="26"
+        fill="url(#titaniumSpec)">DHAVLI</text>
+
+  <!-- Subtitle Hairline Accent -->
+  <line x1="380" y1="262" x2="820" y2="262" stroke="#16263b" stroke-width="1.0"/>
+  <line x1="450" y1="262" x2="750" y2="262" stroke="#00f0ff" stroke-width="1.4" opacity="0.85" filter="url(#vectorGlow)"/>
+
+  <!-- Subtitle Designation -->
+  <text x="600" y="286"
+        text-anchor="middle"
+        font-family="'Courier New', Courier, monospace"
+        font-size="12" font-weight="700" letter-spacing="6"
+        fill="#e2e8f0" opacity="0.95">AUTONOMOUS ACOUSTIC INTELLIGENCE GRID</text>
+
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 4: LIVING MULTI-HARMONIC ACOUSTIC WAVEFORM (CENTER CANVAS)
+       LAYER 4: LIVING ACOUSTIC HARMONIC WAVE RIBBON
        ══════════════════════════════════════════════════════════════════ -->
-  <g clip-path="url(#centerWaveClip)" opacity="0.85">
-    <!-- Wave 1: Complex Fundamental + Harmonic Burst (Seamless 480px cycle) -->
+  <g clip-path="url(#waveClip)" opacity="0.85">
+    <!-- Primary Transient Soundwave (Seamless 400px loop) -->
     <g class="anim-wave1">
-      <path d="M 0,240 
-               Q 20,228 40,240 T 80,240 T 120,240 
-               Q 135,210 150,240 Q 165,270 180,240 
-               Q 195,185 210,240 Q 225,295 240,240 
-               Q 250,215 260,240 Q 270,265 280,240 
-               Q 295,230 310,240 T 350,240 T 390,240 
-               Q 410,225 430,240 T 470,240 T 510,240
-               Q 530,228 550,240 T 590,240 T 630,240 
-               Q 645,210 660,240 Q 675,270 690,240 
-               Q 705,185 720,240 Q 735,295 750,240 
-               Q 760,215 770,240 Q 780,265 790,240 
-               Q 805,230 820,240 T 860,240 T 900,240 
-               Q 920,225 940,240 T 980,240 T 1020,240
-               Q 1040,228 1060,240 T 1100,240 T 1140,240 
-               Q 1155,210 1170,240 Q 1185,270 1200,240 
-               Q 1215,185 1230,240 Q 1245,295 1260,240 
-               Q 1270,215 1280,240 Q 1290,265 1300,240 
-               Q 1315,230 1330,240 T 1370,240 T 1410,240 
-               Q 1430,225 1450,240 T 1490,240 T 1530,240
-               Q 1550,228 1570,240 T 1610,240 T 1650,240 
-               Q 1665,210 1680,240 Q 1695,270 1710,240 
-               Q 1725,185 1740,240 Q 1755,295 1770,240 
-               Q 1780,215 1790,240 Q 1800,265 1810,240 
-               Q 1825,230 1840,240 T 1880,240 T 1920,240"
-            fill="none" stroke="url(#waveEnergy)" stroke-width="2.2" stroke-linecap="round" filter="url(#hyperGlow)"/>
+      <path d="M 0,330 
+               Q 25,322 50,330 T 100,330 
+               Q 120,305 140,330 Q 160,355 180,330 
+               Q 195,280 210,330 Q 225,375 240,330 
+               Q 255,310 270,330 Q 285,350 300,330 
+               Q 325,322 350,330 T 400,330
+               Q 425,322 450,330 T 500,330 
+               Q 520,305 540,330 Q 560,355 580,330 
+               Q 595,280 610,330 Q 625,375 640,330 
+               Q 655,310 670,330 Q 685,350 700,330 
+               Q 725,322 750,330 T 800,330
+               Q 825,322 850,330 T 900,330 
+               Q 920,305 940,330 Q 960,355 980,330 
+               Q 995,280 1010,330 Q 1025,375 1040,330 
+               Q 1055,310 1070,330 Q 1085,350 1100,330 
+               Q 1125,322 1150,330 T 1200,330
+               Q 1225,322 1250,330 T 1300,330 
+               Q 1320,305 1340,330 Q 1360,355 1380,330 
+               Q 1395,280 1410,330 Q 1425,375 1440,330 
+               Q 1455,310 1470,330 Q 1485,350 1500,330 
+               Q 1525,322 1550,330 T 1600,330"
+            fill="none" stroke="url(#waveRibbon)" stroke-width="2.2" stroke-linecap="round" filter="url(#vectorGlow)"/>
     </g>
 
-    <!-- Wave 2: Sub-harmonic carrier wave (counter-frequency) -->
+    <!-- Sub-Harmonic Reference Wave -->
     <g class="anim-wave2" opacity="0.45">
-      <path d="M 0,240 
-               Q 15,233 30,240 T 60,240 T 90,240 
-               Q 105,220 120,240 Q 135,260 150,240 
-               Q 160,205 170,240 Q 180,275 190,240 
-               Q 205,232 220,240 T 250,240 T 280,240 
-               Q 295,235 310,240 T 340,240 T 370,240
-               Q 385,233 400,240 T 430,240 T 460,240 
-               Q 475,220 490,240 Q 505,260 520,240 
-               Q 530,205 540,240 Q 550,275 560,240 
-               Q 575,232 590,240 T 620,240 T 650,240 
-               Q 665,235 680,240 T 710,240 T 740,240
-               Q 755,233 770,240 T 800,240 T 830,240 
-               Q 845,220 860,240 Q 875,260 890,240 
-               Q 900,205 910,240 Q 920,275 930,240 
-               Q 945,232 960,240 T 990,240 T 1020,240 
-               Q 1035,235 1050,240 T 1080,240 T 1110,240
-               Q 1125,233 1140,240 T 1170,240 T 1200,240 
-               Q 1215,220 1230,240 Q 1245,260 1260,240 
-               Q 1270,205 1280,240 Q 1290,275 1300,240 
-               Q 1315,232 1330,240 T 1360,240 T 1390,240 
-               Q 1405,235 1420,240 T 1450,240 T 1480,240"
+      <path d="M 0,330 
+               Q 20,324 40,330 T 80,330 
+               Q 100,315 120,330 Q 140,345 160,330 
+               Q 175,295 190,330 Q 205,360 220,330 
+               Q 240,324 260,330 T 280,330
+               Q 300,324 320,330 T 360,330 
+               Q 380,315 400,330 Q 420,345 440,330 
+               Q 455,295 470,330 Q 485,360 500,330 
+               Q 520,324 540,330 T 560,330
+               Q 580,324 600,330 T 640,330 
+               Q 660,315 680,330 Q 700,345 720,330 
+               Q 735,295 750,330 Q 765,360 780,330 
+               Q 800,324 820,330 T 840,330
+               Q 860,324 880,330 T 920,330 
+               Q 940,315 960,330 Q 980,345 1000,330 
+               Q 1015,295 1030,330 Q 1045,360 1060,330 
+               Q 1080,324 1100,330 T 1120,330
+               Q 1140,324 1160,330 T 1200,330 
+               Q 1220,315 1240,330 Q 1260,345 1280,330 
+               Q 1295,295 1310,330 Q 1325,360 1340,330 
+               Q 1360,324 1380,330 T 1400,330"
             fill="none" stroke="#00f0ff" stroke-width="1.0" stroke-linecap="round"/>
     </g>
   </g>
-  <clipPath id="centerWaveClip">
-    <rect x="250" y="140" width="700" height="200"/>
+  <clipPath id="waveClip">
+    <rect x="180" y="270" width="840" height="110"/>
   </clipPath>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 5: CENTER HERO TYPOGRAPHY — DHVANI &amp; ध्वनि
-       Sculpted Monolithic Titanium &amp; Luminescent Ancient Script
+       LAYER 5: MINIMALIST FORENSIC STATUS HEADERS & FOOTERS
        ══════════════════════════════════════════════════════════════════ -->
+  <!-- Top Bar -->
+  <g font-family="'Courier New', Courier, monospace" font-size="8.5" letter-spacing="2">
+    <!-- Top Left -->
+    <circle cx="48" cy="40" r="3.5" fill="#ff3b30" class="anim-live" filter="url(#vectorGlow)"/>
+    <text x="60" y="43" fill="#ff3b30" font-weight="bold">LIVE RADAR MESH</text>
+    <text x="210" y="43" fill="#3a4b60">|</text>
+    <text x="225" y="43" fill="#88a0b8">NODES: 04/04 ONLINE</text>
 
-  <!-- Tactical Reticle Framing Above Typography -->
-  <g stroke="#ff3b30" stroke-width="0.8" opacity="0.65">
-    <line x1="380" y1="130" x2="440" y2="130"/>
-    <line x1="760" y1="130" x2="820" y2="130"/>
-    <circle cx="600" cy="130" r="2.5" fill="#ff3b30"/>
-  </g>
+    <!-- Top Center -->
+    <text x="600" y="43" fill="#00d2ff" opacity="0.85" text-anchor="middle" font-weight="bold" letter-spacing="3">
+      [ DHAVLI // DHVANI ACOUSTIC PROTOCOL ]
+    </text>
 
-  <!-- Sanskrit / Hindi Calligraphic Title: ध्वनि -->
-  <!-- Ambient halo behind Devanagari text -->
-  <text x="600" y="196"
-        text-anchor="middle"
-        font-family="'Noto Sans Devanagari','Mukta','Devanagari MT','Mangal','Arial Unicode MS',sans-serif"
-        font-size="82" font-weight="900" letter-spacing="4"
-        fill="#ff3b30" opacity="0.35" filter="url(#hyperGlow)">ध्वनि</text>
-
-  <!-- Incandescent core of ध्वनि with crisp vector fill -->
-  <text x="600" y="196"
-        text-anchor="middle"
-        font-family="'Noto Sans Devanagari','Mukta','Devanagari MT','Mangal','Arial Unicode MS',sans-serif"
-        font-size="82" font-weight="900" letter-spacing="4"
-        fill="url(#devaFlame)">ध्वनि</text>
-
-  <!-- Thin Precision Bracket Calibrations flanking ध्वनि -->
-  <text x="460" y="184" font-family="'Courier New', monospace" font-size="16" fill="#00d2ff" opacity="0.8" font-weight="bold">「</text>
-  <text x="735" y="184" font-family="'Courier New', monospace" font-size="16" fill="#00d2ff" opacity="0.8" font-weight="bold">」</text>
-
-  <!-- Monolithic English Logotype: DHVANI -->
-  <!-- Deep shadow under-layer -->
-  <text x="600" y="264"
-        text-anchor="middle"
-        font-family="'Cinzel', 'Trajan Pro', 'Eurostile', 'Helvetica Neue', 'Arial Black', sans-serif"
-        font-size="52" font-weight="900" letter-spacing="24"
-        fill="#04070c" opacity="0.95">DHVANI</text>
-
-  <!-- Specular Titanium Metal Base Layer -->
-  <text x="600" y="264"
-        text-anchor="middle"
-        font-family="'Cinzel', 'Trajan Pro', 'Eurostile', 'Helvetica Neue', 'Arial Black', sans-serif"
-        font-size="52" font-weight="900" letter-spacing="24"
-        fill="url(#titaniumMetal)">DHVANI</text>
-
-  <!-- Subtitle Hairline Rule -->
-  <line x1="340" y1="288" x2="860" y2="288" stroke="#1c2d44" stroke-width="1.2"/>
-  <line x1="420" y1="288" x2="780" y2="288" stroke="#00f0ff" stroke-width="1.4" opacity="0.85" filter="url(#hyperGlow)"/>
-
-  <!-- Hollywood Cinema Subtitle Designation -->
-  <text x="600" y="312"
-        text-anchor="middle"
-        font-family="'Courier New', Courier, monospace"
-        font-size="11.5" font-weight="700" letter-spacing="6.5"
-        fill="#e6effa" opacity="0.95">ACOUSTIC INTELLIGENCE  //  FORENSIC RESPONSE GRID</text>
-
-  <!-- Tactical Core Metrics Underneath Title -->
-  <g font-family="'Courier New', monospace" font-size="8.5" letter-spacing="2" fill="#6c829e">
-    <text x="600" y="334" text-anchor="middle">
-      <tspan fill="#ff3b30">LATENCY:</tspan> 380ms CPU INFERENCE  ·  
-      <tspan fill="#00d2ff">MESH:</tspan> 16kHz PCM SATELLITE RADAR  ·  
-      <tspan fill="#ffb844">FORENSICS:</tspan> MIT AST + WAV2VEC2
+    <!-- Top Right -->
+    <text x="1145" y="43" fill="#88a0b8" text-anchor="end">
+      <tspan fill="#ffaa33">ASPECT: 2.39:1</tspan> · UTC SYNC
     </text>
   </g>
 
-  <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 6: AMBIENT CINEMATIC PROJECTOR PARTICLES (DUST MOTES)
-       ══════════════════════════════════════════════════════════════════ -->
-  <g opacity="0.85">
-    <circle cx="520" cy="210" r="1.2" fill="#00f0ff" class="anim-dust-a"/>
-    <circle cx="680" cy="245" r="0.9" fill="#ffb844" class="anim-dust-b"/>
-    <circle cx="440" cy="260" r="1.4" fill="#ffffff" class="anim-dust-a"/>
-    <circle cx="760" cy="190" r="0.8" fill="#ff3b30" class="anim-dust-b"/>
-    <circle cx="580" cy="275" r="1.1" fill="#00d2ff" class="anim-dust-a"/>
-    <circle cx="630" cy="170" r="0.7" fill="#ffe6c2" class="anim-dust-b"/>
-  </g>
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 7: HUD CHASSIS BORDER &amp; MILITARY SPEC REGISTRATION MARKS
-       ══════════════════════════════════════════════════════════════════ -->
-  <!-- Outer Chamfered Precision Frame -->
-  <g stroke="#1a2738" stroke-width="1.2" fill="none">
-    <rect x="20" y="18" width="1160" height="444" rx="6"/>
-    <rect x="26" y="24" width="1148" height="432" rx="4" stroke="#0a121d" stroke-width="0.8"/>
-  </g>
-
-  <!-- Corner Viewfinder Brackets (Tactical Ground Glass Marks) -->
-  <g stroke="#00f0ff" stroke-width="2.2" fill="none" opacity="0.85">
-    <!-- Top-Left -->
-    <path d="M 28,48 L 28,28 L 48,28"/>
-    <!-- Top-Right -->
-    <path d="M 1172,48 L 1172,28 L 1152,28"/>
-    <!-- Bottom-Left -->
-    <path d="M 28,432 L 28,452 L 48,452"/>
-    <!-- Bottom-Right -->
-    <path d="M 1172,432 L 1172,452 L 1152,452"/>
-  </g>
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 8: TOP HUD HEADER TELEMETRY
-       ══════════════════════════════════════════════════════════════════ -->
-  <g font-family="'Courier New', Courier, monospace" font-size="9" letter-spacing="2">
-    <!-- Top Left: Live Status -->
-    <circle cx="48" cy="42" r="4.0" fill="#ff3b30" class="anim-live" filter="url(#hyperGlow)"/>
-    <text x="60" y="45" fill="#ff3b30" font-weight="bold">LIVE TRIAGE MESH</text>
-    <text x="210" y="45" fill="#506680">|</text>
-    <text x="226" y="45" fill="#88a0b8">NODES: 04/04 ONLINE</text>
-
-    <!-- Top Center: Classification -->
-    <text x="600" y="45" fill="#00d2ff" opacity="0.85" text-anchor="middle" font-weight="bold" letter-spacing="3.5">
-      [ PROTOCOL: TOP SECRET // ORCON-US-IN // BUILD 2026.4 ]
-    </text>
-
-    <!-- Top Right: Optical Specs -->
-    <text x="1152" y="45" fill="#88a0b8" opacity="0.85" text-anchor="end">
-      <tspan fill="#ffb844">ASPECT: 2.39:1</tspan>  ·  UTC 19:04:28
-    </text>
-  </g>
-
-  <line x1="30" y1="58" x2="1170" y2="58" stroke="#121e2d" stroke-width="0.8"/>
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 9: BOTTOM FOOTER TELEMETRY STRIP
-       ══════════════════════════════════════════════════════════════════ -->
-  <line x1="30" y1="422" x2="1170" y2="422" stroke="#121e2d" stroke-width="0.8"/>
-
-  <g font-family="'Courier New', Courier, monospace" font-size="8.5" letter-spacing="1.8" class="anim-tele">
+  <!-- Bottom Telemetry Strip -->
+  <line x1="36" y1="375" x2="1164" y2="375" stroke="#121e2e" stroke-width="0.8"/>
+  <g font-family="'Courier New', Courier, monospace" font-size="8" letter-spacing="1.8" fill="#64748b">
     <!-- Bottom Left -->
-    <text x="44" y="442" fill="#5c7594">
-      <tspan fill="#00f0ff">COORDINATES:</tspan> 28°36'48"N  77°12'32"E  ·  ELEVATION: 216m ASL
+    <text x="48" y="392">
+      <tspan fill="#00f0ff">LOCATION:</tspan> 28°36'48"N 77°12'32"E · ELEV: 216m ASL
     </text>
 
     <!-- Bottom Center -->
-    <text x="600" y="442" fill="#ff4455" opacity="0.9" text-anchor="middle" font-weight="bold">
-      ● THREAT LEVEL: CRITICAL (CODE RED)  ·  TIME-TO-TRIAGE: 1.38s
+    <text x="600" y="392" text-anchor="middle" fill="#ff4455" font-weight="bold">
+      ● EMERGENCY TRIAGE: 1.38s · ZERO-LATENCY ASR
     </text>
 
     <!-- Bottom Right -->
-    <text x="1152" y="442" fill="#5c7594" text-anchor="end">
-      SHA-256: <tspan fill="#88a0b8">e9b7...2f01</tspan>  ·  STATUS: SECURE
+    <text x="1145" y="392" text-anchor="end">
+      SHA-256: <tspan fill="#94a3b8">e9b7...2f01</tspan> · TAMPER-EVIDENT
     </text>
   </g>
 
-  <!-- ══════════════════════════════════════════════════════════════════
-       LAYER 10: ANALOG CRT SCANLINES &amp; CINEMA VIGNETTE FINISH
-       ══════════════════════════════════════════════════════════════════ -->
-  <!-- Subtle CRT Scanlines -->
-  <rect width="1200" height="480" fill="url(#scanlines)" opacity="0.5" pointer-events="none"/>
-
-  <!-- Cinematic Corner Vignette -->
-  <radialGradient id="edgeVignette" cx="50%" cy="50%" r="65%">
-    <stop offset="0%"   stop-color="#000000" stop-opacity="0"/>
-    <stop offset="70%"  stop-color="#000000" stop-opacity="0.3"/>
-    <stop offset="100%" stop-color="#000000" stop-opacity="0.85"/>
-  </radialGradient>
-  <rect width="1200" height="480" fill="url(#edgeVignette)" pointer-events="none"/>
+  <!-- Ambient Cinema Projector Dust Motes -->
+  <circle cx="480" cy="180" r="1.1" fill="#00f0ff" class="anim-mote"/>
+  <circle cx="720" cy="220" r="0.9" fill="#ffaa33" class="anim-mote"/>
+  <circle cx="560" cy="250" r="1.2" fill="#ffffff" class="anim-mote"/>
 
 </svg>

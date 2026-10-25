@@ -1,0 +1,34 @@
+{
+  "scenarios": [
+    {
+      "id": "covert_pizza_distress",
+      "title": "English \u00b7 Covert pizza order distress call (demo video.mp3)",
+      "description": "Caller contacts Police Control Room pretending to order a pepperoni pizza because an aggressor is in the room. The dispatcher detects the anomaly, verifies covert distress, extracts floor-level apartment location, and initiates priority response.",
+      "file": "covert_pizza_distress.wav",
+      "language_hint": "en",
+      "duration_hint": 102.4,
+      "consent_note": "Consented emergency call demonstration recording provided as demo video.mp3.",
+      "is_simulated": true
+    },
+    {
+      "id": "hinglish_distress_scam",
+      "title": "Hinglish \u00b7 distress + digital-arrest scam indicators",
+      "description": "Synthetic caller reports fear near Dadar station, a customs parcel story, a digital-arrest claim and a payment demand. A second quieter voice is mixed in. Designed to exercise ASR, translation, speaker clustering, reference matching and landmark mapping.",
+      "file": "hinglish_distress_scam.wav",
+      "language_hint": "hi-en",
+      "duration_hint": 30.0,
+      "consent_note": "Synthetic demonstration audio generated with edge-tts. No real person, call or emergency is represented.",
+      "is_simulated": true
+    },
+    {
+      "id": "english_help_marine_drive",
+      "title": "English \u00b7 help request near Marine Drive",
+      "description": "A short synthetic English call used to verify the English path without translation. It includes a spoken landmark and a request for help.",
+      "file": "english_help_marine_drive.wav",
+      "language_hint": "en",
+      "duration_hint": 14.0,
+      "consent_note": "Synthetic demonstration audio generated with edge-tts. No real person, call or emergency is represented.",
+      "is_simulated": true
+    }
+  ]
+}

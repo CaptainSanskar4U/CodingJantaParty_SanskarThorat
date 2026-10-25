@@ -2993,6 +2993,8 @@
   <meta name="description"
     content="DHVANI (ध्वनि) is an autonomous acoustic intelligence and emergency triage grid that listens to live and recorded calls for acoustic distress, sub-bass tremors, and emotional signals with zero latency.">
   <meta name="theme-color" content="#060a0f">
+  <link rel="stylesheet" href="/static/dhavli-loader.css">
+  <script src="/static/dhavli-loader.js"></script>
 </head>
 
 <body class="pre">
@@ -3377,8 +3379,8 @@
         return { x: x, y: init ? rnd(0, H) : H + 10, r: rnd(.5, 1.7), z: rnd(.3, 1), vx: rnd(-.05, .12), vy: -rnd(.07, .3), a: rnd(.14, .5), ph: rnd(0, 6.28), sp: rnd(.4, 1.4), warm: warm, px: 0, py: 0 }
       }
       function initParts() {
-        parts = []; var n = mobile() ? 34 : 92; for (var i = 0; i < n; i++)parts.push(mk(true));
-        glints = []; if (!mobile()) for (var j = 0; j < 18; j++)glints.push({ x: rnd(1338, 1418), y: rnd(832, 938), ph: rnd(0, 6.28), sp: rnd(.8, 2.2), s: rnd(3, 8) });
+        parts = []; var n = mobile() ? 14 : 28; for (var i = 0; i < n; i++)parts.push(mk(true));
+        glints = []; if (!mobile()) for (var j = 0; j < 8; j++)glints.push({ x: rnd(1338, 1418), y: rnd(832, 938), ph: rnd(0, 6.28), sp: rnd(.8, 2.2), s: rnd(3, 8) });
       }
       /* baked light layers: the waveform highlight and reflection shimmer are computed once from the photo,
           then only a small gradient window is composited per frame */
@@ -3496,7 +3498,7 @@
       var img = new Image(), gates = [];
       if (m) { img.src = m[2]; gates.push(img.decode ? img.decode().catch(function () { }) : Promise.resolve()) }
       if (document.fonts && document.fonts.ready) gates.push(document.fonts.ready);
-      Promise.all(gates).then(function () { try { if (m) initFx(img) } catch (e) { } requestAnimationFrame(go) });
+      Promise.all(gates).then(function () { requestAnimationFrame(go); setTimeout(function() { try { if (m) initFx(img) } catch(e){} }, 100); });
       setTimeout(go, 2200);
       if (!reduce) requestAnimationFrame(frame);
     })();

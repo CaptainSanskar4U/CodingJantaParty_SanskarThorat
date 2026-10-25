@@ -1,0 +1,42 @@
+{
+  "version": 3,
+  "routes": [
+    {
+      "src": "^/(?:(.+)/)?index(?:\\.html)?/?$",
+      "headers": {
+        "Location": "/$1"
+      },
+      "status": 308
+    },
+    {
+      "src": "^/(.*)\\.html/?$",
+      "headers": {
+        "Location": "/$1"
+      },
+      "status": 308
+    },
+    {
+      "handle": "error"
+    },
+    {
+      "status": 404,
+      "src": "^(?!/api).*$",
+      "dest": "/404"
+    }
+  ],
+  "overrides": {
+    "console/index.html": {
+      "path": "console/index"
+    },
+    "index.html": {
+      "path": "index"
+    },
+    "Orbitwin_Emergency_Response_Intelligence.html": {
+      "path": "Orbitwin_Emergency_Response_Intelligence"
+    },
+    "Vecna_Verse.html": {
+      "path": "Vecna_Verse"
+    }
+  },
+  "crons": []
+}

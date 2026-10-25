@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_uMwZGTRyNqBPK8ETgR2587Sfh8Vy",
+  "orgId": "team_q1EMyJcb1fb6zExSvFAqPaRa",
+  "projectName": "dhvani-emergency-intelligence",
+  "settings": {
+    "createdAt": 1792907233986,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

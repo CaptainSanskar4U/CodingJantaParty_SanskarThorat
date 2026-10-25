@@ -1,0 +1,224 @@
+{
+  "pack": {
+    "name": "Dhvani sample distress & scam reference pack",
+    "version": "1.0-demo",
+    "authority": "Operator-supplied demonstration reference pack. This is NOT an official police distress codebook. Replace or extend it with an authorised agency list before operational use.",
+    "updated": "2026-10-24"
+  },
+  "entries": [
+    {
+      "id": "distress-help",
+      "type": "distress_phrase",
+      "subtype": "request_for_help",
+      "title": "Request for help",
+      "aliases": [
+        "help me",
+        "please help",
+        "meri madad karo",
+        "mujhe madad chahiye",
+        "mujhe bachao",
+        "bachao",
+        "save me",
+        "madad karo",
+        "koi hai",
+        "मुझे मदद चाहिए",
+        "मुजे मदद चाहिये",
+        "मदद चाहिए",
+        "मुझे बचाओ",
+        "मेरी मदद करो",
+        "मुझे मदद चाहिये",
+        "मदद चाहिये",
+        "बचाओ",
+        "कृपया बचाओ",
+        "क्रिप्या बचाओ",
+        "डर गई हूँ",
+        "डर लग रहा है",
+        "मैं डर गई",
+        "help",
+        "please save"
+      ],
+      "description": "A direct request for assistance. Treat as a possible distress signal and review the surrounding audio and transcript before drawing conclusions.",
+      "source_ref": "Orbitwin sample reference pack v1.0, entry distress-help (operator-supplied; not an official codebook).",
+      "confidence": 0.96
+    },
+    {
+      "id": "distress-danger",
+      "type": "distress_phrase",
+      "subtype": "danger_language",
+      "title": "Language indicating immediate danger",
+      "aliases": [
+        "jaan ka khatra",
+        "jaan ko khatra",
+        "khatre mein hoon",
+        "khatre mein hai",
+        "emergency hai",
+        "emergency",
+        "abhi bachao",
+        "जान का खतरा",
+        "खतरे में हूँ",
+        "खतरे में है"
+      ],
+      "description": "Language that may indicate perceived immediate danger. This is a phrase match, not proof that a crime is occurring.",
+      "source_ref": "Orbitwin sample reference pack v1.0, entry distress-danger (operator-supplied; not an official codebook).",
+      "confidence": 0.93
+    },
+    {
+      "id": "emergency-112",
+      "type": "emergency_number",
+      "subtype": "emergency_number",
+      "title": "Emergency number 112 mentioned",
+      "aliases": [
+        "112",
+        "one one two"
+      ],
+      "description": "The national emergency number in India. Verify whether the caller was referring to the emergency service or reading a number in another context.",
+      "source_ref": "Government of India emergency response number 112 (public information).",
+      "confidence": 0.99
+    },
+    {
+      "id": "scam-digital-arrest",
+      "type": "scam_term",
+      "subtype": "impersonation",
+      "title": "Digital arrest",
+      "aliases": [
+        "digital arrest",
+        "digital arrest warrant",
+        "online arrest",
+        "डिजिटल अरेस्ट",
+        "दिजितल अरस्ट",
+        "डिजिटल अरस्ट",
+        "डिजिटल अर्स्ट",
+        "दिजितल अर्ज्ट",
+        "डिजिटल अर्ज्ट"
+      ],
+      "description": "A fraud pattern in which callers impersonate police, CBI or customs officials and claim an arrest is taking place over a video call. Genuine agencies do not conduct arrests or evidence verification in this way. Treat the phrase as a lead for review, not as proof of a crime.",
+      "source_ref": "Government of India Cyber Crime Portal awareness material: https://cybercrime.gov.in/",
+      "confidence": 0.98
+    },
+    {
+      "id": "scam-customs-parcel",
+      "type": "scam_term",
+      "subtype": "parcel_scam",
+      "title": "Customs / courier parcel scam",
+      "aliases": [
+        "customs parcel",
+        "courier parcel",
+        "parcel mein drugs",
+        "parcel contains drugs",
+        "customs department",
+        "parcel in your name",
+        "कस्टम्स पार्सल",
+        "कुस्तम्स पार्सल",
+        "कस्टम पार्सल",
+        "पार्सल में ड्रग्स",
+        "पार्सल में द्रग्स",
+        "कुस्टम्स पार्सल",
+        "उस में द्रग्स",
+        "उसमें ड्रग्स"
+      ],
+      "description": "A fraud narrative claiming that a parcel in the victim's name contains illegal goods and that payment or verification is required. Verify through the courier or customs authority using independently sourced contact details.",
+      "source_ref": "Government of India Cyber Crime Portal awareness material: https://cybercrime.gov.in/",
+      "confidence": 0.95
+    },
+    {
+      "id": "scam-mule-account",
+      "type": "scam_term",
+      "subtype": "money_movement",
+      "title": "Mule account",
+      "aliases": [
+        "mule account",
+        "mule accounts",
+        "account for transfer",
+        "rent your account",
+        "bank account use"
+      ],
+      "description": "An account used to receive or move criminal proceeds. Fraudsters may ask a victim or recruit to transfer money through such an account. A mention is a lead, not proof of criminal conduct.",
+      "source_ref": "Reserve Bank of India consumer awareness material and Government of India Cyber Crime Portal: https://cybercrime.gov.in/",
+      "confidence": 0.94
+    },
+    {
+      "id": "scam-otp",
+      "type": "scam_term",
+      "subtype": "credential_theft",
+      "title": "OTP / credential request",
+      "aliases": [
+        "otp",
+        "one time password",
+        "share otp",
+        "send otp",
+        "pin number",
+        "cvv",
+        "ओटीपी",
+        "ओटीपी बताओ"
+      ],
+      "description": "A request for a one-time password, PIN or card verification value. Legitimate staff do not need these secrets to help a customer. Treat the request as a potential fraud indicator and never repeat the secret in a report.",
+      "source_ref": "Reserve Bank of India consumer awareness material: https://www.rbi.org.in/",
+      "confidence": 0.96
+    },
+    {
+      "id": "scam-impersonation",
+      "type": "scam_term",
+      "subtype": "authority_impersonation",
+      "title": "Claimed police / CBI verification",
+      "aliases": [
+        "cbi officer",
+        "police officer",
+        "cbi case",
+        "police case",
+        "video call verification",
+        "verification call",
+        "officer se baat",
+        "cbi अफसर",
+        "सीबीआई अफसर",
+        "पुलिस अफसर",
+        "वीडियो कॉल वेरिफिकेशन"
+      ],
+      "description": "A claimed official identity or verification procedure. Independently verify the caller through an official published number. This phrase alone does not establish impersonation.",
+      "source_ref": "Government of India Cyber Crime Portal awareness material: https://cybercrime.gov.in/",
+      "confidence": 0.9
+    },
+    {
+      "id": "scam-payment",
+      "type": "scam_term",
+      "subtype": "payment_pressure",
+      "title": "Urgent payment or transfer demand",
+      "aliases": [
+        "50 hazaar",
+        "fifty thousand",
+        "pachaas hazaar",
+        "transfer the money",
+        "pay now",
+        "immediately transfer",
+        "paisa transfer",
+        "paise bhejo",
+        "पचास हज़ार",
+        "पचास हजार",
+        "रुपये मांग",
+        "पैसे भेजो",
+        "पैसा ट्रांसफर"
+      ],
+      "description": "A demand for an urgent payment or transfer. Payment pressure can occur in legitimate disputes too; review the full conversation and verify the recipient independently.",
+      "source_ref": "Orbitwin sample reference pack v1.0, entry scam-payment (operator-supplied; not an official codebook).",
+      "confidence": 0.88
+    },
+    {
+      "id": "context-control",
+      "type": "contextual_risk",
+      "subtype": "controlling_language",
+      "title": "Potentially controlling language",
+      "aliases": [
+        "chup raho",
+        "zyada mat bolo",
+        "kuch mat bolo",
+        "phone band karo",
+        "call mat karo",
+        "चुप रहो",
+        "कुछ मत बोलो",
+        "फोन मत करो"
+      ],
+      "description": "Language that may indicate someone is being discouraged from speaking or seeking help. This is a contextual lead only and is not proof of coercion, kidnapping or guilt.",
+      "source_ref": "Orbitwin sample reference pack v1.0, entry context-control (operator-supplied; not an official codebook).",
+      "confidence": 0.8
+    }
+  ]
+}

@@ -1,0 +1,430 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dhvani | Emergency Response Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/static/orbitwin.css"></head><body><div id="st" class="auth-view">
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark"><svg width="26" height="26" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13.5" fill="none" stroke="#ff2e43" stroke-width="7"/><path d="M20.3 1v10.5M20.3 28.5v10.5" stroke="#050506" stroke-width="1.8"/><path d="M26.2 11.6 32 14.6" stroke="#050506" stroke-width="1.6"/></svg></span>
+    <span class="brand-copy"><b>Dhvani</b><small>Response intelligence</small></span>
+  </div>
+  <div class="searchbar"><span id="si"></span><input id="q" placeholder="Search calls, transcript, locations, cases…" aria-label="Search"><kbd>Ctrl K</kbd></div>
+  <div class="top-actions">
+    <button id="sys" class="engine" title="Checking local engine…"><i id="sysDot"></i><span id="sysText">Connecting…</span></button>
+    <button id="liveBtn" class="btn"><span id="liveIc"></span>Go live</button>
+    <button id="uploadBtn" class="btn primary" title="Upload a recording or load a labelled demo"><span id="upIc"></span>New recording</button>
+    <div class="top-divider"></div>
+    <div class="notif-wrap"><button class="icon-btn" id="bell" aria-label="Alerts"></button><i id="bellBadge">0</i></div>
+    <button class="profile" id="pf" aria-label="Account"></button>
+  </div>
+  <div class="dropdown" id="bd"></div>
+  <div class="dropdown" id="pd"></div>
+  <div class="popover" id="statusPop">
+    <div class="popover-head"><span>System status</span><small>Local deployment</small></div>
+    <div id="ss"></div>
+  </div>
+</header>
+
+<aside class="sidebar">
+  <div class="side-label">Workspace</div>
+  <nav class="nav-list" id="sb"></nav>
+  <div class="sidebar-bottom">
+    <button class="help-link" id="sup"></button>
+    <button class="helpline" id="hp"></button>
+  </div>
+</aside>
+
+<main class="workspace">
+  <section class="queue-column">
+    <div class="panel queue-panel">
+      <div class="panel-head queue-head">
+        <div><span class="eyebrow">Incoming</span><div class="queue-title-row"><h1>Call queue</h1><span class="count-pill" id="cc">0</span></div></div>
+      </div>
+      <select id="fl" class="queue-filter" aria-label="Filter calls"><option value="">All priorities</option><option value="high">High priority</option><option value="medium">Medium priority</option><option value="low">Low priority</option></select>
+      <div id="cq"></div>
+    </div>
+  </section>
+
+  <section class="call-column">
+    <div class="panel call-panel" id="callPanel">
+      <div class="call-head">
+        <div class="call-info">
+          <div class="call-meta"><span class="priority-pill" id="pr">NO RECORDING SELECTED</span><span class="ref" id="ref">—</span></div>
+          <div class="call-title" id="ph"><span>Select a recording to begin</span></div>
+          <div class="call-sub" id="lc"><span>Local analysis · no live telephony connected</span></div>
+          <div class="call-chips"><span class="ch" id="c1"></span><span class="ch" id="c2"></span><span class="ch" id="c3"></span></div>
+        </div>
+        <div class="call-controls">
+          <div class="duration"><span class="duration-label">Duration</span><b id="tm">00:00</b></div>
+          <div class="call-buttons"><button class="btn ghost" id="caseBtn"></button><button class="btn danger" id="end"></button></div>
+        </div>
+      </div>
+      <div class="call-workspace">
+        <div class="wave-panel">
+          <div class="wave-head"><span>Audio signal</span><span>Click to seek</span></div>
+          <div class="wave-wrap" id="waveBox"><canvas id="wv" width="1400" height="220"></canvas><button id="pp" class="play-btn" aria-label="Play or pause"></button><div id="mk" class="play-marker">00:00</div></div>
+          <div id="mt"></div>
+        </div>
+        <div class="urgency-card">
+          <div class="urgency-label">Urgency</div>
+          <svg width="66" height="66" viewBox="0 0 62 62"><circle cx="31" cy="31" r="25" fill="none" stroke="#27272e" stroke-width="6"/><circle cx="31" cy="31" r="25" fill="none" stroke="#ff2e43" stroke-width="6" id="rg" stroke-dasharray="0 170" stroke-linecap="round" transform="rotate(-90 31 31)"/><text id="rv" x="31" y="36" text-anchor="middle" fill="#f6f6f8" font-size="14" font-weight="600">—</text></svg>
+          <div id="hg">unscored</div>
+          <div class="urgency-note">Decision support only</div>
+        </div>
+      </div>
+      <div class="call-footer"><span id="em">No recording selected</span><span class="call-footer-note">HUMAN REVIEW REQUIRED</span></div>
+    </div>
+
+    <div class="demo-review-bar" id="demoReviewBar" style="display:none">
+      <div class="demo-review-summary">
+        <div class="review-status-badge"><span class="pulse-dot green"></span>CALL COMPLETED · READY FOR REVIEW</div>
+        <div class="review-title">Incident Analysis Summary · #EC-24056</div>
+        <div class="review-chips">
+          <span class="ch" id="revCh1">7 Distress &amp; Scam Findings</span>
+          <span class="ch" id="revCh2">2 Speakers Diarised</span>
+          <span class="ch" id="revCh3">Dadar Station Mapped</span>
+          <span class="ch hi" id="revCh4">Urgency: 92/100 (HIGH)</span>
+        </div>
+      </div>
+      <div class="demo-review-actions">
+        <button class="btn ghost" id="demoReplayBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg> Replay Demo</button>
+        <button class="btn secondary" id="demoConfirmAllBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg> Confirm All Findings</button>
+        <button class="btn primary" id="demoDownloadReportBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Case Report</button>
+      </div>
+    </div>
+
+    <div class="panel" id="transcriptPanel">
+      <div class="transcript-head">
+        <div id="tabs"></div>
+        <div class="transcript-tools"><button id="xp" title="Toggle English translation">EN</button></div>
+      </div>
+      <div id="tx"></div>
+      <div class="player-row" id="playerRow">
+        <span id="ck"></span><span id="pt">00:00 / 00:00</span>
+        <div class="progress" id="pb"><i id="pg" style="width:0"></i><i id="kn" style="left:0"></i></div>
+        <button id="sp">1x</button><button id="vl" aria-label="Mute"></button>
+      </div>
+    </div>
+
+    <div class="panel related-panel" id="relatedPanel">
+      <div class="related-head"><b>Linked findings</b><span>Reference-backed · review required</span></div>
+      <div id="re"></div>
+    </div>
+  </section>
+
+  <aside class="context-column" id="contextColumn">
+    <!-- 1. Real-Time Investigator Copilot -->
+    <div class="panel copilot-panel" id="copilotPanel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow"><span class="pulse-dot red"></span>Real-Time AI Copilot</span>
+          <h2>Investigator Guidance</h2>
+        </div>
+        <span class="copilot-phase-badge" id="copilotPhase">EVALUATING</span>
+      </div>
+      <div class="copilot-card" id="copilotCard">
+        <div class="copilot-action-label">WHAT TO ASK / SAY NEXT</div>
+        <div class="copilot-prompt" id="copilotPrompt">Awaiting speech signal to provide investigator guidance…</div>
+        <div class="copilot-rationale" id="copilotRationale">Dhvani neural model will evaluate caller stress, disguise patterns, and tactical risk in real time.</div>
+        <div class="copilot-checklist" id="copilotChecklist">
+          <div class="chk-item" id="chkCaller"><i></i> <span>Caller Disguise Identified</span></div>
+          <div class="chk-item" id="chkSafety"><i></i> <span>Closed Yes/No Protocol</span></div>
+          <div class="chk-item" id="chkLocation"><i></i> <span>Apartment Level Verified</span></div>
+          <div class="chk-item" id="chkDispatch"><i></i> <span>Emergency Unit Dispatched</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Keyword & Repetition Tracker -->
+    <div class="panel keyword-panel" id="keywordPanel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">Acoustic Keyword Engine</span>
+          <h2>Keyword Detection</h2>
+        </div>
+        <span class="count-pill red" id="keywordCount">0 hits</span>
+      </div>
+      <div class="keyword-focus-card" id="keywordCard">
+        <div class="keyword-stat-row">
+          <div class="keyword-term">
+            <span class="kw-label">Target Term</span>
+            <b class="kw-val" id="kwTerm">“PIZZA”</b>
+          </div>
+          <div class="keyword-reps">
+            <span class="kw-label">Repetition Pattern</span>
+            <span class="kw-reps-badge" id="kwRepsBadge">MONITORING</span>
+          </div>
+        </div>
+        <div class="keyword-timeline-chips" id="kwTimeline">
+          <span class="kw-chip" id="kwc1"><i class="dot"></i> t=20.7s (disguised plea)</span>
+          <span class="kw-chip" id="kwc2"><i class="dot"></i> t=23.0s (pepperoni)</span>
+          <span class="kw-chip" id="kwc3"><i class="dot"></i> t=40.0s (insistence)</span>
+          <span class="kw-chip" id="kwc4"><i class="dot"></i> t=89.8s (delivery cover)</span>
+        </div>
+        <div class="keyword-insight-box">
+          <div class="kw-insight-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+            Why This Repetition Matters
+          </div>
+          <p id="kwReason">In hostage and domestic violence crises, victims use familiar civilian transaction scripts to communicate without alerting the captor in the room.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Emotion Detection & Vocal Stress -->
+    <div class="panel emotion-panel" id="emotionPanel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">Human Speech Biometrics</span>
+          <h2>Emotion Detection</h2>
+        </div>
+        <span class="tag red" id="emotionDominant">MONITORING</span>
+      </div>
+      <div class="emotion-meter-group">
+        <div class="emotion-row">
+          <div class="emo-meta"><span>Vocal Tremor &amp; Fear</span><b id="emoFearVal">0%</b></div>
+          <div class="emo-bar"><i id="emoFearBar" style="width:0%"></i></div>
+        </div>
+        <div class="emotion-row">
+          <div class="emo-meta"><span>Physiological Stress</span><b id="emoStressVal">0%</b></div>
+          <div class="emo-bar"><i id="emoStressBar" style="width:0%"></i></div>
+        </div>
+        <div class="emotion-row">
+          <div class="emo-meta"><span>Constrained Airflow</span><b id="emoBreathVal">0%</b></div>
+          <div class="emo-bar"><i id="emoBreathBar" style="width:0%"></i></div>
+        </div>
+        <div class="emotion-row">
+          <div class="emo-meta"><span>Cognitive Role Pretense</span><b id="emoPretenseVal">0%</b></div>
+          <div class="emo-bar"><i id="emoPretenseBar" style="width:0%"></i></div>
+        </div>
+      </div>
+      <div class="vocal-spectrogram-hint" id="vocalHint">
+        <span class="radar-ping"></span>
+        <span id="vocalHintText">Micro-tremor frequency jitter: calibrating speech baseline…</span>
+      </div>
+    </div>
+
+    <!-- 4. Location Tracking with Radar Visualizer -->
+    <div class="panel location-panel" id="locationPanel">
+      <div class="panel-head">
+        <div><span class="eyebrow">Geospatial</span><h2>Location Tracking</h2></div>
+        <span class="hint" id="locStageBadge">Triangulating</span>
+      </div>
+      <div class="map-frame" id="mapPanel">
+        <div id="mw" class="mp map-canvas"></div>
+        <div class="map-radar-overlay" id="mapRadar">
+          <div class="radar-scanner"></div>
+          <div class="radar-target-reticle" id="radarReticle"></div>
+        </div>
+        <div class="map-telemetry-badge" id="mapTelemetry">
+          <span class="pulse-dot green"></span>
+          <span id="mapTelemetryText">CELL SECTOR 42-B · DADAR WEST</span>
+        </div>
+        <button class="map-open" id="ex" aria-label="Open full map"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        <button class="map-zoom" id="zi" aria-label="Zoom in">+</button><button class="map-zoom" id="zo" aria-label="Zoom out">−</button>
+      </div>
+      <div id="so"></div>
+      <button class="map-link" id="vf">Open full map <span>→</span></button>
+    </div>
+
+    <!-- 5. Background Audio Breakdown & Equalizer -->
+    <div class="panel audio-panel" id="audioPanel">
+      <div class="panel-head">
+        <div><span class="eyebrow">Forensics</span><h2>Background Audio Analysis</h2></div>
+        <span class="tag amber" id="audioEventCount">4 events</span>
+      </div>
+      <div class="audio-analyzer-box">
+        <div class="spectrum-bars" id="spectrumBars"></div>
+        <div class="spectrum-meta">
+          <span>160 Hz (Caller)</span>
+          <span>1.2 kHz (Acoustic Echo)</span>
+          <span>3.4 kHz (Door)</span>
+        </div>
+      </div>
+      <div id="ba"></div>
+    </div>
+
+    <!-- 6. Original Signal Panel (Hidden anchor for tabs/dialogs) -->
+    <div class="panel signal-panel" id="featurePanel" style="display:none">
+      <div class="panel-head"><div><span class="eyebrow">Review</span><h2>Signal intelligence</h2></div></div>
+      <div id="fe" class="feature-list"></div>
+    </div>
+  </aside>
+</main>
+
+<div class="fullmap" id="full">
+  <div class="fullmap-head"><div><b>Location intelligence</b><span>Full map · OpenStreetMap</span></div><button id="fx">Close map</button></div>
+  <div id="mf" class="mp fullmap-map"></div>
+</div>
+
+<div id="overlay" class="ovl">
+  <div class="ovl-panel">
+    <div class="ovl-h"><div><b id="ovlTitle">Investigation</b><span id="ovlSub"></span></div><button class="ovl-close" id="ovlClose">Close</button></div>
+    <div class="ovl-b" id="ovlBody"></div>
+  </div>
+</div>
+
+<div id="login" class="login auth-screen screen">
+  <button class="login-back" id="loginBack" type="button">← Back to overview</button>
+  <div class="login-shell">
+    <section class="login-intro">
+      <div class="login-brand">
+        <span class="brand-mark"><svg width="32" height="32" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13.5" fill="none" stroke="#ff2e43" stroke-width="7"/><path d="M20.3 1v10.5M20.3 28.5v10.5" stroke="#050506" stroke-width="1.8"/><path d="M26.2 11.6 32 14.6" stroke="#050506" stroke-width="1.6"/></svg></span>
+        <span><b>Dhvani</b><small>Response intelligence</small></span>
+      </div>
+      <div class="login-kicker">Secure operations console</div>
+      <h1>Every urgent call.<br><em>Every signal, clear.</em></h1>
+      <p>Review consented emergency-call recordings with local speech intelligence, evidence-linked cases and real location context. Built for investigators who need a clear next step, not another dashboard to decode.</p>
+      <ul class="login-points">
+        <li><i></i>Hindi, English and Hinglish transcription</li>
+        <li><i></i>Local analysis with human review controls</li>
+        <li><i></i>Protected case evidence and downloadable reports</li>
+      </ul>
+      <div class="login-footnote">AUTHORISED PERSONNEL ONLY · AUDIO STAYS ON THIS MACHINE</div>
+    </section>
+    <section class="login-card">
+      <div class="eyebrow">Authorised access</div>
+      <h2>Sign in to Console</h2>
+      <div class="sub">Use your investigator credentials to open the response workspace. Session cookies and CSRF protection are enabled.</div>
+      <form id="loginForm">
+        <div class="field"><label for="loginUser">Username</label><input id="loginUser" autocomplete="username" required></div>
+        <div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
+        <button class="btn primary" id="loginBtn" type="submit">Enter workspace</button>
+        <div class="login-err" id="loginErr"></div>
+      </form>
+      <div class="login-note">Demo access is seeded from <b>DHVANI_DEMO_USER</b> / <b>DHVANI_DEMO_PASSWORD</b> in <b>.env</b>. Change the defaults before any shared deployment.</div>
+    </section>
+  </div>
+</div>
+
+<div id="uploadModal" class="modal">
+  <div class="modal-card">
+    <button class="modal-close" id="uploadClose">Close</button>
+    <h2>Add a recording</h2>
+    <div class="sub">Upload a consented call recording, or load a clearly labelled synthetic demo. Analysis runs locally and may take 1–3 minutes on CPU. Live mode sends short microphone chunks to Gemini; uploaded recordings stay local.</div>
+    <div class="live-entry">
+      <div><b>Live microphone</b><p>Capture the room and get a provisional Gemini transcript every few seconds. Final findings and the map still run locally after Stop.</p></div>
+      <button type="button" class="btn amber small" id="liveOpen"><span id="liveOpenIc"></span>Go Live</button>
+    </div>
+    <form id="uploadForm">
+      <div class="drop"><input id="fileInput" type="file" accept="audio/*,video/mp4,video/webm" required><div class="muted" id="fileHint" style="margin-top:7px;font-size:9.5px;color:#8b98b0">WAV, MP3, M4A, AAC, OGG, OPUS, FLAC, WebM or MP4 · max 50 MB · max 5 minutes.</div></div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field grow"><label for="sourceLabel">Source label (optional)</label><input id="sourceLabel" placeholder="e.g. Caller recording 24 Oct 2026"></div>
+        <div class="field grow"><label for="caseSelect">Link to case (optional)</label><select id="caseSelect"><option value="">No case</option></select></div>
+      </div>
+      <label class="row" style="font-size:10px;color:#aab6cc;margin:6px 0 12px"><input id="consent" type="checkbox" style="width:14px;height:14px"> I confirm I am authorised to process this recording and that it may contain sensitive personal data.</label>
+      <div class="row between"><span class="muted" id="uploadErr" style="color:#ff6a77;font-size:10px"></span><button class="btn red" id="uploadSubmit" type="submit">Upload &amp; analyse</button></div>
+    </form>
+    <h3 style="font-size:12px;margin:20px 0 8px;color:#dfe6f2">Labelled demo scenarios</h3>
+    <div id="demoList"></div>
+    <div class="muted" style="font-size:9px;color:#8b98b0;line-height:14px">Demo audio is synthetic and marked as such in the queue, transcript, report and map. It is not a real emergency call. The second scenario is useful for checking the English path.</div>
+  </div>
+</div>
+
+<div id="liveModal" class="modal">
+  <div class="modal-card live-card">
+    <button class="modal-close" id="liveClose">Close</button>
+    <h2>Live microphone</h2>
+    <div class="sub">This is a live listening session, not a telephone intercept. The browser records your microphone; short chunks go to Google Gemini for a provisional transcript. The final analysis, map and evidence stay local.</div>
+
+    <div id="liveSetup">
+      <div class="live-warning">Audio leaves this device for Google Gemini while live mode is active. Only use this with consent from the people in the room. Do not record covertly.</div>
+      <label class="row live-consent"><input id="liveConsent" type="checkbox" style="width:14px;height:14px"> I confirm I have consent to capture this microphone audio and understand the Gemini privacy implication.</label>
+      <div class="row" style="margin-bottom:12px">
+        <div class="field grow"><label for="liveLanguage">Language hint</label><select id="liveLanguage"><option value="auto">Auto detect</option><option value="hinglish">Hindi + English (Hinglish)</option><option value="hi">Hindi</option><option value="en">English</option></select></div>
+        <div class="field grow"><label for="liveCase">Link to case (optional)</label><select id="liveCase"><option value="">No case</option></select></div>
+      </div>
+      <div class="row between"><span class="muted" id="liveConfigNote" style="font-size:9.5px;color:#8b98b0">Checking Gemini configuration…</span><button id="liveStartBtn" class="btn red" disabled>Start listening</button></div>
+      <div id="liveSetupErr" class="live-err"></div>
+    </div>
+
+    <div id="liveSession" style="display:none">
+      <div class="live-status"><span class="live-dot"></span><span id="liveState">Listening</span><span id="liveCloud" class="tag amber">Gemini provisional</span><span class="mono" id="liveTimer">00:00</span></div>
+      <div id="liveTranscript" class="live-transcript"><div class="muted" style="font-size:10px;color:#8b98b0">Speak clearly. The first transcript may take a few seconds.</div></div>
+      <div id="liveErr" class="live-err"></div>
+      <div class="row between">
+        <span class="muted" style="font-size:9px;color:#8b98b0;max-width:410px;line-height:14px">Transcript shown here is provisional. Stop to upload the full recording; the local pipeline then produces the final transcript, findings, map and urgency.</span>
+        <span class="row" style="gap:7px"><button id="liveStopBtn" class="btn red">Stop &amp; analyse</button><button id="liveCancelBtn" class="btn">Cancel</button></span>
+      </div>
+    </div>
+
+    <div id="liveDone" style="display:none">
+      <div class="live-status"><span class="live-dot" style="animation:none;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.12)"></span><span id="liveDoneState">Recording uploaded. Local analysis queued.</span></div>
+      <div class="row between"><span class="muted" style="font-size:9px;color:#8b98b0">The new call is selected in the dashboard. The final transcript replaces the provisional Gemini text.</span><button id="liveDoneBtn" class="btn">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="incomingCallModal" class="incoming-modal" style="display:none">
+  <div class="incoming-card">
+    <div class="incoming-header">
+      <span class="incoming-live-badge"><span class="pulse-dot"></span>EMERGENCY CALL DISPATCH</span>
+      <span class="incoming-timer" id="incomingTimer">RINGING · 00:03</span>
+    </div>
+    <div class="incoming-caller-wrap">
+      <div class="incoming-ring-halo">
+        <div class="ring-pulse r1"></div>
+        <div class="ring-pulse r2"></div>
+        <div class="incoming-avatar">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff2e43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+        </div>
+      </div>
+      <div class="incoming-caller-meta">
+        <div class="incoming-number">+91 98201 44021</div>
+        <div class="incoming-location">Dadar West, Mumbai · Tower Cell 42-B</div>
+        <div class="incoming-pills">
+          <span class="priority-pill" style="background:#ff2e43">CRITICAL RISK</span>
+          <span class="tag amber">VOICE ANOMALY DETECTED</span>
+        </div>
+      </div>
+    </div>
+    <div class="incoming-countdown-bar">
+      <div class="incoming-countdown-fill" id="incomingCountdownFill"></div>
+    </div>
+    <div class="incoming-auto-hint">Auto-answering call in <b id="incomingCountNum">3</b>s…</div>
+    <div class="incoming-actions">
+      <button id="incomingDeclineBtn" class="btn ghost">Decline</button>
+      <button id="incomingAnswerBtn" class="btn primary-call">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        Answer Call
+      </button>
+    </div>
+    <div class="incoming-disclaimer">
+      [DEMONSTRATION] Fictional emergency call · Labelled synthetic scenario · Human verification required
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+<audio id="audio" preload="metadata"></audio>
+<script>
+var P={phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',home:'<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',map:'<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h6"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',chev:'<path d="m9 6 6 6-6 6"/>',down:'<path d="m6 9 6 6 6-6"/>',shield:'<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/>',bars:'<path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>',pause:'<path d="M9 5v14M15 5v14" stroke-width="4"/>',play:'<path d="M7 4v16l13-8z" fill="currentColor"/>',vol:'<path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',pin:'<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',power:'<path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/>',head:'<path d="M3 14v-2a9 9 0 0 1 18 0v2M3 14h4v6H5a2 2 0 0 1-2-2zM21 14h-4v6h2a2 2 0 0 0 2-2z"/>',alert:'<path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/>',clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',tr:'<path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>',tower:'<path d="M12 12v10M8 22h8M5 8a10 10 0 0 1 14 0M8 11a6 6 0 0 1 8 0"/>',ex:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',inbox:'<path d="M4 4h16v12H4zM4 16l3 4h10l3-4M4 12h5l1 2h4l1-2h5"/>',fear:'<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/><path d="M12 8v4M12 15v.5"/>',ring:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>'};
+
+P.homeF='<path fill="currentColor" stroke="none" d="M12 2.8 1.8 12H5v9h5.5v-6h3v6H19v-9h3.2z"/>';
+P.mapF='<path fill="currentColor" stroke="none" d="M3 6.2 8.5 4v14.2L3 20.5zM10.2 4l4.1 1.7V20L10.2 18.2zM16 5.7 21 3.7v14.6L16 20.5z"/>';
+P.fileF='<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.8 9.2v1.8h8.4v-1.8zm0 3.8v1.8h5.6V15z"/>';
+P.gearF='<path fill="currentColor" stroke="none" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>';
+P.phoneF='<path fill="currentColor" stroke="none" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>';
+P.phoneRing=P.phoneF+'<path d="M15 3.5a6.5 6.5 0 0 1 5.5 5.5M15 7a3 3 0 0 1 2.5 2.5" opacity=".5"/>';
+P.phoneCall=P.phone+'<path d="M14.05 2a9 9 0 0 1 8 7.94M14.05 6A5 5 0 0 1 18 10"/>';
+P.hangup='<path fill="currentColor" stroke="none" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.956.956 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28a11.27 11.27 0 0 0-2.67-1.85.996.996 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>';
+P.pinF='<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M12 22s7.5-6.4 7.5-12.2A7.5 7.5 0 0 0 4.5 9.8C4.5 15.6 12 22 12 22zm0-9.8a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6z"/>';
+P.volF='<path fill="currentColor" stroke="none" d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>';
+P.spk='<path fill="currentColor" stroke="none" d="M11 5 6 9H2v6h4l5 4z"/><path d="M15 9a4 4 0 0 1 0 6" stroke-width="2.4"/>';
+P.shieldF='<path fill="currentColor" stroke="none" d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/><path fill="#0d1524" stroke="none" d="M12 7.2l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z"/>';
+P.fearF='<path fill="currentColor" stroke="none" d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/><path d="M12 8v4.5M12 15.5v.5" stroke="#2a0a10" stroke-width="2.2"/>';
+P.trembF='<path fill="currentColor" stroke="none" d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/><path d="M9.5 8h5M9.5 11.5h5M9.5 15h5M9.5 8v7" stroke="#2a2209" stroke-width="1.8"/>';
+P.headF='<path d="M4 14v-2a8 8 0 0 1 16 0v2" stroke-width="2.4"/><rect x="2.5" y="12.5" width="4.5" height="7.5" rx="2" fill="currentColor" stroke="none"/><rect x="17" y="12.5" width="4.5" height="7.5" rx="2" fill="currentColor" stroke="none"/><path d="M19.5 20c0 1.6-2 2-5 2" stroke-width="1.8"/>';
+P.userF='<circle cx="12" cy="8" r="4.2" fill="currentColor" stroke="none"/><path d="M4 21a8 8 0 0 1 16 0z" fill="currentColor" stroke="none"/>';
+P.scan='<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/>';
+P.arrow='<path d="M4 12h15M13 6l6 6-6 6"/>';
+P.refresh='<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>';
+P.target='<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/>';
+P.pwr='<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5"/>';
+P.qIc='<path d="M5 4v10h7M14 14.5l4.5-4.5M14.5 10H19v4.5"/>';
+P.mapC='<rect x="3" y="3" width="18" height="18" rx="3.5" fill="currentColor" stroke="none"/><path d="M12 6.5a3.4 3.4 0 0 1 3.4 3.4c0 2.4-3.4 5.2-3.4 5.2s-3.4-2.8-3.4-5.2A3.4 3.4 0 0 1 12 6.5z" fill="#3b2a0e" stroke="none"/><path d="M6 18l4-3.5 3 2.5 5-4.5" stroke="#3b2a0e" stroke-width="1.6"/>';
+P.mic='<rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5v1a6.5 6.5 0 0 0 13 0v-1M12 18v3.5M8.5 21.5h7"/>';
+P.barsB='<path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" stroke-width="2.8"/>';
+P.warnF='<path d="M12 4 3.5 19.5h17z" fill="#fff" stroke="none"/><path d="M12 10v4" stroke="#e5202e" stroke-width="2.4"/>';
+function I(n,s,c){return '<svg width="'+(s||16)+'" height="'+(s||16)+'" viewBox="0 0 24 24" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+P[n]+'</svg>'}
+function $(i){return document.getElementById(i)}
+</script>
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script src="/static/app.js"></script></div></body></html>

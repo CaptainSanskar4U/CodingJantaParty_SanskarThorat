@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/console", "destination": "/console/index.html" },
+    { "source": "/Orbitwin_Emergency_Response_Intelligence.html", "destination": "/console/index.html" }
+  ]
+}
