@@ -1,0 +1,1198 @@
+{
+  "segments": [
+    {
+      "start_s": 8.85,
+      "end_s": 11.49,
+      "text": "Hello, this is Polis Control Room. How can I assist you?",
+      "words": [
+        {
+          "start": 8.85,
+          "end": 9.33,
+          "word": " Hello,"
+        },
+        {
+          "start": 9.43,
+          "end": 9.53,
+          "word": " this"
+        },
+        {
+          "start": 9.53,
+          "end": 9.69,
+          "word": " is"
+        },
+        {
+          "start": 9.69,
+          "end": 9.99,
+          "word": " Polis"
+        },
+        {
+          "start": 9.99,
+          "end": 10.29,
+          "word": " Control"
+        },
+        {
+          "start": 10.29,
+          "end": 10.53,
+          "word": " Room."
+        },
+        {
+          "start": 10.69,
+          "end": 10.79,
+          "word": " How"
+        },
+        {
+          "start": 10.79,
+          "end": 10.91,
+          "word": " can"
+        },
+        {
+          "start": 10.91,
+          "end": 11.05,
+          "word": " I"
+        },
+        {
+          "start": 11.05,
+          "end": 11.23,
+          "word": " assist"
+        },
+        {
+          "start": 11.23,
+          "end": 11.49,
+          "word": " you?"
+        }
+      ]
+    },
+    {
+      "start_s": 12.09,
+      "end_s": 12.23,
+      "text": "Huh?",
+      "words": [
+        {
+          "start": 12.09,
+          "end": 12.23,
+          "word": " Huh?"
+        }
+      ]
+    },
+    {
+      "start_s": 14.82,
+      "end_s": 16.32,
+      "text": "I can't even build it a lot of.",
+      "words": [
+        {
+          "start": 14.82,
+          "end": 15.06,
+          "word": " I"
+        },
+        {
+          "start": 15.06,
+          "end": 15.18,
+          "word": " can't"
+        },
+        {
+          "start": 15.18,
+          "end": 15.38,
+          "word": " even"
+        },
+        {
+          "start": 15.38,
+          "end": 15.58,
+          "word": " build"
+        },
+        {
+          "start": 15.58,
+          "end": 15.68,
+          "word": " it"
+        },
+        {
+          "start": 15.68,
+          "end": 15.8,
+          "word": " a"
+        },
+        {
+          "start": 15.8,
+          "end": 15.96,
+          "word": " lot"
+        },
+        {
+          "start": 15.96,
+          "end": 16.32,
+          "word": " of."
+        }
+      ]
+    },
+    {
+      "start_s": 16.36,
+      "end_s": 17.2,
+      "text": "I can't even build it.",
+      "words": [
+        {
+          "start": 16.36,
+          "end": 16.5,
+          "word": " I"
+        },
+        {
+          "start": 16.5,
+          "end": 16.68,
+          "word": " can't"
+        },
+        {
+          "start": 16.68,
+          "end": 16.8,
+          "word": " even"
+        },
+        {
+          "start": 16.8,
+          "end": 17.08,
+          "word": " build"
+        },
+        {
+          "start": 17.08,
+          "end": 17.2,
+          "word": " it."
+        }
+      ]
+    },
+    {
+      "start_s": 17.45,
+      "end_s": 18.69,
+      "text": "I need...",
+      "words": [
+        {
+          "start": 17.45,
+          "end": 17.83,
+          "word": " I"
+        },
+        {
+          "start": 17.83,
+          "end": 18.69,
+          "word": " need..."
+        }
+      ]
+    },
+    {
+      "start_s": 18.69,
+      "end_s": 19.93,
+      "text": "Christmother, what do you need?",
+      "words": [
+        {
+          "start": 18.69,
+          "end": 19.11,
+          "word": " Christmother,"
+        },
+        {
+          "start": 19.41,
+          "end": 19.65,
+          "word": " what"
+        },
+        {
+          "start": 19.65,
+          "end": 19.75,
+          "word": " do"
+        },
+        {
+          "start": 19.75,
+          "end": 19.81,
+          "word": " you"
+        },
+        {
+          "start": 19.81,
+          "end": 19.93,
+          "word": " need?"
+        }
+      ]
+    },
+    {
+      "start_s": 20.79,
+      "end_s": 21.71,
+      "text": "I need a pizza.",
+      "words": [
+        {
+          "start": 20.79,
+          "end": 21.13,
+          "word": " I"
+        },
+        {
+          "start": 21.13,
+          "end": 21.31,
+          "word": " need"
+        },
+        {
+          "start": 21.31,
+          "end": 21.53,
+          "word": " a"
+        },
+        {
+          "start": 21.53,
+          "end": 21.71,
+          "word": " pizza."
+        }
+      ]
+    },
+    {
+      "start_s": 22.01,
+      "end_s": 22.13,
+      "text": "What?",
+      "words": [
+        {
+          "start": 22.01,
+          "end": 22.13,
+          "word": " What?"
+        }
+      ]
+    },
+    {
+      "start_s": 22.57,
+      "end_s": 24.49,
+      "text": "A regular peperoni pizza.",
+      "words": [
+        {
+          "start": 22.57,
+          "end": 23.03,
+          "word": " A"
+        },
+        {
+          "start": 23.03,
+          "end": 23.35,
+          "word": " regular"
+        },
+        {
+          "start": 23.35,
+          "end": 24.09,
+          "word": " peperoni"
+        },
+        {
+          "start": 24.09,
+          "end": 24.49,
+          "word": " pizza."
+        }
+      ]
+    },
+    {
+      "start_s": 25.26,
+      "end_s": 27.74,
+      "text": "Man, this is Polis Control Room, wrong number.",
+      "words": [
+        {
+          "start": 25.26,
+          "end": 25.8,
+          "word": " Man,"
+        },
+        {
+          "start": 25.92,
+          "end": 26.0,
+          "word": " this"
+        },
+        {
+          "start": 26.0,
+          "end": 26.1,
+          "word": " is"
+        },
+        {
+          "start": 26.1,
+          "end": 26.5,
+          "word": " Polis"
+        },
+        {
+          "start": 26.5,
+          "end": 26.74,
+          "word": " Control"
+        },
+        {
+          "start": 26.74,
+          "end": 27.06,
+          "word": " Room,"
+        },
+        {
+          "start": 27.34,
+          "end": 27.44,
+          "word": " wrong"
+        },
+        {
+          "start": 27.44,
+          "end": 27.74,
+          "word": " number."
+        }
+      ]
+    },
+    {
+      "start_s": 28.3,
+      "end_s": 28.58,
+      "text": "Yes.",
+      "words": [
+        {
+          "start": 28.3,
+          "end": 28.58,
+          "word": " Yes."
+        }
+      ]
+    },
+    {
+      "start_s": 29.42,
+      "end_s": 30.56,
+      "text": "I have put two elements.",
+      "words": [
+        {
+          "start": 29.42,
+          "end": 29.72,
+          "word": " I"
+        },
+        {
+          "start": 29.72,
+          "end": 29.86,
+          "word": " have"
+        },
+        {
+          "start": 29.86,
+          "end": 29.96,
+          "word": " put"
+        },
+        {
+          "start": 29.96,
+          "end": 30.26,
+          "word": " two"
+        },
+        {
+          "start": 30.26,
+          "end": 30.56,
+          "word": " elements."
+        }
+      ]
+    },
+    {
+      "start_s": 31.49,
+      "end_s": 33.41,
+      "text": "All the mountains are closed.",
+      "words": [
+        {
+          "start": 31.49,
+          "end": 32.03,
+          "word": " All"
+        },
+        {
+          "start": 32.03,
+          "end": 32.25,
+          "word": " the"
+        },
+        {
+          "start": 32.25,
+          "end": 32.73,
+          "word": " mountains"
+        },
+        {
+          "start": 32.73,
+          "end": 33.11,
+          "word": " are"
+        },
+        {
+          "start": 33.11,
+          "end": 33.41,
+          "word": " closed."
+        }
+      ]
+    },
+    {
+      "start_s": 34.57,
+      "end_s": 36.03,
+      "text": "Mom, you don't get it.",
+      "words": [
+        {
+          "start": 34.57,
+          "end": 34.79,
+          "word": " Mom,"
+        },
+        {
+          "start": 35.23,
+          "end": 35.53,
+          "word": " you"
+        },
+        {
+          "start": 35.53,
+          "end": 35.73,
+          "word": " don't"
+        },
+        {
+          "start": 35.73,
+          "end": 35.87,
+          "word": " get"
+        },
+        {
+          "start": 35.87,
+          "end": 36.03,
+          "word": " it."
+        }
+      ]
+    },
+    {
+      "start_s": 36.65,
+      "end_s": 38.13,
+      "text": "This is Polis Control Room.",
+      "words": [
+        {
+          "start": 36.65,
+          "end": 36.89,
+          "word": " This"
+        },
+        {
+          "start": 36.89,
+          "end": 37.03,
+          "word": " is"
+        },
+        {
+          "start": 37.03,
+          "end": 37.45,
+          "word": " Polis"
+        },
+        {
+          "start": 37.45,
+          "end": 37.73,
+          "word": " Control"
+        },
+        {
+          "start": 37.73,
+          "end": 38.13,
+          "word": " Room."
+        }
+      ]
+    },
+    {
+      "start_s": 38.45,
+      "end_s": 39.75,
+      "text": "We don't deliver pizzas.",
+      "words": [
+        {
+          "start": 38.45,
+          "end": 38.91,
+          "word": " We"
+        },
+        {
+          "start": 38.91,
+          "end": 39.03,
+          "word": " don't"
+        },
+        {
+          "start": 39.03,
+          "end": 39.35,
+          "word": " deliver"
+        },
+        {
+          "start": 39.35,
+          "end": 39.75,
+          "word": " pizzas."
+        }
+      ]
+    },
+    {
+      "start_s": 40.05,
+      "end_s": 40.97,
+      "text": "I need the pizza.",
+      "words": [
+        {
+          "start": 40.05,
+          "end": 40.21,
+          "word": " I"
+        },
+        {
+          "start": 40.21,
+          "end": 40.43,
+          "word": " need"
+        },
+        {
+          "start": 40.43,
+          "end": 40.65,
+          "word": " the"
+        },
+        {
+          "start": 40.65,
+          "end": 40.97,
+          "word": " pizza."
+        }
+      ]
+    },
+    {
+      "start_s": 40.97,
+      "end_s": 42.01,
+      "text": "I got it!",
+      "words": [
+        {
+          "start": 40.97,
+          "end": 41.03,
+          "word": " I"
+        },
+        {
+          "start": 41.03,
+          "end": 41.77,
+          "word": " got"
+        },
+        {
+          "start": 41.77,
+          "end": 42.01,
+          "word": " it!"
+        }
+      ]
+    },
+    {
+      "start_s": 42.35,
+      "end_s": 50.56,
+      "text": "You two have made me happy with the pizza.",
+      "words": [
+        {
+          "start": 42.35,
+          "end": 42.71,
+          "word": " You"
+        },
+        {
+          "start": 46.78,
+          "end": 46.94,
+          "word": " two"
+        },
+        {
+          "start": 46.94,
+          "end": 47.12,
+          "word": " have"
+        },
+        {
+          "start": 47.12,
+          "end": 47.44,
+          "word": " made"
+        },
+        {
+          "start": 47.44,
+          "end": 48.08,
+          "word": " me"
+        },
+        {
+          "start": 49.42,
+          "end": 49.92,
+          "word": " happy"
+        },
+        {
+          "start": 49.92,
+          "end": 50.16,
+          "word": " with"
+        },
+        {
+          "start": 50.16,
+          "end": 50.3,
+          "word": " the"
+        },
+        {
+          "start": 50.3,
+          "end": 50.56,
+          "word": " pizza."
+        }
+      ]
+    },
+    {
+      "start_s": 50.8,
+      "end_s": 52.99,
+      "text": "Pizza is one time.",
+      "words": [
+        {
+          "start": 50.8,
+          "end": 51.2,
+          "word": " Pizza"
+        },
+        {
+          "start": 51.2,
+          "end": 51.88,
+          "word": " is"
+        },
+        {
+          "start": 52.49,
+          "end": 52.71,
+          "word": " one"
+        },
+        {
+          "start": 52.71,
+          "end": 52.99,
+          "word": " time."
+        }
+      ]
+    },
+    {
+      "start_s": 54.04,
+      "end_s": 55.18,
+      "text": "Man, are you okay?",
+      "words": [
+        {
+          "start": 54.04,
+          "end": 54.24,
+          "word": " Man,"
+        },
+        {
+          "start": 54.66,
+          "end": 54.78,
+          "word": " are"
+        },
+        {
+          "start": 54.78,
+          "end": 54.9,
+          "word": " you"
+        },
+        {
+          "start": 54.9,
+          "end": 55.18,
+          "word": " okay?"
+        }
+      ]
+    },
+    {
+      "start_s": 56.53,
+      "end_s": 58.35,
+      "text": "Are you into some substance or alcohol?",
+      "words": [
+        {
+          "start": 56.53,
+          "end": 56.61,
+          "word": " Are"
+        },
+        {
+          "start": 56.61,
+          "end": 56.73,
+          "word": " you"
+        },
+        {
+          "start": 56.73,
+          "end": 56.91,
+          "word": " into"
+        },
+        {
+          "start": 56.91,
+          "end": 57.19,
+          "word": " some"
+        },
+        {
+          "start": 57.19,
+          "end": 57.79,
+          "word": " substance"
+        },
+        {
+          "start": 57.79,
+          "end": 58.09,
+          "word": " or"
+        },
+        {
+          "start": 58.09,
+          "end": 58.35,
+          "word": " alcohol?"
+        }
+      ]
+    },
+    {
+      "start_s": 59.01,
+      "end_s": 61.24,
+      "text": "Yes, I couldn't run.",
+      "words": [
+        {
+          "start": 59.01,
+          "end": 59.15,
+          "word": " Yes,"
+        },
+        {
+          "start": 60.44,
+          "end": 60.72,
+          "word": " I"
+        },
+        {
+          "start": 60.72,
+          "end": 61.06,
+          "word": " couldn't"
+        },
+        {
+          "start": 61.06,
+          "end": 61.24,
+          "word": " run."
+        }
+      ]
+    },
+    {
+      "start_s": 61.66,
+      "end_s": 62.54,
+      "text": "What are I doing?",
+      "words": [
+        {
+          "start": 61.66,
+          "end": 61.94,
+          "word": " What"
+        },
+        {
+          "start": 61.94,
+          "end": 62.14,
+          "word": " are"
+        },
+        {
+          "start": 62.14,
+          "end": 62.42,
+          "word": " I"
+        },
+        {
+          "start": 62.42,
+          "end": 62.54,
+          "word": " doing?"
+        }
+      ]
+    },
+    {
+      "start_s": 64.94,
+      "end_s": 66.32,
+      "text": "Because I'm homeless.",
+      "words": [
+        {
+          "start": 64.94,
+          "end": 65.46,
+          "word": " Because"
+        },
+        {
+          "start": 65.46,
+          "end": 65.98,
+          "word": " I'm"
+        },
+        {
+          "start": 65.98,
+          "end": 66.32,
+          "word": " homeless."
+        }
+      ]
+    },
+    {
+      "start_s": 70.06,
+      "end_s": 70.86,
+      "text": "Are you in trouble?",
+      "words": [
+        {
+          "start": 70.06,
+          "end": 70.3,
+          "word": " Are"
+        },
+        {
+          "start": 70.3,
+          "end": 70.48,
+          "word": " you"
+        },
+        {
+          "start": 70.48,
+          "end": 70.62,
+          "word": " in"
+        },
+        {
+          "start": 70.62,
+          "end": 70.86,
+          "word": " trouble?"
+        }
+      ]
+    },
+    {
+      "start_s": 71.24,
+      "end_s": 71.68,
+      "text": "I'm in jail.",
+      "words": [
+        {
+          "start": 71.24,
+          "end": 71.44,
+          "word": " I'm"
+        },
+        {
+          "start": 71.44,
+          "end": 71.48,
+          "word": " in"
+        },
+        {
+          "start": 71.48,
+          "end": 71.68,
+          "word": " jail."
+        }
+      ]
+    },
+    {
+      "start_s": 72.04,
+      "end_s": 74.0,
+      "text": "Yes, my house is near your outlet.",
+      "words": [
+        {
+          "start": 72.04,
+          "end": 72.2,
+          "word": " Yes,"
+        },
+        {
+          "start": 72.64,
+          "end": 72.86,
+          "word": " my"
+        },
+        {
+          "start": 72.86,
+          "end": 73.08,
+          "word": " house"
+        },
+        {
+          "start": 73.08,
+          "end": 73.34,
+          "word": " is"
+        },
+        {
+          "start": 73.34,
+          "end": 73.5,
+          "word": " near"
+        },
+        {
+          "start": 73.5,
+          "end": 73.68,
+          "word": " your"
+        },
+        {
+          "start": 73.68,
+          "end": 74.0,
+          "word": " outlet."
+        }
+      ]
+    },
+    {
+      "start_s": 74.64,
+      "end_s": 76.64,
+      "text": "In the station and the eye of the ghost.",
+      "words": [
+        {
+          "start": 74.64,
+          "end": 75.02,
+          "word": " In"
+        },
+        {
+          "start": 75.02,
+          "end": 75.14,
+          "word": " the"
+        },
+        {
+          "start": 75.14,
+          "end": 75.5,
+          "word": " station"
+        },
+        {
+          "start": 75.5,
+          "end": 75.96,
+          "word": " and"
+        },
+        {
+          "start": 75.96,
+          "end": 76.14,
+          "word": " the"
+        },
+        {
+          "start": 76.14,
+          "end": 76.24,
+          "word": " eye"
+        },
+        {
+          "start": 76.24,
+          "end": 76.38,
+          "word": " of"
+        },
+        {
+          "start": 76.38,
+          "end": 76.64,
+          "word": " the"
+        },
+        {
+          "start": 76.64,
+          "end": 76.64,
+          "word": " ghost."
+        }
+      ]
+    },
+    {
+      "start_s": 77.39,
+      "end_s": 77.95,
+      "text": "There's a building.",
+      "words": [
+        {
+          "start": 77.39,
+          "end": 77.59,
+          "word": " There's"
+        },
+        {
+          "start": 77.59,
+          "end": 77.67,
+          "word": " a"
+        },
+        {
+          "start": 77.67,
+          "end": 77.95,
+          "word": " building."
+        }
+      ]
+    },
+    {
+      "start_s": 78.55,
+      "end_s": 79.35,
+      "text": "That's my apartment.",
+      "words": [
+        {
+          "start": 78.55,
+          "end": 78.89,
+          "word": " That's"
+        },
+        {
+          "start": 78.89,
+          "end": 78.97,
+          "word": " my"
+        },
+        {
+          "start": 78.97,
+          "end": 79.35,
+          "word": " apartment."
+        }
+      ]
+    },
+    {
+      "start_s": 80.7,
+      "end_s": 82.12,
+      "text": "The floor.",
+      "words": [
+        {
+          "start": 80.7,
+          "end": 81.22,
+          "word": " The"
+        },
+        {
+          "start": 81.6,
+          "end": 82.12,
+          "word": " floor."
+        }
+      ]
+    },
+    {
+      "start_s": 82.74,
+      "end_s": 83.28,
+      "text": "The third floor.",
+      "words": [
+        {
+          "start": 82.74,
+          "end": 82.92,
+          "word": " The"
+        },
+        {
+          "start": 82.92,
+          "end": 83.04,
+          "word": " third"
+        },
+        {
+          "start": 83.04,
+          "end": 83.28,
+          "word": " floor."
+        }
+      ]
+    },
+    {
+      "start_s": 83.68,
+      "end_s": 83.78,
+      "text": "The third floor.",
+      "words": [
+        {
+          "start": 83.68,
+          "end": 83.78,
+          "word": " The"
+        },
+        {
+          "start": 83.78,
+          "end": 83.78,
+          "word": " third"
+        },
+        {
+          "start": 83.78,
+          "end": 83.78,
+          "word": " floor."
+        }
+      ]
+    },
+    {
+      "start_s": 87.88,
+      "end_s": 89.54,
+      "text": "We'll be sending the help right away.",
+      "words": [
+        {
+          "start": 87.88,
+          "end": 88.48,
+          "word": " We'll"
+        },
+        {
+          "start": 88.48,
+          "end": 88.56,
+          "word": " be"
+        },
+        {
+          "start": 88.56,
+          "end": 88.74,
+          "word": " sending"
+        },
+        {
+          "start": 88.74,
+          "end": 88.98,
+          "word": " the"
+        },
+        {
+          "start": 88.98,
+          "end": 89.08,
+          "word": " help"
+        },
+        {
+          "start": 89.08,
+          "end": 89.3,
+          "word": " right"
+        },
+        {
+          "start": 89.3,
+          "end": 89.54,
+          "word": " away."
+        }
+      ]
+    },
+    {
+      "start_s": 89.88,
+      "end_s": 93.93,
+      "text": "When will you be able to deliver it?",
+      "words": [
+        {
+          "start": 89.88,
+          "end": 90.14,
+          "word": " When"
+        },
+        {
+          "start": 92.57,
+          "end": 92.83,
+          "word": " will"
+        },
+        {
+          "start": 92.83,
+          "end": 92.95,
+          "word": " you"
+        },
+        {
+          "start": 92.95,
+          "end": 93.05,
+          "word": " be"
+        },
+        {
+          "start": 93.05,
+          "end": 93.17,
+          "word": " able"
+        },
+        {
+          "start": 93.17,
+          "end": 93.33,
+          "word": " to"
+        },
+        {
+          "start": 93.33,
+          "end": 93.63,
+          "word": " deliver"
+        },
+        {
+          "start": 93.63,
+          "end": 93.93,
+          "word": " it?"
+        }
+      ]
+    },
+    {
+      "start_s": 94.29,
+      "end_s": 97.99,
+      "text": "Well, the map shows that you are creating minutes away from the nearest pet home.",
+      "words": [
+        {
+          "start": 94.29,
+          "end": 94.43,
+          "word": " Well,"
+        },
+        {
+          "start": 94.97,
+          "end": 95.17,
+          "word": " the"
+        },
+        {
+          "start": 95.17,
+          "end": 95.33,
+          "word": " map"
+        },
+        {
+          "start": 95.33,
+          "end": 95.63,
+          "word": " shows"
+        },
+        {
+          "start": 95.63,
+          "end": 95.83,
+          "word": " that"
+        },
+        {
+          "start": 95.83,
+          "end": 96.01,
+          "word": " you"
+        },
+        {
+          "start": 96.01,
+          "end": 96.09,
+          "word": " are"
+        },
+        {
+          "start": 96.09,
+          "end": 96.31,
+          "word": " creating"
+        },
+        {
+          "start": 96.31,
+          "end": 96.59,
+          "word": " minutes"
+        },
+        {
+          "start": 96.59,
+          "end": 96.77,
+          "word": " away"
+        },
+        {
+          "start": 96.77,
+          "end": 97.01,
+          "word": " from"
+        },
+        {
+          "start": 97.01,
+          "end": 97.19,
+          "word": " the"
+        },
+        {
+          "start": 97.19,
+          "end": 97.57,
+          "word": " nearest"
+        },
+        {
+          "start": 97.57,
+          "end": 97.89,
+          "word": " pet"
+        },
+        {
+          "start": 97.89,
+          "end": 97.99,
+          "word": " home."
+        }
+      ]
+    },
+    {
+      "start_s": 99.46,
+      "end_s": 100.02,
+      "text": "Take care.",
+      "words": [
+        {
+          "start": 99.46,
+          "end": 99.82,
+          "word": " Take"
+        },
+        {
+          "start": 99.82,
+          "end": 100.02,
+          "word": " care."
+        }
+      ]
+    }
+  ],
+  "language": "en",
+  "language_probability": 0.604,
+  "text": "Hello, this is Polis Control Room. How can I assist you? Huh? I can't even build it a lot of. I can't even build it. I need... Christmother, what do you need? I need a pizza. What? A regular peperoni pizza. Man, this is Polis Control Room, wrong number. Yes. I have put two elements. All the mountains are closed. Mom, you don't get it. This is Polis Control Room. We don't deliver pizzas. I need the pizza. I got it! You two have made me happy with the pizza. Pizza is one time. Man, are you okay? Are you into some substance or alcohol? Yes, I couldn't run. What are I doing? Because I'm homeless. Are you in trouble? I'm in jail. Yes, my house is near your outlet. In the station and the eye of the ghost. There's a building. That's my apartment. The floor. The third floor. The third floor. We'll be sending the help right away. When will you be able to deliver it? Well, the map shows that you are creating minutes away from the nearest pet home. Take care."
+}
