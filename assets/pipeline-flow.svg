@@ -1,187 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 180" width="100%" height="100%">
   <defs>
-    <!-- Rack Unit Background -->
-    <linearGradient id="rackBg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#12141a" />
-      <stop offset="100%" stop-color="#0a0b0e" />
-    </linearGradient>
-
-    <!-- Module Card Gradient -->
-    <linearGradient id="moduleCard" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#161822" />
-      <stop offset="100%" stop-color="#0f1118" />
-    </linearGradient>
-
-    <!-- Optic Bus Pulse Gradient -->
-    <linearGradient id="packetGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#ff453a" stop-opacity="0" />
-      <stop offset="50%" stop-color="#ff9f0a" stop-opacity="1" />
-      <stop offset="100%" stop-color="#ff453a" stop-opacity="0" />
+    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff2e43" />
+      <stop offset="50%" stop-color="#ff7584" />
+      <stop offset="100%" stop-color="#3fb950" />
     </linearGradient>
 
     <style>
-      @keyframes dataFlow {
-        0% { stroke-dashoffset: 80; }
+      @keyframes pulseMove {
+        0% { stroke-dashoffset: 200; }
         100% { stroke-dashoffset: 0; }
       }
-      @keyframes vuBlink1 { 0%, 100% { fill: #30d158; } 50% { fill: #1c3d25; } }
-      @keyframes vuBlink2 { 0%, 100% { fill: #ff9f0a; } 50% { fill: #3d2a10; } }
-      @keyframes vuBlink3 { 0%, 100% { fill: #ff453a; } 70% { fill: #381210; } }
-      @keyframes cellPulse { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.3; } }
-      @keyframes packetSlide {
-        0% { transform: translateX(0); opacity: 0; }
-        20% { opacity: 1; }
-        80% { opacity: 1; }
-        100% { transform: translateX(55px); opacity: 0; }
+      @keyframes cardGlow {
+        0%, 100% { stroke: rgba(255, 46, 67, 0.3); }
+        50% { stroke: rgba(255, 46, 67, 0.75); }
       }
-
-      .bus-wire { stroke: #27272a; stroke-width: 2; }
-      .bus-signal { stroke: #ff9f0a; stroke-width: 2; stroke-dasharray: 6 12; animation: dataFlow 1.8s linear infinite; }
-      .vu-green { animation: vuBlink1 1.1s ease-in-out infinite; }
-      .vu-amber { animation: vuBlink2 0.8s ease-in-out infinite; }
-      .vu-red { animation: vuBlink3 0.6s ease-in-out infinite; }
-      .synapse { animation: cellPulse 2s ease-in-out infinite; }
-      .mono { font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace; }
-      .sans { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; }
+      .flow-line { stroke: #ff2e43; stroke-width: 2; stroke-dasharray: 8 12; animation: pulseMove 3s linear infinite; }
+      .p-card { fill: #0b0b0f; stroke-width: 1.5; animation: cardGlow 4s ease-in-out infinite; }
+      .p-title { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: bold; fill: #ffffff; letter-spacing: 1px; }
+      .p-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: #8b949e; }
+      .p-badge { font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: bold; fill: #ff4d5e; }
     </style>
   </defs>
 
-  <!-- Industrial 19-inch Rack Enclosure -->
-  <rect width="920" height="220" rx="10" fill="url(#rackBg)" stroke="#27272a" stroke-width="1.5" />
+  <!-- Background Base -->
+  <rect width="880" height="180" rx="10" fill="#060608" stroke="rgba(255, 46, 67, 0.2)" stroke-width="1.2" />
 
-  <!-- Chassis Corner Mount Screws -->
-  <circle cx="16" cy="16" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
-  <circle cx="904" cy="16" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
-  <circle cx="16" cy="204" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
-  <circle cx="904" cy="204" r="3.5" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <!-- Connecting Animated Data Lines -->
+  <line class="flow-line" x1="170" y1="90" x2="250" y2="90" />
+  <line class="flow-line" x1="390" y1="90" x2="470" y2="90" />
+  <line class="flow-line" x1="610" y1="90" x2="690" y2="90" />
 
-  <!-- Rack Unit Top Rail Banner -->
-  <g transform="translate(36, 26)">
-    <text x="0" y="0" class="mono" font-size="8.5" font-weight="700" fill="#71717a" letter-spacing="1.5">
-      DHVANI FORENSIC DSP CHAIN // SPEC: IEC-60268
-    </text>
-    <text x="848" y="0" text-anchor="end" class="mono" font-size="8.5" fill="#a1a1aa">
-      TOTAL PIPELINE LATENCY: <tspan fill="#30d158" font-weight="bold">~380ms</tspan> · DISPATCH: <tspan fill="#ff453a" font-weight="bold">&lt;1.4s</tspan>
-    </text>
-    <line x1="0" y1="10" x2="848" y2="10" stroke="#1f222e" stroke-width="1" />
+  <!-- Node 1: Ingestion -->
+  <g transform="translate(30, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff2e43" />
+    <text x="32" y="27" class="p-title">1. INGESTION</text>
+    <text x="14" y="52" class="p-sub">ffmpeg normalizer</text>
+    <text x="14" y="68" class="p-sub">16,000Hz mono</text>
+    <text x="14" y="84" class="p-sub">SHA-256 seal</text>
+    <rect x="14" y="90" width="80" height="1" fill="rgba(255, 46, 67, 0.4)" />
   </g>
 
-  <!-- HARDWARE SIGNAL BUSES (Inter-module conduits) -->
-  <line class="bus-wire" x1="225" y1="125" x2="280" y2="125" />
-  <line class="bus-signal" x1="225" y1="125" x2="280" y2="125" />
-
-  <line class="bus-wire" x1="435" y1="125" x2="490" y2="125" />
-  <line class="bus-signal" x1="435" y1="125" x2="490" y2="125" />
-
-  <line class="bus-wire" x1="645" y1="125" x2="700" y2="125" />
-  <line class="bus-signal" x1="645" y1="125" x2="700" y2="125" />
-
-  <!-- MODULE 01: INGESTION & FORENSIC SEAL -->
-  <g transform="translate(35, 52)">
-    <rect width="190" height="142" rx="7" fill="url(#moduleCard)" stroke="#27272a" stroke-width="1.2" />
-    
-    <!-- Module Header -->
-    <g transform="translate(14, 22)">
-      <circle cx="0" cy="0" r="3" fill="#ff453a" />
-      <text x="10" y="3" class="mono" font-size="9" font-weight="700" fill="#f4f4f5" letter-spacing="1">
-        01 // INGESTION
-      </text>
-    </g>
-
-    <!-- Technical Parameters -->
-    <text x="14" y="52" class="mono" font-size="8.5" fill="#a1a1aa">SRC: Telephony 8/16kHz</text>
-    <text x="14" y="68" class="mono" font-size="8.5" fill="#a1a1aa">DSP: ffmpeg PCM Mono</text>
-    <text x="14" y="84" class="mono" font-size="8.5" fill="#a1a1aa">SEAL: SHA-256 Hash</text>
-
-    <!-- Dynamic Hardware VU Meter -->
-    <g transform="translate(14, 102)">
-      <text x="0" y="10" class="mono" font-size="7.5" fill="#71717a">LEVEL:</text>
-      <!-- Discrete LED Bar Segments -->
-      <rect class="vu-green" x="42" y="3" width="12" height="8" rx="1.5" />
-      <rect class="vu-green" x="57" y="3" width="12" height="8" rx="1.5" />
-      <rect class="vu-green" x="72" y="3" width="12" height="8" rx="1.5" />
-      <rect class="vu-amber" x="87" y="3" width="12" height="8" rx="1.5" />
-      <rect class="vu-amber" x="102" y="3" width="12" height="8" rx="1.5" />
-      <rect class="vu-red" x="117" y="3" width="12" height="8" rx="1.5" />
-    </g>
-    <text x="14" y="130" class="mono" font-size="7.5" fill="#30d158">✓ BIT-PERFECT AUDIT</text>
+  <!-- Node 2: Neural Core -->
+  <g transform="translate(250, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff2e43" />
+    <text x="32" y="27" class="p-title">2. ASR &amp; AST</text>
+    <text x="14" y="52" class="p-sub">faster-whisper</text>
+    <text x="14" y="68" class="p-sub">MIT AudioSet AST</text>
+    <text x="14" y="84" class="p-sub">wav2vec2 stress</text>
   </g>
 
-  <!-- MODULE 02: NEURAL ASR & ACOUSTIC AST -->
-  <g transform="translate(245, 52)">
-    <rect width="190" height="142" rx="7" fill="url(#moduleCard)" stroke="#27272a" stroke-width="1.2" />
-    
-    <!-- Module Header -->
-    <g transform="translate(14, 22)">
-      <circle cx="0" cy="0" r="3" fill="#ff9f0a" />
-      <text x="10" y="3" class="mono" font-size="9" font-weight="700" fill="#f4f4f5" letter-spacing="1">
-        02 // NEURAL AUDIO
-      </text>
-    </g>
-
-    <text x="14" y="52" class="mono" font-size="8.5" fill="#a1a1aa">ASR: faster-whisper INT8</text>
-    <text x="14" y="68" class="mono" font-size="8.5" fill="#a1a1aa">AST: MIT AudioSet 527</text>
-    <text x="14" y="84" class="mono" font-size="8.5" fill="#a1a1aa">EMO: wav2vec2 Pitch Tremor</text>
-
-    <!-- Mini Spectrogram / Neural Synapse Grid -->
-    <g transform="translate(14, 100)">
-      <g class="synapse">
-        <circle cx="10" cy="6" r="2.5" fill="#ff9f0a" />
-        <circle cx="25" cy="6" r="2" fill="#ff453a" />
-        <circle cx="40" cy="6" r="3" fill="#ffd60a" />
-        <circle cx="55" cy="6" r="2.5" fill="#ff9f0a" />
-        <line x1="10" y1="6" x2="55" y2="6" stroke="#ff9f0a" stroke-opacity="0.3" stroke-width="0.8" />
-      </g>
-    </g>
-    <text x="14" y="130" class="mono" font-size="7.5" fill="#ff9f0a">● SPECTRAL ANOMALY: 84%</text>
+  <!-- Node 3: Intent Decoder -->
+  <g transform="translate(470, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff4d5e" />
+    <text x="32" y="27" class="p-title">3. NLP INTENT</text>
+    <text x="14" y="52" class="p-sub">Covert distress</text>
+    <text x="14" y="68" class="p-sub">Spoken landmark</text>
+    <text x="14" y="84" class="p-sub">0-100 triage score</text>
   </g>
 
-  <!-- MODULE 03: NLP INTENT & THREAT TRIAGE -->
-  <g transform="translate(455, 52)">
-    <rect width="190" height="142" rx="7" fill="url(#moduleCard)" stroke="#27272a" stroke-width="1.2" />
-    
-    <!-- Module Header -->
-    <g transform="translate(14, 22)">
-      <circle cx="0" cy="0" r="3" fill="#ff453a" />
-      <text x="10" y="3" class="mono" font-size="9" font-weight="700" fill="#f4f4f5" letter-spacing="1">
-        03 // NLP INTENT
-      </text>
-    </g>
-
-    <text x="14" y="52" class="mono" font-size="8.5" fill="#a1a1aa">MATCH: Covert Distress</text>
-    <text x="14" y="68" class="mono" font-size="8.5" fill="#a1a1aa">NER: Structural Landmark</text>
-    <text x="14" y="84" class="mono" font-size="8.5" fill="#a1a1aa">TRIAGE: Priority Level 1</text>
-
-    <!-- Confidence Gauge Strip -->
-    <g transform="translate(14, 102)">
-      <rect width="162" height="7" rx="3.5" fill="#181a24" />
-      <rect width="158" height="7" rx="3.5" fill="#ff453a" />
-    </g>
-    <text x="14" y="130" class="mono" font-size="7.5" fill="#ff453a">🚨 COVERT THREAT: 98.4%</text>
-  </g>
-
-  <!-- MODULE 04: TACTICAL CAD & ESRI SATELLITE -->
-  <g transform="translate(665, 52)">
-    <rect width="215" height="142" rx="7" fill="url(#moduleCard)" stroke="#30d158" stroke-width="1.2" />
-    
-    <!-- Module Header -->
-    <g transform="translate(14, 22)">
-      <circle cx="0" cy="0" r="3" fill="#30d158" />
-      <text x="10" y="3" class="mono" font-size="9" font-weight="700" fill="#30d158" letter-spacing="1">
-        04 // TACTICAL CAD
-      </text>
-    </g>
-
-    <text x="14" y="52" class="mono" font-size="8.5" fill="#a1a1aa">GRID: Esri Level-19 (0.3m)</text>
-    <text x="14" y="68" class="mono" font-size="8.5" fill="#a1a1aa">LOC: Dadar West · Fl 3</text>
-    <text x="14" y="84" class="mono" font-size="8.5" fill="#a1a1aa">DISPATCH: Patrol Unit 04</text>
-
-    <!-- Status Badge -->
-    <g transform="translate(14, 100)">
-      <rect width="186" height="22" rx="4" fill="#0f2316" stroke="#30d158" stroke-width="0.8" />
-      <text x="8" y="14" class="mono" font-size="8" font-weight="700" fill="#30d158">
-        ✓ SATELLITE INTERCEPT ACTIVE
-      </text>
-    </g>
+  <!-- Node 4: Dispatch HUD -->
+  <g transform="translate(690, 40)">
+    <rect class="p-card" width="160" height="100" rx="8" stroke="#3fb950" />
+    <circle cx="20" cy="24" r="4" fill="#3fb950" />
+    <text x="32" y="27" class="p-title">4. TACTICAL HUD</text>
+    <text x="14" y="52" class="p-sub">Esri Satellite Grid</text>
+    <text x="14" y="68" class="p-sub">Court evidence pack</text>
+    <text x="14" y="84" class="p-sub" fill="#3fb950">LATENCY: &lt;1.4s</text>
   </g>
 </svg>
