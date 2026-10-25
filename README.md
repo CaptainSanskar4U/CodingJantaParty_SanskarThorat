@@ -1,6 +1,5 @@
 <div align="center">
-
-<img src="./assets/dhvani-hero.svg" alt="DHVANI ध्वनि — THE SIGNAL" width="100%" />
+<img src="assets/dhvani-hero.svg" alt="DHVANI ध्वनि — Autonomous Acoustic Intelligence & Emergency Triage Grid" width="100%" />
 
 <br/>
 
