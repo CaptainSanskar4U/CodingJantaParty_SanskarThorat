@@ -318,16 +318,19 @@
 
     .copy>*,
     .copy a,
-    .copy .play {
-      pointer-events: auto
+    .copy .play,
+    .copy .wd,
+    a.play,
+    a.wd {
+      pointer-events: auto !important;
+      cursor: pointer !important;
     }
 
     .copy h1,
     .copy .sub,
     .copy .eyebrow,
     .copy .foot,
-    .copy .sep,
-    .copy .wd {
+    .copy .sep {
       pointer-events: none
     }
 
@@ -818,7 +821,19 @@
       font-size: 13px;
       line-height: 19px;
       font-weight: 400;
-      color: #f1eee9
+      color: #f1eee9;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      text-decoration: none !important;
+      transition: color .2s ease;
+    }
+
+    .wd:hover {
+      color: #ffffff !important;
+    }
+
+    .wd:hover small {
+      color: #00f0ff !important;
     }
 
     .wd small {
@@ -3077,10 +3092,8 @@
               <path d="M0.6 5H12M8 1L12 5L8 9" />
             </svg></a>
           <div class="abs sep rv" style="--d:2.25s"></div>
-          <a class="demo-link-wrap" href="https://youtu.be/2rOg1Y0TThU" target="_blank" rel="noopener noreferrer" aria-label="Watch demo on YouTube" style="text-decoration:none; color:inherit; display:contents;">
-            <div class="abs play rv" style="--d:2.3s" role="button" aria-label="Watch demo" tabindex="0" data-mag></div>
-            <div class="abs wd rv" style="--d:2.4s; cursor:pointer; pointer-events:auto;">Watch Demo<small>2 min</small></div>
-          </a>
+          <a class="abs play rv" style="--d:2.3s" href="https://youtu.be/2rOg1Y0TThU" target="_blank" rel="noopener noreferrer" aria-label="Watch demo on YouTube" role="button" tabindex="0" data-mag></a>
+          <a class="abs wd rv" style="--d:2.4s" href="https://youtu.be/2rOg1Y0TThU" target="_blank" rel="noopener noreferrer" aria-label="Watch demo on YouTube">Watch Demo<small>2 min</small></a>
         </div>
 
         <div class="abs foot"><span class="rule gx" style="--d:2.4s"></span><span class="rv" style="--d:2.55s">SUPPORT
@@ -3485,19 +3498,24 @@
       [].forEach.call(document.querySelectorAll('a[href="#"]'), function (a) { a.addEventListener('click', function (e) { e.preventDefault() }) });
       var play = document.querySelector('.play');
       var wd = document.querySelector('.wd');
-      function openDemo(e) {
-        if (e && e.preventDefault) e.preventDefault();
-        if (play) { play.classList.remove('hit'); void play.offsetWidth; play.classList.add('hit'); }
-        window.open('https://youtu.be/2rOg1Y0TThU', '_blank', 'noopener,noreferrer');
+      function animateHit() {
+        if (play) {
+          play.classList.remove('hit');
+          void play.offsetWidth;
+          play.classList.add('hit');
+        }
       }
       if (play) {
-        play.addEventListener('click', openDemo);
-        play.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDemo(e); } });
+        play.addEventListener('click', animateHit);
+        play.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            animateHit();
+            window.open('https://youtu.be/2rOg1Y0TThU', '_blank', 'noopener,noreferrer');
+          }
+        });
       }
       if (wd) {
-        wd.style.cursor = 'pointer';
-        wd.style.pointerEvents = 'auto';
-        wd.addEventListener('click', openDemo);
+        wd.addEventListener('click', animateHit);
       }
 
       /* ambient "analysis" scan across the photo tiles */
