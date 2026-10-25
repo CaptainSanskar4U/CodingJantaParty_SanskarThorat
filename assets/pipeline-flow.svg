@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 180" width="100%" height="100%">
+  <defs>
+    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff2e43" />
+      <stop offset="50%" stop-color="#ff7584" />
+      <stop offset="100%" stop-color="#3fb950" />
+    </linearGradient>
+
+    <style>
+      @keyframes pulseMove {
+        0% { stroke-dashoffset: 200; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes cardGlow {
+        0%, 100% { stroke: rgba(255, 46, 67, 0.3); }
+        50% { stroke: rgba(255, 46, 67, 0.75); }
+      }
+      .flow-line { stroke: #ff2e43; stroke-width: 2; stroke-dasharray: 8 12; animation: pulseMove 3s linear infinite; }
+      .p-card { fill: #0b0b0f; stroke-width: 1.5; animation: cardGlow 4s ease-in-out infinite; }
+      .p-title { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: bold; fill: #ffffff; letter-spacing: 1px; }
+      .p-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: #8b949e; }
+      .p-badge { font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: bold; fill: #ff4d5e; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="880" height="180" rx="10" fill="#060608" stroke="rgba(255, 46, 67, 0.2)" stroke-width="1.2" />
+
+  <!-- Connecting Animated Data Lines -->
+  <line class="flow-line" x1="170" y1="90" x2="250" y2="90" />
+  <line class="flow-line" x1="390" y1="90" x2="470" y2="90" />
+  <line class="flow-line" x1="610" y1="90" x2="690" y2="90" />
+
+  <!-- Node 1: Ingestion -->
+  <g transform="translate(30, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff2e43" />
+    <text x="32" y="27" class="p-title">1. INGESTION</text>
+    <text x="14" y="52" class="p-sub">ffmpeg normalizer</text>
+    <text x="14" y="68" class="p-sub">16,000Hz mono</text>
+    <text x="14" y="84" class="p-sub">SHA-256 seal</text>
+    <rect x="14" y="90" width="80" height="1" fill="rgba(255, 46, 67, 0.4)" />
+  </g>
+
+  <!-- Node 2: Neural Core -->
+  <g transform="translate(250, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff2e43" />
+    <text x="32" y="27" class="p-title">2. ASR &amp; AST</text>
+    <text x="14" y="52" class="p-sub">faster-whisper</text>
+    <text x="14" y="68" class="p-sub">MIT AudioSet AST</text>
+    <text x="14" y="84" class="p-sub">wav2vec2 stress</text>
+  </g>
+
+  <!-- Node 3: Intent Decoder -->
+  <g transform="translate(470, 40)">
+    <rect class="p-card" width="140" height="100" rx="8" />
+    <circle cx="20" cy="24" r="4" fill="#ff4d5e" />
+    <text x="32" y="27" class="p-title">3. NLP INTENT</text>
+    <text x="14" y="52" class="p-sub">Covert distress</text>
+    <text x="14" y="68" class="p-sub">Spoken landmark</text>
+    <text x="14" y="84" class="p-sub">0-100 triage score</text>
+  </g>
+
+  <!-- Node 4: Dispatch HUD -->
+  <g transform="translate(690, 40)">
+    <rect class="p-card" width="160" height="100" rx="8" stroke="#3fb950" />
+    <circle cx="20" cy="24" r="4" fill="#3fb950" />
+    <text x="32" y="27" class="p-title">4. TACTICAL HUD</text>
+    <text x="14" y="52" class="p-sub">Esri Satellite Grid</text>
+    <text x="14" y="68" class="p-sub">Court evidence pack</text>
+    <text x="14" y="84" class="p-sub" fill="#3fb950">LATENCY: &lt;1.4s</text>
+  </g>
+</svg>

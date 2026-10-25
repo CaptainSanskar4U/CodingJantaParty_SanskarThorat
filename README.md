@@ -1,29 +1,26 @@
 <div align="center">
 
-```
-  ██████╗  ██╗  ██╗ ██╗   ██╗  █████╗  ███╗   ██╗ ██╗
-  ██╔══██╗ ██║  ██║ ██║   ██║ ██╔══██╗ ████╗  ██║ ██║
-  ██║  ██║ ███████║ ██║   ██║ ███████║ ██╔██╗ ██║ ██║
-  ██║  ██║ ██╔══██║ ╚██╗ ██╔╝ ██╔══██║ ██║╚██╗██║ ██║
-  ██████╔╝ ██║  ██║  ╚████╔╝  ██║  ██║ ██║ ╚████║ ██║
-  ╚═════╝  ╚═╝  ╚═╝   ╚═══╝   ╚═╝  ╚═╝ ╚═╝  ╚═══╝ ╚═╝
-  [ D H V A N I ] · C O V E R T   D I S T R E S S   A I
-```
+<!-- LIVE ANIMATED HERO BANNER -->
+<p align="center">
+  <img src="assets/hero-banner.svg" alt="Dhvani Hero Banner" width="100%" />
+</p>
 
-### **AUTONOMOUS EMERGENCY TRIAGE & ACOUSTIC FORENSICS GRID**
-*Decodes what victims cannot say aloud. Pinpoints where they are trapped. Zero latency.*
+<!-- LIVE TYPING EFFECT -->
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=16&pause=1200&color=FF2E43&center=true&vCenter=true&width=750&lines=🚨+Decoding+Covert+Distress+Signals+in+Under+1.4s...;🛰️+Pinpointing+Spoken+Landmarks+on+Esri+Level-19+Satellite...;🧠+MIT+AudioSet+Neural+Acoustic+Event+Classification...;⚖️+Generating+Court-Admissible+Cryptographic+Evidence+Dossiers..." alt="Live HUD Telemetry" />
+</p>
 
 ---
 
-[![Vercel Deployment](https://img.shields.io/badge/LIVE_RADAR_CONSOLE-Vercel_Edge-000?style=for-the-badge&logo=vercel&logoColor=white)](https://public-two-xi-62.vercel.app/console)
+[![Vercel Deployment](https://img.shields.io/badge/LIVE_RADAR_CONSOLE-Vercel_Edge-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://public-two-xi-62.vercel.app/console)
 [![Python 3.13](https://img.shields.io/badge/ENGINE-Python_3.13_FastAPI-009688?style=for-the-badge&logo=python&logoColor=white)](https://fastapi.tiangolo.com)
 [![ASR](https://img.shields.io/badge/ASR-Faster--Whisper_INT8-FF6F00?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/SYSTRAN/faster-whisper)
 [![Imagery](https://img.shields.io/badge/MAP_GRID-Esri_World_Imagery_Satellite-1E88E5?style=for-the-badge&logo=esri&logoColor=white)](https://www.esri.com/)
-[![Acoustics](https://img.shields.io/badge/FORENSICS-MIT_AST_+_Wav2Vec2-D32F2F?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/)
-[![Tests](https://img.shields.io/badge/TESTS-10%2F10_PASSED-success?style=for-the-badge&logo=pytest&logoColor=white)](#-verification--system-benchmarks)
+[![Forensics](https://img.shields.io/badge/ACOUSTICS-MIT_AST_+_Wav2Vec2-D32F2F?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/)
+[![Tests](https://img.shields.io/badge/TESTS-10%2F10_PASSED-3fb950?style=for-the-badge&logo=pytest&logoColor=white)](#-verification--system-benchmarks)
 
 ```
-[SYSTEM STATUS: ONLINE]   [GRID: LEVEL-19 SATELLITE]   [AUDIO PIPELINE: 16kHz PCM]   [CPU INFERENCE: ~380ms]
+[SYSTEM STATUS: ONLINE]   [GRID: LEVEL-19 SATELLITE]   [AUDIO: 16kHz PCM]   [CPU LATENCY: ~380ms]
 ```
 
 [🔴 Live Cloud Console](https://public-two-xi-62.vercel.app/console) • [⚡ 30-Second Local Setup](#-reproduce-in-30-seconds) • [🍕 Case 2026-0002 Dossier](#-live-case-dossier-the-pizza-anomaly) • [🧠 Neural Architecture](#-neural-forensic-architecture) • [⚖️ Legal Chain of Custody](#️-forensic-chain-of-custody--court-dossiers)
@@ -37,7 +34,7 @@
 > In high-threat domestic violence, active burglaries, or extortion kidnapping, callers **are forced to speak under hostile observation**. 
 > Standard 112/911 operators receive dozens of false or prank calls an hour. When a victim whispers: *"Can you deliver a large pepperoni pizza to apartment 302?"*, conventional automated dispatchers log a misdial and terminate the call.
 >
-> **DHVANI (ध्वनि)** intercepts the audio stream, extracts subconscious acoustic panic markers, parses disguised distress codes through latent NLP matching, geolocates floor-level landmarks on satellite imagery, and constructs a legally binding chain-of-custody dossier in **under 2 seconds**.
+> **DHVANI (ध्वनि)** intercepts the audio stream, extracts subconscious acoustic panic markers, parses disguised distress codes through latent NLP matching, geolocates floor-level landmarks on high-resolution satellite imagery, and constructs a legally binding chain-of-custody dossier in **under 2 seconds**.
 
 ---
 
@@ -72,68 +69,16 @@
 
 ---
 
-## 🧠 NEURAL FORENSIC ARCHITECTURE
-
-```
-                                  [EMERGENCY CALL STREAM]
-                                             │
-                        ┌────────────────────┴────────────────────┐
-                        ▼                                         ▼
-              [Live Ingest: 5s Chunks]                   [Offline File Upload]
-                        │                                         │
-                        └────────────────────┬────────────────────┘
-                                             │
-                                             ▼
-                       [ffmpeg Normalization Pipeline]
-                       ├── Dual-pass mono conversion
-                       ├── 16,000 Hz sample rate (Nyquist-optimal)
-                       └── Signed 16-bit PCM little-endian (pcm_s16le)
-                                             │
-                      ┌──────────────────────┼──────────────────────┐
-                      ▼                      ▼                      ▼
-           [SPEECH INTELLIGENCE]    [ACOUSTIC FORENSICS]     [PROSODIC ANALYSIS]
-           faster-whisper (CTrans2)  MIT AST (AudioSet-10-10) wav2vec2-base-superb-er
-           ├── INT8 Quantization     ├── 10-sec Patch Spect   ├── Vocal Emotion Score
-           ├── Hindi / Hinglish / EN ├── Gunshot / Gasp / Cry ├── Pitch F0 Jitter
-           └── Whisper Translation   └── Door Slam Detection  └── Pause-to-Speech Ratio
-                      │                      │                      │
-                      └──────────────────────┼──────────────────────┘
-                                             │
-                                             ▼
-                               [DHVANI LATENT SEMANTIC ENGINE]
-                               ├── Distress Phrase Vector Matcher
-                               ├── Spoken Landmark NER Extractor
-                               └── Transparent 0–100 Urgency Formula
-                                             │
-                      ┌──────────────────────┴──────────────────────┐
-                      ▼                                             ▼
-          [TACTICAL RADAR DISPLAY]                      [COURT EVIDENCE PACK]
-          Esri High-Resolution Satellite                ├── SHA-256 Audio Checksum
-          ├── Dynamic Radar Rings (@keyframes)          ├── Per-Finding Attribution
-          ├── Dadar/Marine Drive Geo-Resolver           └── Instant Print-to-PDF
-          └── Layer Switch: Satellite ⟷ Street          
-```
-
-### 1. Ingestion & Pre-Processing Rigor
-- Raw audio is immediately validated against MIME type (`audio/*`, `video/mp4`, `video/webm`) and duration caps.
-- Normalized through zero-loss internal `ffmpeg` bindings into standard `16kHz mono pcm_s16le`—matching the exact acoustic training distribution of transformer speech encoders.
-- Calculates **640-bin RMS waveform peaks** asynchronously for instant zero-latency canvas rendering on the client.
-
-### 2. Multi-Tier Acoustic Event Classification
-- **Acoustic Classifier (`MIT/ast-finetuned-audioset-10-10-0.4593`)**: Evaluates 10-second non-overlapping spectrogram windows to distinguish human distress vocalizations from environmental noises (doors slamming, vehicle horns, scuffles).
-- **Prosody Engine**: Measures speaking rate (syllables/second), fundamental frequency drift ($F_0$), and silence-to-speech ratio to quantify adrenaline-induced vocal cord constriction.
-
-### 3. Latent Semantic Matching (Not Simple RegEx)
-- Spoken words are cross-referenced with `data/reference_pack.json`.
-- Detects covert aliases (`pepperoni pizza`, `wrong number`, `don't deliver`, `two people here`) with penalty weighting on machine-translated tokens to prevent false-positive escalations.
-
----
-
 ## 🛰️ TACTICAL SATELLITE TRACKING GRID
-*No mocked coordinates. No fake visual filters. Pure ground intelligence.*
+*Zero mocked coordinates. Zero fake visual filters. Pure ground intelligence.*
+
+<!-- LIVE ANIMATED RADAR TRACKER -->
+<p align="center">
+  <img src="assets/radar-tracker.svg" alt="Tactical Radar HUD" width="100%" />
+</p>
 
 ```
- 🛰️ ESRI ARCGIS WORLD IMAGERY (Level-19 Native Tiles)
+ 🛰️ ESRI ARCGIS WORLD IMAGERY (Level-19 Native Satellite)
  ├── Spatial Resolution: 0.3m per pixel (visible vehicles & apartment roofs)
  ├── Dynamic Hybrid Overlay: CARTO Dark Matter street labels
  ├── Radar Beacons: CSS-animated dual pulse rings (@keyframes pin-pulse)
@@ -147,6 +92,28 @@ When an abducted or trapped caller states: *"Near Dadar station, third floor apa
 2. **Local Gazetteer Query**: Zero-latency lookup in pre-warmed Mumbai/Delhi geospatial index.
 3. **Nominatim Fallback**: Reverse-geocodes with strict throttling to populate bounding boxes.
 4. **Accuracy Confidence Radius**: Renders tactical coverage circles ($r = 350\text{m}$) directly on the operator HUD.
+
+---
+
+## 🧠 NEURAL FORENSIC ARCHITECTURE
+
+<!-- LIVE ANIMATED PIPELINE FLOW -->
+<p align="center">
+  <img src="assets/pipeline-flow.svg" alt="Neural Pipeline Flow" width="100%" />
+</p>
+
+### 1. Ingestion & Pre-Processing Rigor
+- Raw audio is immediately validated against MIME type (`audio/*`, `video/mp4`, `video/webm`) and duration caps.
+- Normalized through zero-loss internal `ffmpeg` bindings into standard `16kHz mono pcm_s16le`—matching the exact acoustic training distribution of transformer speech encoders.
+- Calculates **640-bin RMS waveform peaks** asynchronously for instant zero-latency canvas rendering on the client.
+
+### 2. Multi-Tier Acoustic Event Classification
+- **Acoustic Classifier (`MIT/ast-finetuned-audioset-10-10-0.4593`)**: Evaluates 10-second non-overlapping spectrogram windows to distinguish human distress vocalizations from environmental noises (doors slamming, vehicle horns, scuffles).
+- **Prosody Engine**: Measures speaking rate (syllables/second), fundamental frequency drift ($F_0$), and silence-to-speech ratio to quantify adrenaline-induced vocal cord constriction.
+
+### 3. Latent Semantic Matching (Not Simple RegEx)
+- Spoken words are cross-referenced with `data/reference_pack.json`.
+- Detects covert aliases (`pepperoni pizza`, `wrong number`, `don't deliver`, `two people here`) with penalty weighting on machine-translated tokens to prevent false-positive escalations.
 
 ---
 
@@ -259,6 +226,10 @@ CodingJantaParty_SanskarThorat/
 │   ├── geo.py               # Nominatim geocoder + Mumbai local gazetteer
 │   ├── reports.py           # Legal PDF/HTML court evidence generator
 │   └── storage.py           # 16kHz mono normalization & waveform peak extractor
+├── assets/
+│   ├── hero-banner.svg      # Live animated cyber-tactical banner
+│   ├── radar-tracker.svg    # Rotating tactical satellite radar HUD
+│   └── pipeline-flow.svg    # Animated neural pipeline data flow
 ├── data/
 │   ├── demo/                # Flagship scenarios (covert_pizza_distress.wav)
 │   ├── reference_pack.json  # Emergency distress lexicon & scam indicators

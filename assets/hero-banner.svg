@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0d" />
+      <stop offset="50%" stop-color="#050508" />
+      <stop offset="100%" stop-color="#0e0709" />
+    </linearGradient>
+
+    <!-- Glowing Red Gradient -->
+    <linearGradient id="redGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff2e43" />
+      <stop offset="100%" stop-color="#ff6b6b" />
+    </linearGradient>
+
+    <!-- Scanline Gradient -->
+    <linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff2e43" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ff2e43" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#ff2e43" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 46, 67, 0.07)" stroke-width="1" />
+      <circle cx="0" cy="0" r="1.5" fill="rgba(255, 46, 67, 0.2)" />
+    </pattern>
+
+    <!-- Glow Filter -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <style>
+      @keyframes scan {
+        0% { transform: translateY(-100px); }
+        100% { transform: translateY(300px); }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; transform: scale(0.98); }
+        50% { opacity: 0.9; transform: scale(1.02); }
+      }
+      @keyframes wave {
+        0%, 100% { height: 8px; }
+        50% { height: 42px; }
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.2; }
+      }
+      @keyframes textGlow {
+        0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 46, 67, 0.6)); }
+        50% { filter: drop-shadow(0 0 20px rgba(255, 46, 67, 0.95)); }
+      }
+      .scanner { animation: scan 4s linear infinite; }
+      .rec-dot { animation: blink 1.2s ease-in-out infinite; }
+      .brand-title { animation: textGlow 3s ease-in-out infinite; }
+      .hud-text { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 11px; fill: #8b949e; letter-spacing: 1.5px; }
+      .hud-val { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 11px; fill: #ff4d5e; font-weight: bold; }
+      .mono-tag { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 10px; fill: #e6edf3; letter-spacing: 2px; }
+      .w-bar { transform-origin: bottom; animation: wave 1.4s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="880" height="280" rx="12" fill="url(#bgGrad)" stroke="rgba(255, 46, 67, 0.3)" stroke-width="1.5" />
+  <rect width="880" height="280" rx="12" fill="url(#grid)" />
+
+  <!-- Scanning Laser Line -->
+  <rect class="scanner" x="0" y="0" width="880" height="40" fill="url(#scanGrad)" pointer-events="none" />
+
+  <!-- Corner Brackets (HUD Styling) -->
+  <path d="M 16 36 L 16 16 L 36 16" fill="none" stroke="#ff2e43" stroke-width="2.5" />
+  <path d="M 864 36 L 864 16 L 844 16" fill="none" stroke="#ff2e43" stroke-width="2.5" />
+  <path d="M 16 244 L 16 264 L 36 264" fill="none" stroke="#ff2e43" stroke-width="2.5" />
+  <path d="M 864 244 L 864 264 L 844 264" fill="none" stroke="#ff2e43" stroke-width="2.5" />
+
+  <!-- Top Status Bar -->
+  <circle class="rec-dot" cx="36" cy="38" r="4.5" fill="#ff2e43" />
+  <text x="50" y="42" class="hud-text" font-weight="bold">SYSTEM ACTIVE</text>
+  <text x="210" y="42" class="hud-text">GRID: <tspan class="hud-val">ESRI SATELLITE 19x</tspan></text>
+  <text x="440" y="42" class="hud-text">SAMPLING: <tspan class="hud-val">16,000Hz PCM</tspan></text>
+  <text x="680" y="42" class="hud-text">LATENCY: <tspan class="hud-val">&lt; 1.4s</tspan></text>
+
+  <line x1="26" y1="56" x2="854" y2="56" stroke="rgba(255, 46, 67, 0.2)" stroke-width="1" />
+
+  <!-- Main Hero Brand Title -->
+  <g class="brand-title">
+    <text x="440" y="125" text-anchor="middle" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="52" fill="#ffffff" letter-spacing="8">
+      DHVANI <tspan fill="#ff2e43">·</tspan> ध्वनि
+    </text>
+  </g>
+
+  <!-- Subtitle Tagline -->
+  <text x="440" y="158" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" fill="#ff7584" letter-spacing="3.5">
+    AUTONOMOUS EMERGENCY TRIAGE &amp; COVERT DISTRESS INTELLIGENCE
+  </text>
+  <text x="440" y="180" text-anchor="middle" font-family="'Inter', sans-serif" font-size="12" fill="#8b949e">
+    Decoding hidden distress in disguised emergency calls with real-time acoustic neural forensics
+  </text>
+
+  <!-- Live Animated Equalizer Waveform Bars -->
+  <g transform="translate(240, 245)">
+    <rect class="w-bar" style="animation-delay: 0.1s" x="0" y="-30" width="4" height="24" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.4s" x="12" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.2s" x="24" y="-30" width="4" height="34" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.7s" x="36" y="-30" width="4" height="12" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.3s" x="48" y="-30" width="4" height="42" rx="2" fill="#ff6b6b" />
+    <rect class="w-bar" style="animation-delay: 0.5s" x="60" y="-30" width="4" height="28" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.9s" x="72" y="-30" width="4" height="16" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.2s" x="84" y="-30" width="4" height="38" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.6s" x="96" y="-30" width="4" height="22" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.1s" x="108" y="-30" width="4" height="32" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.8s" x="120" y="-30" width="4" height="14" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.3s" x="132" y="-30" width="4" height="40" rx="2" fill="#ff6b6b" />
+    <rect class="w-bar" style="animation-delay: 0.5s" x="144" y="-30" width="4" height="26" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.2s" x="156" y="-30" width="4" height="36" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.7s" x="168" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.4s" x="180" y="-30" width="4" height="30" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.6s" x="192" y="-30" width="4" height="20" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.1s" x="204" y="-30" width="4" height="44" rx="2" fill="#ff6b6b" />
+    <rect class="w-bar" style="animation-delay: 0.8s" x="216" y="-30" width="4" height="15" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.3s" x="228" y="-30" width="4" height="35" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.5s" x="240" y="-30" width="4" height="25" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.9s" x="252" y="-30" width="4" height="12" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.2s" x="264" y="-30" width="4" height="38" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.4s" x="276" y="-30" width="4" height="22" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.7s" x="288" y="-30" width="4" height="16" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.1s" x="300" y="-30" width="4" height="42" rx="2" fill="#ff6b6b" />
+    <rect class="w-bar" style="animation-delay: 0.5s" x="312" y="-30" width="4" height="28" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.3s" x="324" y="-30" width="4" height="36" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.8s" x="336" y="-30" width="4" height="18" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.2s" x="348" y="-30" width="4" height="30" rx="2" fill="#ff4d5e" />
+    <rect class="w-bar" style="animation-delay: 0.6s" x="360" y="-30" width="4" height="24" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.4s" x="372" y="-30" width="4" height="38" rx="2" fill="#ff6b6b" />
+    <rect class="w-bar" style="animation-delay: 0.1s" x="384" y="-30" width="4" height="20" rx="2" fill="#ff2e43" />
+    <rect class="w-bar" style="animation-delay: 0.7s" x="396" y="-30" width="4" height="34" rx="2" fill="#ff4d5e" />
+  </g>
+
+  <!-- Live Pulse Waves Bottom Border -->
+  <line x1="26" y1="220" x2="854" y2="220" stroke="rgba(255, 46, 67, 0.15)" stroke-width="1" />
+  <text x="36" y="248" class="hud-text">PIPELINE: <tspan fill="#e6edf3">WHISPER ASR + MIT AUDIOSET + ESRI SAT</tspan></text>
+  <text x="844" y="248" text-anchor="end" class="hud-text">TACTICAL BUILD: <tspan class="hud-val">v1.0.0-PROD</tspan></text>
+</svg>
