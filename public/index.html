@@ -3077,8 +3077,10 @@
               <path d="M0.6 5H12M8 1L12 5L8 9" />
             </svg></a>
           <div class="abs sep rv" style="--d:2.25s"></div>
-          <div class="abs play rv" style="--d:2.3s" role="button" aria-label="Watch demo" tabindex="0" data-mag></div>
-          <div class="abs wd rv" style="--d:2.4s">Watch Demo<small>2 min</small></div>
+          <a class="demo-link-wrap" href="https://youtu.be/2rOg1Y0TThU" target="_blank" rel="noopener noreferrer" aria-label="Watch demo on YouTube" style="text-decoration:none; color:inherit; display:contents;">
+            <div class="abs play rv" style="--d:2.3s" role="button" aria-label="Watch demo" tabindex="0" data-mag></div>
+            <div class="abs wd rv" style="--d:2.4s; cursor:pointer; pointer-events:auto;">Watch Demo<small>2 min</small></div>
+          </a>
         </div>
 
         <div class="abs foot"><span class="rule gx" style="--d:2.4s"></span><span class="rv" style="--d:2.55s">SUPPORT
@@ -3304,7 +3306,7 @@
            >Start Investigation <svg viewBox="0 0 13 10" fill="none" stroke="currentColor"
               stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M0.6 5H12M8 1L12 5L8 9" />
-            </svg></a><a class="b2 gh" href="#con">Watch Demo · 2 min</a></div>
+            </svg></a><a class="b2 gh" href="https://youtu.be/2rOg1Y0TThU" target="_blank" rel="noopener noreferrer">Watch Demo · 2 min</a></div>
       </div>
     </div>
   </section>
@@ -3482,9 +3484,21 @@
       /* placeholder links shouldn't jump the page; play is keyboard-operable */
       [].forEach.call(document.querySelectorAll('a[href="#"]'), function (a) { a.addEventListener('click', function (e) { e.preventDefault() }) });
       var play = document.querySelector('.play');
-      function hit() { setTimeout(function () { document.getElementById("hook").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }) }, 350); play.classList.remove('hit'); void play.offsetWidth; play.classList.add('hit') }
-      play.addEventListener('click', hit);
-      play.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hit() } });
+      var wd = document.querySelector('.wd');
+      function openDemo(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (play) { play.classList.remove('hit'); void play.offsetWidth; play.classList.add('hit'); }
+        window.open('https://youtu.be/2rOg1Y0TThU', '_blank', 'noopener,noreferrer');
+      }
+      if (play) {
+        play.addEventListener('click', openDemo);
+        play.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDemo(e); } });
+      }
+      if (wd) {
+        wd.style.cursor = 'pointer';
+        wd.style.pointerEvents = 'auto';
+        wd.addEventListener('click', openDemo);
+      }
 
       /* ambient "analysis" scan across the photo tiles */
       var tiles = [].slice.call(document.querySelectorAll('.tile')), ti = 0, over = 0;
