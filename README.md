@@ -1,9 +1,9 @@
 <div align="center">
-<img src="assets/dhvani-hero.svg" alt="DHAVLI धवली · DHVANI ध्वनि — Autonomous Acoustic Intelligence &amp; Emergency Triage Grid" width="100%" />
+<img src="assets/dhvani-hero.svg" alt="DHVANI (ध्वनि) — Autonomous Acoustic Intelligence &amp; Emergency Triage Grid" width="100%" />
 
 <br/>
 
-### **DHAVLI · धवली // DHVANI (ध्वनि)**
+### **DHVANI (ध्वनि)**
 ### **AUTONOMOUS EMERGENCY TRIAGE &amp; ACOUSTIC FORENSICS GRID**
 *Decodes what victims cannot say aloud. Pinpoints where they are trapped. Zero latency.*
 
