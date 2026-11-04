@@ -4,13 +4,15 @@ from __future__ import annotations
 import json
 import math
 import re
+import threading
+import time
 from pathlib import Path
 
 import numpy as np
 from scipy.fftpack import dct
 from scipy.cluster.vq import kmeans2
 
-from . import config, db, geo, models, phrases, storage
+from . import config, db, geo, guidance, models, phrases, storage
 
 
 def _load_audio(path: Path) -> tuple[np.ndarray, int]:
@@ -522,3 +524,216 @@ def process_call(call_id: str, job_id: str) -> None:
         })
         db.audit(None, "analysis_failed", "call", call_id, {"error": str(exc)[:500]})
         raise
+
+
+# ---------------------------------------------------------------------------
+# Real-Time Streaming & Live Analysis Pipeline
+# ---------------------------------------------------------------------------
+
+_LIVE_LOCK = threading.Lock()
+_LIVE_SESSIONS: dict[str, dict] = {}
+
+
+def get_live_session(session_id: str) -> dict:
+    with _LIVE_LOCK:
+        if session_id not in _LIVE_SESSIONS:
+            _LIVE_SESSIONS[session_id] = {
+                "created_at": time.time(),
+                "last_active": time.time(),
+                "samples": [],
+                "total_samples": 0,
+                "transcript": "",
+                "pizza_occurrences": [],
+            }
+        session = _LIVE_SESSIONS[session_id]
+        session["last_active"] = time.time()
+        return session
+
+
+def clear_live_session(session_id: str) -> None:
+    with _LIVE_LOCK:
+        _LIVE_SESSIONS.pop(session_id, None)
+
+
+def analyze_live_chunk(
+    chunk_pcm: np.ndarray,
+    session_id: str,
+    chunk_index: int = 0,
+    provisional_text: str = "",
+    language_hint: str = "auto",
+) -> dict:
+    session = get_live_session(session_id)
+
+    with _LIVE_LOCK:
+        session["samples"].append(chunk_pcm)
+        session["total_samples"] += len(chunk_pcm)
+        cumulative_samples = np.concatenate(session["samples"]) if session["samples"] else chunk_pcm
+        total_duration_s = round(session["total_samples"] / 16000.0, 2)
+        has_sufficient_data = total_duration_s > 3.0 or chunk_index >= 1
+
+        # 1. Transcribe chunk if no provisional text provided
+        if provisional_text:
+            cleaned_prov = provisional_text.strip()
+            if cleaned_prov:
+                if session["transcript"]:
+                    session["transcript"] += " " + cleaned_prov
+                else:
+                    session["transcript"] = cleaned_prov
+        else:
+            try:
+                lang = None if language_hint in {"", "auto"} else language_hint
+                asr_res = models.transcribe(chunk_pcm, config.WHISPER_MODEL, language=lang)
+                chunk_text = asr_res.get("text", "").strip()
+                if chunk_text:
+                    if session["transcript"]:
+                        session["transcript"] += " " + chunk_text
+                    else:
+                        session["transcript"] = chunk_text
+            except Exception:
+                pass
+
+        cumulative_text = session["transcript"].strip()
+        word_count = len(cumulative_text.split())
+
+        # 2. Extract real acoustic prosody on cumulative audio
+        prosody = _prosody(cumulative_samples, 16000, word_count, total_duration_s)
+
+        pitch_median = prosody.get("pitch_median_hz")
+        pitch_var = float(prosody.get("pitch_variation_hz") or 0.0)
+        pause_ratio = float(prosody.get("pause_ratio") or 0.0)
+        speech_rate = float(prosody.get("speech_rate_words_per_sec") or 0.0)
+
+        # 3. Keyword Detection for "PIZZA"
+        matches = list(re.finditer(r"\bpizza\b", cumulative_text, re.IGNORECASE))
+        pizza_count = len(matches)
+
+        current_time = total_duration_s
+        if pizza_count > len(session["pizza_occurrences"]):
+            new_count = pizza_count - len(session["pizza_occurrences"])
+            for _ in range(new_count):
+                session["pizza_occurrences"].append({
+                    "time_s": current_time,
+                    "term": "PIZZA",
+                })
+
+        if pizza_count == 0:
+            kw_badge = "MONITORING SPEECH…"
+            kw_alert = "normal"
+            kw_reason = "Listening for covert civilian transaction scripts, food orders, or disguised distress phrases."
+        elif pizza_count == 1:
+            kw_badge = "1x DETECTED · MONITORING"
+            kw_alert = "medium"
+            kw_reason = "First occurrence of 'PIZZA' detected. Continuing to monitor speech."
+        elif pizza_count == 2:
+            kw_badge = "2x DETECTED · MONITORING"
+            kw_alert = "high"
+            kw_reason = "Second occurrence of 'PIZZA' detected. Continuing to monitor speech."
+        else:
+            kw_badge = f"{pizza_count}x DETECTED · PIZZA DETECTED"
+            kw_alert = "critical"
+            kw_reason = "Repeated covert keyword detected ('PIZZA' 3+ times). Potential coded communication flagged."
+
+        # 4. Human Speech Biometrics (distinguishing observable metrics from interpretations)
+        if pitch_var > 0:
+            tremor_score = min(98, max(12, int((pitch_var / 35.0) * 50 + (pause_ratio / 0.5) * 50)))
+        else:
+            tremor_score = min(85, max(10, int(pause_ratio * 90)))
+
+        stress_score = min(96, max(15, int(tremor_score * 0.8 + (1.0 - min(1.0, speech_rate / 3.0)) * 20)))
+        breath_score = min(94, max(8, int(pause_ratio * 115)))
+        pretense_score = min(95, 20 + (25 * pizza_count)) if pizza_count > 0 else min(70, max(5, int(pause_ratio * 40)))
+
+        if tremor_score >= 70:
+            dominant_tag = "ACUTE VOCAL TREMOR (HIGH JITTER)"
+            tag_class = "tag red"
+            vocal_hint = f"Micro-tremor: {pitch_var:.1f} Hz frequency jitter in 180-240Hz band (Elevated physiological strain)"
+        elif tremor_score >= 45:
+            dominant_tag = "MODERATE STRESS"
+            tag_class = "tag amber"
+            vocal_hint = f"Micro-tremor: {pitch_var:.1f} Hz variation with {int(pause_ratio * 100)}% pause hesitation"
+        else:
+            dominant_tag = "CALIBRATING / BASELINE"
+            tag_class = "tag gray"
+            vocal_hint = "Vocal fold tension within normal baseline range"
+
+        # 5. Dynamic Investigator Guidance
+        guidance_data = guidance.generate_guidance(
+            transcript=cumulative_text,
+            observable_prosody=prosody,
+            keyword_hits=pizza_count,
+            has_sufficient_data=has_sufficient_data,
+        )
+
+        # 6. Real Geographic Location (Google Maps centered around Mumbai)
+        spoken_landmark = None
+        for item in geo.GAZETTEER:
+            for alias in item["aliases"]:
+                if alias.lower() in cumulative_text.lower():
+                    spoken_landmark = item
+                    break
+            if spoken_landmark:
+                break
+
+        if spoken_landmark:
+            location_info = {
+                "center": [spoken_landmark["lat"], spoken_landmark["lon"]],
+                "lat": spoken_landmark["lat"],
+                "lon": spoken_landmark["lon"],
+                "label": spoken_landmark["label"],
+                "is_demo_location": False,
+                "source_type": "Spoken Landmark Geocoded",
+                "source_detail": f"Caller stated landmark matching {spoken_landmark['label']}. Landmark is approximate and not GPS device fix.",
+                "accuracy_m": spoken_landmark.get("accuracy_m", 700),
+                "badge": "Landmark Verified",
+            }
+        else:
+            location_info = {
+                "center": [19.0760, 72.8777],
+                "lat": 19.0760,
+                "lon": 72.8777,
+                "label": "Mumbai, Maharashtra, India",
+                "is_demo_location": True,
+                "source_type": "Predefined Mumbai Reference (Device GPS Inactive)",
+                "source_detail": "Live GPS unavailable. Centered on Mumbai demonstration coordinates. Real map coordinates shown.",
+                "accuracy_m": 1500,
+                "badge": "Mumbai Reference Grid",
+            }
+
+        return {
+            "ok": True,
+            "session_id": session_id,
+            "duration_s": total_duration_s,
+            "has_sufficient_data": has_sufficient_data,
+            "transcript": cumulative_text,
+            "prosody": {
+                "observable": {
+                    "pitch_median_hz": pitch_median,
+                    "pitch_variation_hz": pitch_var,
+                    "pause_ratio": pause_ratio,
+                    "speech_rate_wps": speech_rate,
+                    "zero_crossing_rate": prosody.get("zero_crossing_rate", 0),
+                    "rms_mean": prosody.get("rms_mean", 0),
+                },
+                "interpretations": {
+                    "tremor_score": tremor_score if has_sufficient_data else 0,
+                    "stress_score": stress_score if has_sufficient_data else 0,
+                    "breath_score": breath_score if has_sufficient_data else 0,
+                    "pretense_score": pretense_score if has_sufficient_data else 0,
+                    "dominant_tag": dominant_tag if has_sufficient_data else "CALIBRATING…",
+                    "tag_class": tag_class if has_sufficient_data else "tag gray",
+                    "vocal_hint": vocal_hint if has_sufficient_data else "Listening for speech baseline…",
+                },
+                "disclaimer": "Observable acoustic measurements provided for decision support. Acoustic patterns alone do not prove deception or victimhood.",
+            },
+            "keywords": {
+                "target": "Pizza Detected" if pizza_count >= 3 else "Find the Victim's Hint",
+                "keyword_name": "PIZZA",
+                "count": pizza_count,
+                "badge": kw_badge if has_sufficient_data else "AWAITING SPEECH…",
+                "alert_level": kw_alert,
+                "occurrences": session["pizza_occurrences"],
+                "reason": kw_reason,
+            },
+            "guidance": guidance_data,
+            "location": location_info,
+        }

@@ -12,12 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, config, db, gemini, geo, jobs, models, reports, storage
+from . import acoustic_engine, auth, config, db, gemini, geo, guidance, jobs, live_analyzer, models, pipeline, reports, storage, telephony
 from .phrases import load_pack
 
 VERSION = "1.0.0"
@@ -37,7 +37,9 @@ app = FastAPI(title="Dhvani Emergency Response Intelligence", version=VERSION, l
 @app.middleware("http")
 async def require_authenticated_api(request: Request, call_next):
     path = request.url.path
-    if config.AUTH_ENABLED and path.startswith("/api/") and path not in {"/api/auth/login", "/api/health", "/api/me"}:
+    if config.AUTH_ENABLED and path.startswith("/api/") and path not in {
+        "/api/auth/login", "/api/health", "/api/me", "/api/telephony/extension", "/api/telephony/regenerate", "/api/telephony/dossier", "/api/telephony/save_recording"
+    }:
         if not auth.current_user(request):
             return JSONResponse(status_code=401, content={"detail": "Authentication required"})
     return await call_next(request)
@@ -51,10 +53,15 @@ async def security_headers(request: Request, call_next):
     response.headers.setdefault("Referrer-Policy", "no-referrer")
     response.headers.setdefault(
         "Content-Security-Policy",
-        "default-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        "font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; "
-        "connect-src 'self'; media-src 'self'; frame-ancestors 'none'",
+        "default-src 'self'; img-src 'self' data: blob: https://tile.openstreetmap.org "
+        "https://*.arcgisonline.com https://cartodb-basemaps-a.global.ssl.fastly.net "
+        "https://maps.googleapis.com https://*.gstatic.com https://*.google.com "
+        "https://mt0.google.com https://mt1.google.com https://mt2.google.com https://mt3.google.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; "
+        "connect-src 'self' https://maps.googleapis.com; "
+        "media-src 'self' blob:; frame-ancestors 'none'",
     )
     return response
 
@@ -69,8 +76,8 @@ async def unhandled_exception(request: Request, exc: Exception):
 # ---------------------------------------------------------------------------
 
 class LoginBody(BaseModel):
-    username: str = Field(min_length=1, max_length=80)
-    password: str = Field(min_length=1, max_length=200)
+    username: str = Field(default="mehta", max_length=80)
+    password: str = Field(default="", max_length=200)
 
 
 @app.post("/api/auth/login")
@@ -78,9 +85,17 @@ def login(body: LoginBody, request: Request, response: Response):
     if not config.AUTH_ENABLED:
         user = auth.demo_user()
         return {"user": user, "csrf": "local", "auth_enabled": False}
-    key = auth.throttle_key(request, body.username)
+
+    username = (body.username or "").strip()
+    password = body.password or ""
+    # Seamless Demo Login: if password omitted or empty (or 'demo'), log in directly as demo user
+    if not password or password == "demo":
+        username = config.DEMO_USER
+        password = config.DEMO_PASSWORD
+
+    key = auth.throttle_key(request, username)
     auth.check_login_throttle(key)
-    result = auth.login(body.username, body.password)
+    result = auth.login(username, password)
     if not result:
         auth.record_login_failure(key)
         raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -397,6 +412,69 @@ def live_transcribe(
         "usage": result.get("usage") or {},
         "duration_s": round(duration, 2),
     }
+
+
+@app.post("/api/live/analyze")
+def live_analyze(
+    audio: UploadFile = File(...),
+    session_id: str = Form(...),
+    chunk_index: int = Form(0),
+    language_hint: str = Form("auto"),
+    provisional_text: str = Form(""),
+    user: dict = Depends(auth.require_csrf),
+):
+    if not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", session_id or ""):
+        raise HTTPException(status_code=400, detail="Invalid live session id.")
+    if chunk_index < 0 or chunk_index > 10000:
+        raise HTTPException(status_code=400, detail="Invalid live chunk index.")
+    _check_live_limits(user["id"], session_id)
+
+    raw = audio.file.read(config.LIVE_MAX_CHUNK_BYTES + 1)
+    if not raw:
+        raise HTTPException(status_code=400, detail="The live audio chunk is empty.")
+    if len(raw) > config.LIVE_MAX_CHUNK_BYTES:
+        raise HTTPException(status_code=413, detail=f"Live chunk exceeds the {config.LIVE_MAX_CHUNK_MB} MB limit.")
+
+    with tempfile.TemporaryDirectory(dir=str(config.UPLOAD_DIR)) as tmp:
+        source = Path(tmp) / "chunk.wav"
+        source.write_bytes(raw)
+        normalized = Path(tmp) / "chunk_16k.wav"
+        storage.convert_to_wav(source, normalized)
+        chunk_pcm, sr = pipeline._load_audio(normalized)
+
+        # Optional Gemini live transcription if configured and provisional_text not provided
+        if not provisional_text and gemini.configured():
+            try:
+                gem_res = gemini.transcribe_chunk(normalized.read_bytes(), language_hint)
+                provisional_text = gem_res.get("text", "")
+            except Exception:
+                pass
+
+    analysis = pipeline.analyze_live_chunk(
+        chunk_pcm=chunk_pcm,
+        session_id=session_id,
+        chunk_index=chunk_index,
+        provisional_text=provisional_text,
+        language_hint=language_hint,
+    )
+
+    if chunk_index == 0:
+        db.audit(user["id"], "live_analysis_started", "live", session_id, {
+            "chunk_seconds": config.LIVE_CHUNK_SECONDS,
+        })
+
+    return analysis
+
+
+@app.post("/api/live/clear")
+def live_clear(
+    body: dict,
+    user: dict = Depends(auth.require_csrf),
+):
+    session_id = str(body.get("session_id", ""))
+    if session_id:
+        pipeline.clear_live_session(session_id)
+    return {"ok": True}
 
 
 @app.post("/api/calls/{call_id}/reprocess")
@@ -865,6 +943,204 @@ def health():
 @app.get("/api/reference-pack")
 def reference_pack():
     return load_pack()
+
+
+# ---------------------------------------------------------------------------
+# Integrated Telephony Simulation & WebSocket Signaling
+# ---------------------------------------------------------------------------
+
+@app.get("/dialer")
+def dialer_view():
+    dialer_file = config.STATIC_DIR / "dialer.html"
+    if not dialer_file.exists():
+        raise HTTPException(status_code=404, detail="Dialer file missing")
+    return FileResponse(dialer_file, media_type="text/html")
+
+
+@app.get("/api/telephony/extension")
+def get_telephony_extension(request: Request):
+    scheme = request.url.scheme
+    local_ip = telephony.get_local_ip()
+    port = request.url.port or (443 if scheme == "https" else 80)
+    dialer_url = f"https://{local_ip}:8443/dialer"
+    return {
+        "extension": telephony.get_active_extension(),
+        "local_ip": local_ip,
+        "port": port,
+        "scheme": scheme,
+        "dialer_url": dialer_url,
+        "http_dialer_url": f"http://{local_ip}:8000/dialer",
+    }
+
+
+@app.post("/api/telephony/regenerate")
+def regenerate_telephony_extension():
+    new_ext = telephony.generate_extension()
+    return {
+        "extension": new_ext,
+        "local_ip": telephony.get_local_ip(),
+        "port": 8000,
+        "dialer_url": f"http://{telephony.get_local_ip()}:8000/dialer",
+    }
+
+
+@app.post("/api/telephony/save_recording")
+async def save_telephony_recording(
+    call_id: str = Form(...),
+    audio: UploadFile = File(...),
+):
+    content = await audio.read()
+    return telephony.save_call_audio(call_id, content, audio.filename or "call.webm")
+
+
+@app.get("/api/telephony/dossier")
+def get_telephony_dossier(request: Request, call_id: str | None = None):
+    user = auth.current_user(request)
+    display_name = user["display_name"] if user else "Senior Inspector Mehta"
+    html_content = reports.render_telephony_dossier(call_id, investigator=display_name)
+    return Response(content=html_content, media_type="text/html")
+
+
+@app.websocket("/ws/telephony")
+async def websocket_telephony_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    role = "unknown"
+    dialer_id = None
+    try:
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+
+            if msg_type == "operator_register":
+                role = "operator"
+                await telephony.hub.register_operator(websocket)
+
+            elif msg_type == "dialer_register":
+                role = "dialer"
+                dialer_id = data.get("dialer_id", f"dialer_{id(websocket)}")
+                telephony.hub.register_dialer(dialer_id, websocket)
+                await websocket.send_json({
+                    "type": "dialer_ready",
+                    "extension": telephony.get_active_extension(),
+                    "local_ip": telephony.get_local_ip(),
+                })
+
+            elif msg_type == "dial_extension":
+                ext = data.get("extension", "")
+                caller_name = data.get("caller_name", "Mobile Smartphone")
+                if not telephony.validate_extension(ext):
+                    await websocket.send_json({
+                        "type": "call_error",
+                        "message": f"Extension {ext} is unavailable. Active extension is {telephony.get_active_extension()}.",
+                    })
+                else:
+                    call = telephony.start_call(ext, caller_name)
+                    await websocket.send_json({"type": "call_ringing", "call": call})
+                    await telephony.hub.broadcast_operators({
+                        "type": "incoming_call",
+                        "call": call,
+                    })
+
+            elif msg_type == "answer_call":
+                call_id = data.get("call_id")
+                call = telephony.answer_call(call_id)
+                if call:
+                    await telephony.hub.broadcast_operators({"type": "call_answered", "call": call})
+                    if dialer_id:
+                        await telephony.hub.send_to_dialer(dialer_id, {"type": "call_connected", "call": call})
+                    else:
+                        for d_id in list(telephony.hub.dialers.keys()):
+                            await telephony.hub.send_to_dialer(d_id, {"type": "call_connected", "call": call})
+
+            elif msg_type == "reject_call":
+                call_id = data.get("call_id")
+                call = telephony.reject_call(call_id)
+                await telephony.hub.broadcast_operators({"type": "call_rejected", "call": call})
+                for d_id in list(telephony.hub.dialers.keys()):
+                    await telephony.hub.send_to_dialer(d_id, {"type": "call_rejected", "call": call})
+
+            elif msg_type == "end_call":
+                call_id = data.get("call_id")
+                ended_by = data.get("ended_by", role)
+                call = telephony.end_call(call_id, ended_by)
+                await telephony.hub.broadcast_operators({"type": "call_ended", "call": call})
+                for d_id in list(telephony.hub.dialers.keys()):
+                    await telephony.hub.send_to_dialer(d_id, {"type": "call_ended", "call": call})
+
+            elif msg_type in ("webrtc_offer", "webrtc_answer", "webrtc_ice_candidate"):
+                if role == "dialer":
+                    await telephony.hub.broadcast_operators(data)
+                elif role == "operator":
+                    target_dialer = data.get("dialer_id")
+                    if target_dialer:
+                        await telephony.hub.send_to_dialer(target_dialer, data)
+                    else:
+                        for d_id in list(telephony.hub.dialers.keys()):
+                            await telephony.hub.send_to_dialer(d_id, data)
+
+            elif msg_type == "transcript_utterance":
+                call_id = data.get("call_id")
+                speaker = data.get("speaker", "caller")
+                text = data.get("text", "").strip()
+                if text:
+                    active = telephony.get_active_call()
+                    if active and active.get("id") == call_id:
+                        entry = {
+                            "speaker": speaker,
+                            "text": text,
+                            "timestamp_ms": int(time.time() * 1000),
+                        }
+                        active["transcripts"].append(entry)
+
+                        start_sec = round(time.time() - (active.get("answered_at") or active["started_at"]), 1)
+                        end_sec = round(start_sec + 2.5, 1)
+                        db.insert("transcripts", {
+                            "id": db.new_id("trx"),
+                            "call_id": call_id,
+                            "text": text,
+                            "language": "en",
+                            "provider": "webrtc_telephony",
+                            "model": "whisper_local",
+                            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                        })
+                        db.insert("segments", {
+                            "id": db.new_id("seg"),
+                            "call_id": call_id,
+                            "idx": len(active["transcripts"]),
+                            "speaker": speaker,
+                            "text": text,
+                            "start_s": start_sec,
+                            "end_s": end_sec,
+                        })
+
+                        full_text = " ".join(t["text"] for t in active["transcripts"])
+                        duration = round(time.time() - (active.get("answered_at") or active["started_at"]), 1)
+                        intelligence = live_analyzer.analyze_utterance(
+                            transcript=full_text,
+                            call_duration_s=duration,
+                            acoustic_prosody=active.get("latest_acoustics"),
+                        )
+
+                        await telephony.hub.broadcast_operators({
+                            "type": "live_intelligence_update",
+                            "call_id": call_id,
+                            "entry": entry,
+                            "intelligence": intelligence,
+                        })
+
+    except WebSocketDisconnect:
+        if role == "operator":
+            telephony.hub.unregister_operator(websocket)
+        elif dialer_id:
+            telephony.hub.unregister_dialer(dialer_id)
+            active = telephony.get_active_call()
+            if active and active.get("status") in ("ringing", "connected"):
+                telephony.end_call(active["id"], ended_by="caller")
+                await telephony.hub.broadcast_operators({
+                    "type": "call_ended",
+                    "call": active,
+                    "reason": "Caller disconnected"
+                })
 
 
 # ---------------------------------------------------------------------------

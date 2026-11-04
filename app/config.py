@@ -71,6 +71,9 @@ LIVE_RATE_LIMIT_PER_MINUTE = max(1, min(60, int(os.getenv("LIVE_RATE_LIMIT_PER_M
 
 MAP_TILE_URL = os.getenv("MAP_TILE_URL", "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}")
 MAP_ATTRIBUTION = os.getenv("MAP_ATTRIBUTION", "Tiles &copy; Esri")
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "").strip()
+MUMBAI_LAT = float(os.getenv("MUMBAI_LAT", "19.0760"))
+MUMBAI_LON = float(os.getenv("MUMBAI_LON", "72.8777"))
 NOMINATIM_URL = os.getenv("NOMINATIM_URL", "https://nominatim.openstreetmap.org")
 NOMINATIM_USER_AGENT = os.getenv("NOMINATIM_USER_AGENT", "Dhvani-Emergency-Intelligence/1.0")
 

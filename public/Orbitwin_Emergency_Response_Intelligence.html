@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dhvani | Emergency Response Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/static/orbitwin.css"><link rel="stylesheet" href="/static/dhavli-loader.css"><script src="/static/dhavli-loader.js"></script></head><body><div id="st" class="auth-view">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/static/orbitwin.css"><link rel="stylesheet" href="/static/dhavli-loader.css"><script src="/static/dhavli-loader.js"></script><script src="/static/vendor/qrcode.js"></script></head><body><div id="st" class="auth-view">
 <header class="topbar">
   <div class="brand">
     <span class="brand-mark"><svg width="26" height="26" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13.5" fill="none" stroke="#ff2e43" stroke-width="7"/><path d="M20.3 1v10.5M20.3 28.5v10.5" stroke="#050506" stroke-width="1.8"/><path d="M26.2 11.6 32 14.6" stroke="#050506" stroke-width="1.6"/></svg></span>
@@ -7,6 +7,13 @@
   </div>
   <div class="searchbar"><span id="si"></span><input id="q" placeholder="Search calls, transcript, locations, cases…" aria-label="Search"><kbd>Ctrl K</kbd></div>
   <div class="top-actions">
+    <div class="telephony-ext-badge" id="telephonyExtBadge" title="Local phone call simulation extension">
+      <span class="pulse-dot green"></span>
+      <span class="telephony-label">SIM EXT:</span>
+      <b class="ext-val" id="topActiveExt">966</b>
+      <button id="regenExtBtn" type="button" class="ext-regen-btn" title="Regenerate extension">↻</button>
+      <button id="openDialerModalBtn" type="button" class="ext-phone-btn" title="Connect mobile phone over Wi-Fi">📱 Phone</button>
+    </div>
     <button id="sys" class="engine" title="Checking local engine…"><i id="sysDot"></i><span id="sysText">Connecting…</span></button>
     <button id="liveBtn" class="btn"><span id="liveIc"></span>Go live</button>
     <button id="uploadBtn" class="btn primary" title="Upload a recording or load a labelled demo"><span id="upIc"></span>New recording</button>
@@ -46,7 +53,7 @@
     <div class="panel call-panel" id="callPanel">
       <div class="call-head">
         <div class="call-info">
-          <div class="call-meta"><span class="priority-pill" id="pr">NO RECORDING SELECTED</span><span class="ref" id="ref">—</span></div>
+          <div class="call-meta"><span class="priority-pill" id="pr">NO RECORDING SELECTED</span><span class="ref" id="ref">—</span><span class="rec-badge" id="callRecBadge" style="display:none; color:#ff2e43; font-size:11px; font-weight:700; align-items:center; gap:5px; margin-left:8px; background:rgba(255,46,67,0.12); border:1px solid rgba(255,46,67,0.3); border-radius:12px; padding:2px 8px;"><span class="pulse-dot red" style="width:7px;height:7px;border-radius:50%;background:#ff2e43;display:inline-block;box-shadow:0 0 8px #ff2e43;"></span>AUTO-RECORDING ON</span></div>
           <div class="call-title" id="ph"><span>Select a recording to begin</span></div>
           <div class="call-sub" id="lc"><span>Local analysis · no live telephony connected</span></div>
           <div class="call-chips"><span class="ch" id="c1"></span><span class="ch" id="c2"></span><span class="ch" id="c3"></span></div>
@@ -70,6 +77,20 @@
         </div>
       </div>
       <div class="call-footer"><span id="em">No recording selected</span><span class="call-footer-note">HUMAN REVIEW REQUIRED</span></div>
+      <canvas id="liveAudioOscilloscope" width="1400" height="120" style="display:none; width:100%; height:90px; background:#07080c; border-radius:8px; border:1px solid rgba(16,185,129,0.3); margin-top:10px;"></canvas>
+      <div id="tacticalDispatchBox" style="display:none; margin-top:10px; padding:12px 16px; background:rgba(255,46,67,0.08); border:1px solid rgba(255,46,67,0.4); border-radius:12px; align-items:center; justify-content:space-between; gap:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="pulse-dot red" style="width:10px; height:10px;"></span>
+          <div>
+            <b style="color:#ff2e43; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;">🚨 Covert Duress Confirmed · Dadar West Target</b>
+            <div style="color:#d1d5db; font-size:11px;" id="dispatchStatusText">Covert keyword 'Pizza' detected 3x. Acoustic stress verified. Tactical units on standby.</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="tacticalDispatchBtn" class="btn red" style="font-weight:700; white-space:nowrap; padding:6px 14px; font-size:12px;">🚨 Dispatch Unit 4-Bravo</button>
+          <button id="downloadDossierBtn" class="btn ghost small" style="white-space:nowrap; padding:6px 12px; font-size:12px;">📄 Evidence Dossier</button>
+        </div>
+      </div>
     </div>
 
     <div class="demo-review-bar" id="demoReviewBar" style="display:none">
@@ -110,84 +131,54 @@
   </section>
 
   <aside class="context-column" id="contextColumn">
-    <!-- 1. Real-Time Investigator Copilot -->
-    <div class="panel copilot-panel" id="copilotPanel">
-      <div class="panel-head">
-        <div>
-          <span class="eyebrow"><span class="pulse-dot red"></span>Real-Time AI Copilot</span>
-          <h2>Investigator Guidance</h2>
+    <!-- Empty State by Default: Populates ONLY when real-time data is analyzed -->
+    <div class="panel empty-context-panel" id="rightPanelEmptyState">
+      <div class="empty-context-box">
+        <div class="empty-context-radar">
+          <span class="empty-radar-ring"></span>
+          <span class="empty-radar-core"></span>
         </div>
-        <span class="copilot-phase-badge" id="copilotPhase">EVALUATING</span>
-      </div>
-      <div class="copilot-card" id="copilotCard">
-        <div class="copilot-action-label">WHAT TO ASK / SAY NEXT</div>
-        <div class="copilot-prompt" id="copilotPrompt">Awaiting speech signal to provide investigator guidance…</div>
-        <div class="copilot-rationale" id="copilotRationale">Dhvani neural model will evaluate caller stress, disguise patterns, and tactical risk in real time.</div>
-        <div class="copilot-checklist" id="copilotChecklist">
-          <div class="chk-item" id="chkCaller"><i></i> <span>Caller Disguise Identified</span></div>
-          <div class="chk-item" id="chkSafety"><i></i> <span>Closed Yes/No Protocol</span></div>
-          <div class="chk-item" id="chkLocation"><i></i> <span>Apartment Level Verified</span></div>
-          <div class="chk-item" id="chkDispatch"><i></i> <span>Emergency Unit Dispatched</span></div>
+        <div class="empty-context-title" id="emptyContextTitle">Live Intelligence Inactive</div>
+        <div class="empty-context-sub" id="emptyContextSub">
+          Awaiting active recording session. Real-time speech biometrics, dynamic investigator guidance, keyword detection, and tactical map activate once sufficient speech data is acquired.
+        </div>
+        <div class="empty-context-hint">
+          <span class="pulse-dot gray" id="emptyContextDot"></span>
+          <span id="emptyContextHintText">Awaiting Audio Stream</span>
         </div>
       </div>
     </div>
 
-    <!-- 2. Keyword & Repetition Tracker -->
-    <div class="panel keyword-panel" id="keywordPanel">
-      <div class="panel-head">
-        <div>
-          <span class="eyebrow">Acoustic Keyword Engine</span>
-          <h2>Keyword Detection</h2>
-        </div>
-        <span class="count-pill red" id="keywordCount">0 hits</span>
-      </div>
-      <div class="keyword-focus-card" id="keywordCard">
-        <div class="keyword-stat-row">
-          <div class="keyword-term">
-            <span class="kw-label">Target Term</span>
-            <b class="kw-val" id="kwTerm">“PIZZA”</b>
-          </div>
-          <div class="keyword-reps">
-            <span class="kw-label">Repetition Pattern</span>
-            <span class="kw-reps-badge" id="kwRepsBadge">MONITORING</span>
-          </div>
-        </div>
-        <div class="keyword-timeline-chips" id="kwTimeline">
-          <span class="kw-chip" id="kwc1"><i class="dot"></i> t=20.7s (disguised plea)</span>
-          <span class="kw-chip" id="kwc2"><i class="dot"></i> t=23.0s (pepperoni)</span>
-          <span class="kw-chip" id="kwc3"><i class="dot"></i> t=40.0s (insistence)</span>
-          <span class="kw-chip" id="kwc4"><i class="dot"></i> t=89.8s (delivery cover)</span>
-        </div>
-        <div class="keyword-insight-box">
-          <div class="kw-insight-title">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
-            Why This Repetition Matters
-          </div>
-          <p id="kwReason">In hostage and domestic violence crises, victims use familiar civilian transaction scripts to communicate without alerting the captor in the room.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. Emotion Detection & Vocal Stress -->
-    <div class="panel emotion-panel" id="emotionPanel">
+    <!-- 1. Human Speech Biometrics & Emotion Detection -->
+    <div class="panel emotion-panel" id="emotionPanel" style="display:none">
       <div class="panel-head">
         <div>
           <span class="eyebrow">Human Speech Biometrics</span>
-          <h2>Emotion Detection</h2>
+          <h2>Human Speech Biometrics</h2>
         </div>
         <span class="tag red" id="emotionDominant">MONITORING</span>
       </div>
+
+      <!-- Observable Acoustic Measurements -->
+      <div class="observable-bio-grid">
+        <div class="bio-item"><span>Pitch (F0 Median)</span><b id="bioPitch">— Hz</b></div>
+        <div class="bio-item"><span>Vocal Jitter (ΔF0)</span><b id="bioJitter">— Hz</b></div>
+        <div class="bio-item"><span>Pause Ratio</span><b id="bioPause">—%</b></div>
+        <div class="bio-item"><span>Speaking Speed</span><b id="bioSpeed">— wps</b></div>
+      </div>
+
+      <!-- Evidence-Backed Interpretations -->
       <div class="emotion-meter-group">
         <div class="emotion-row">
-          <div class="emo-meta"><span>Vocal Tremor &amp; Fear</span><b id="emoFearVal">0%</b></div>
+          <div class="emo-meta"><span>Vocal Tremor &amp; Stress</span><b id="emoFearVal">0%</b></div>
           <div class="emo-bar"><i id="emoFearBar" style="width:0%"></i></div>
         </div>
         <div class="emotion-row">
-          <div class="emo-meta"><span>Physiological Stress</span><b id="emoStressVal">0%</b></div>
+          <div class="emo-meta"><span>Physiological Tension</span><b id="emoStressVal">0%</b></div>
           <div class="emo-bar"><i id="emoStressBar" style="width:0%"></i></div>
         </div>
         <div class="emotion-row">
-          <div class="emo-meta"><span>Constrained Airflow</span><b id="emoBreathVal">0%</b></div>
+          <div class="emo-meta"><span>Hesitation &amp; Airflow</span><b id="emoBreathVal">0%</b></div>
           <div class="emo-bar"><i id="emoBreathBar" style="width:0%"></i></div>
         </div>
         <div class="emotion-row">
@@ -199,13 +190,71 @@
         <span class="radar-ping"></span>
         <span id="vocalHintText">Micro-tremor frequency jitter: calibrating speech baseline…</span>
       </div>
+      <div class="bio-legal-notice">
+        <b>Notice:</b> Observable acoustic measurements provided for decision support. Acoustic patterns alone do not prove deception or victimhood.
+      </div>
     </div>
 
-    <!-- 4. Location Tracking with Radar Visualizer -->
-    <div class="panel location-panel" id="locationPanel">
+    <!-- 2. Real-Time AI Copilot – Investigator Guidance -->
+    <div class="panel copilot-panel" id="copilotPanel" style="display:none">
       <div class="panel-head">
-        <div><span class="eyebrow">Geospatial</span><h2>Location Tracking</h2></div>
-        <span class="hint" id="locStageBadge">Triangulating</span>
+        <div>
+          <span class="eyebrow"><span class="pulse-dot red"></span>Real-Time AI Copilot</span>
+          <h2>Investigator Guidance</h2>
+        </div>
+        <span class="copilot-phase-badge" id="copilotPhase">EVALUATING</span>
+      </div>
+      <div class="copilot-card" id="copilotCard">
+        <div class="copilot-action-label" id="copilotActionLabel">WHAT TO ASK / SAY NEXT</div>
+        <div class="copilot-prompt" id="copilotPrompt">Awaiting speech signal to provide investigator guidance…</div>
+        <div class="copilot-rationale" id="copilotRationale">Dhvani neural model will evaluate caller stress, disguise patterns, and tactical risk in real time.</div>
+        <div class="copilot-checklist" id="copilotChecklist">
+          <div class="chk-item" id="chkCaller"><i></i> <span>Caller Disguise Identified</span></div>
+          <div class="chk-item" id="chkSafety"><i></i> <span>Closed Yes/No Protocol</span></div>
+          <div class="chk-item" id="chkLocation"><i></i> <span>Apartment Level Verified</span></div>
+          <div class="chk-item" id="chkDispatch"><i></i> <span>Emergency Unit Dispatched</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Acoustic Keyword Engine – Keyword Detection -->
+    <div class="panel keyword-panel" id="keywordPanel" style="display:none">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">Acoustic Keyword Engine</span>
+          <h2>Keyword Detection</h2>
+        </div>
+        <span class="count-pill red" id="keywordCount">0 hits</span>
+      </div>
+      <div class="keyword-focus-card" id="keywordCard">
+        <div class="keyword-stat-row">
+          <div class="keyword-term">
+            <span class="kw-label">Target Term</span>
+            <b class="kw-val" id="kwTerm">Find the Victim's Hint</b>
+          </div>
+          <div class="keyword-reps">
+            <span class="kw-label">Repetition Pattern</span>
+            <span class="kw-reps-badge" id="kwRepsBadge">MONITORING</span>
+          </div>
+        </div>
+        <div class="keyword-timeline-chips" id="kwTimeline">
+          <!-- Dynamically populated from real incoming occurrences -->
+        </div>
+        <div class="keyword-insight-box">
+          <div class="kw-insight-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+            Contextual Repetition Assessment
+          </div>
+          <p id="kwReason">Scanning incoming conversation for covert hints or disguised civilian transaction patterns.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Geospatial – Location Tracking -->
+    <div class="panel location-panel" id="locationPanel" style="display:none">
+      <div class="panel-head">
+        <div><span class="eyebrow">Geospatial</span><h2>Location Tracking (Mumbai)</h2></div>
+        <span class="hint" id="locStageBadge">Mumbai Reference Grid</span>
       </div>
       <div class="map-frame" id="mapPanel">
         <div id="mw" class="mp map-canvas"></div>
@@ -215,7 +264,7 @@
         </div>
         <div class="map-telemetry-badge" id="mapTelemetry">
           <span class="pulse-dot green"></span>
-          <span id="mapTelemetryText">CELL SECTOR 42-B · DADAR WEST</span>
+          <span id="mapTelemetryText">MUMBAI, MAHARASHTRA (DEMO REFERENCE)</span>
         </div>
         <button class="map-open" id="ex" aria-label="Open full map"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
         <button class="map-zoom" id="zi" aria-label="Zoom in">+</button><button class="map-zoom" id="zo" aria-label="Zoom out">−</button>
@@ -225,10 +274,10 @@
     </div>
 
     <!-- 5. Background Audio Breakdown & Equalizer -->
-    <div class="panel audio-panel" id="audioPanel">
+    <div class="panel audio-panel" id="audioPanel" style="display:none">
       <div class="panel-head">
         <div><span class="eyebrow">Forensics</span><h2>Background Audio Analysis</h2></div>
-        <span class="tag amber" id="audioEventCount">4 events</span>
+        <span class="tag amber" id="audioEventCount">0 events</span>
       </div>
       <div class="audio-analyzer-box">
         <div class="spectrum-bars" id="spectrumBars"></div>
@@ -284,9 +333,9 @@
       <h2>Sign in to Console</h2>
       <div class="sub">Use your investigator credentials to open the response workspace. Session cookies and CSRF protection are enabled.</div>
       <form id="loginForm">
-        <div class="field"><label for="loginUser">Username</label><input id="loginUser" autocomplete="username" required></div>
-        <div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
-        <button class="btn primary" id="loginBtn" type="submit">Enter workspace</button>
+        <div class="field"><label for="loginUser">Username (Demo Mode)</label><input id="loginUser" autocomplete="username" value="mehta" placeholder="mehta"></div>
+        <div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="No password required (Demo mode)"></div>
+        <button class="btn primary" id="loginBtn" type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">⚡ 1-Click Login to Console</button>
         <div class="login-err" id="loginErr"></div>
       </form>
       <div class="login-note">Demo access is seeded from <b>DHVANI_DEMO_USER</b> / <b>DHVANI_DEMO_PASSWORD</b> in <b>.env</b>. Change the defaults before any shared deployment.</div>
@@ -352,6 +401,40 @@
   </div>
 </div>
 
+<div id="telephonyModal" class="modal">
+  <div class="modal-card" style="max-width: 480px;">
+    <button class="modal-close" id="telephonyClose">Close</button>
+    <h2>📱 Connect Mobile Smartphone over Local Wi-Fi</h2>
+    <div class="sub">Dial the active extension from your mobile phone's browser or launch a phone dialer in a separate tab to test live WebRTC audio calling.</div>
+    <div style="display:flex; gap:16px; align-items:center; justify-content:center; margin:16px 0; padding:16px; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); border-radius:14px;">
+      <div id="telephonyQrContainer" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; border-radius:10px; padding:6px; min-width:140px; min-height:140px;">
+        <!-- QR Code rendered here -->
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:11px; color:#8c8c98; text-transform:uppercase; font-weight:700; margin-bottom:4px;">Active Extension:</div>
+        <div style="font-size:36px; font-weight:800; color:#4ade80; font-family:var(--mono, monospace); line-height:1;" id="modalActiveExt">966</div>
+        <div style="margin-top:10px; font-size:12px; color:#c7c7d4; line-height:1.4;">
+          Point your smartphone camera at this QR code to launch the emergency dialer instantly.
+        </div>
+      </div>
+    </div>
+    <div style="margin: 16px 0;">
+      <div style="font-size: 11px; color: #8c8c98; text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">Mobile Phone URL:</div>
+      <div style="display: flex; gap: 8px;">
+        <input id="mobileDialerUrlInput" readonly style="flex: 1; background: #13141a; border: 1px solid #282936; border-radius: 8px; padding: 8px 12px; color: #ededf2; font-family: var(--mono, monospace); font-size: 12px;">
+        <button id="copyDialerUrlBtn" class="btn primary small" style="white-space: nowrap;">Copy Link</button>
+      </div>
+    </div>
+    <div style="font-size: 11px; color: #10b981; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 8px 10px; margin-top: 10px;">
+      🔒 <b>Real Phone Audio Enabled:</b> Use <code>https://</code> on your phone to allow microphone access. When the browser displays "Your connection is not private", simply tap <b>Advanced → Proceed</b> once.
+    </div>
+    <div style="display: flex; gap: 10px; margin-top: 16px;">
+      <button id="openDialerTabBtn" class="btn primary" style="flex: 1;">Launch Phone in New Tab</button>
+      <button id="telephonyDoneBtn" class="btn ghost">Done</button>
+    </div>
+  </div>
+</div>
+
 <div id="incomingCallModal" class="incoming-modal" style="display:none">
   <div class="incoming-card">
     <div class="incoming-header">
@@ -367,8 +450,8 @@
         </div>
       </div>
       <div class="incoming-caller-meta">
-        <div class="incoming-number">+91 98201 44021</div>
-        <div class="incoming-location">Dadar West, Mumbai · Tower Cell 42-B</div>
+        <div class="incoming-number" id="incomingNumber">+91 98201 44021 (Mobile Phone Call)</div>
+        <div class="incoming-location" id="incomingLocation">Dadar West, Mumbai · Tower Cell 42-B</div>
         <div class="incoming-pills">
           <span class="priority-pill" style="background:#ff2e43">CRITICAL RISK</span>
           <span class="tag amber">VOICE ANOMALY DETECTED</span>
@@ -394,6 +477,7 @@
 
 <div class="toast-wrap" id="toasts"></div>
 <audio id="audio" preload="metadata"></audio>
+<audio id="operatorRemoteAudio" autoplay playsinline style="display:none"></audio>
 <script>
 var P={phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',home:'<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',map:'<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h6"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',chev:'<path d="m9 6 6 6-6 6"/>',down:'<path d="m6 9 6 6 6-6"/>',shield:'<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/>',bars:'<path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>',pause:'<path d="M9 5v14M15 5v14" stroke-width="4"/>',play:'<path d="M7 4v16l13-8z" fill="currentColor"/>',vol:'<path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',pin:'<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',power:'<path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/>',head:'<path d="M3 14v-2a9 9 0 0 1 18 0v2M3 14h4v6H5a2 2 0 0 1-2-2zM21 14h-4v6h2a2 2 0 0 0 2-2z"/>',alert:'<path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/>',clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',tr:'<path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>',tower:'<path d="M12 12v10M8 22h8M5 8a10 10 0 0 1 14 0M8 11a6 6 0 0 1 8 0"/>',ex:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',inbox:'<path d="M4 4h16v12H4zM4 16l3 4h10l3-4M4 12h5l1 2h4l1-2h5"/>',fear:'<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z"/><path d="M12 8v4M12 15v.5"/>',ring:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>'};
 

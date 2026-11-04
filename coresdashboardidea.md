@@ -354,4 +354,4 @@ When implementation and testing are finished, provide a factual completion repor
 
 Begin by inspecting the repository, then execute the work in the smallest safe increments. Keep the project runnable, validate each stage, and continue until you have completed as much as the environment genuinely permits.
 
-**The standard is simple: build what can be built, test what can be tested, document what cannot be completed, and never confuse a convincing interface with a working product.**
+**The standard is simple: build what can be built, test what can be tested, document what cannot be completed, and never confuse a convincing interface with a working product.**Bu 
