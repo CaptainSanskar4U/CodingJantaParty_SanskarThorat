@@ -393,6 +393,7 @@ def translate_live_utterance(
             "confidence": conf,
             "latency_ms": round(max(18.0, elapsed_ms), 1),
             "engine": "VEXYL Indic STT Pass-through",
+            "pass_through": True,
         }
 
     # 3. Direct Key Lookups

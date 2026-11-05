@@ -54,7 +54,10 @@
   var recognition = null;
   var recognitionLang = 'hi-IN';
   var speechRestartTimer = null;
+  var recognitionErrorCount = 0;
   var visualizerActive = false;
+  var lastLevelSentMs = 0;
+  var pendingIce = [];
 
   // DOM
   var dialScreen = document.getElementById('dialScreen');
@@ -180,11 +183,21 @@
       if (pc && pc.signalingState !== 'closed') {
         pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).then(function () {
           console.log('[WebRTC Dialer] Remote description set');
+          // Flush buffered candidates that arrived before the remote description
+          var pending = pendingIce.slice();
+          pendingIce = [];
+          pending.forEach(function (cand) {
+            try { pc.addIceCandidate(new RTCIceCandidate(cand)); } catch (e) {}
+          });
         }).catch(console.warn);
       }
     } else if (msg.type === 'webrtc_ice_candidate') {
-      if (pc && pc.signalingState !== 'closed' && msg.candidate) {
-        pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(console.warn);
+      if (msg.candidate && pc && pc.signalingState !== 'closed') {
+        if (pc.remoteDescription) {
+          try { pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch (e) {}
+        } else {
+          pendingIce.push(msg.candidate);
+        }
       }
     }
   }
@@ -355,6 +368,7 @@
       recognition.lang = recognitionLang;
 
       recognition.onresult = function (ev) {
+        recognitionErrorCount = 0;
         var interimText = '';
         for (var i = ev.resultIndex; i < ev.results.length; ++i) {
           var chunk = ev.results[i][0].transcript.trim();
@@ -389,10 +403,21 @@
       recognition.onerror = function (e) {
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
           console.warn('[Dialer] Speech recognition permission blocked. Mic audio continues, no transcript.');
+          if (micStatusText) micStatusText.textContent = 'Voice transcript blocked · audio still live';
           stopSpeechRecognition();
         } else if (e.error === 'not-found') {
           console.warn('[Dialer] Speech recognition language not supported on this device:', recognitionLang);
           if (micStatusText) micStatusText.textContent = 'Language not supported · try another';
+          stopSpeechRecognition();
+        } else if (e.error === 'audio-capture') {
+          console.warn('[Dialer] Speech recognition cannot capture mic (busy). Retrying…');
+          if (micStatusText && activeCall) micStatusText.textContent = 'Mic busy · audio live';
+        } else {
+          recognitionErrorCount++;
+          if (recognitionErrorCount > 6 && recognition) {
+            console.warn('[Dialer] Speech recognition failing repeatedly - stopping auto-restart.');
+            stopSpeechRecognition();
+          }
         }
       };
 
@@ -474,16 +499,19 @@
           if (dataArray[j] > peak) peak = dataArray[j];
         }
         var avg = dataArray.length ? sum / dataArray.length : 0;
-        // Smoothed 0..1 voice level streamed to the control-room console
+        // Smoothed 0..1 voice level streamed to the control-room console (throttled to ~5/s)
         var level = Math.min(1, (avg / 255) * 1.9 + (peak / 255) * 0.2);
         var now = Date.now();
-        if (activeCall && ws && ws.readyState === WebSocket.OPEN && !isMuted) {
-          ws.send(JSON.stringify({
-            type: 'audio_level',
-            call_id: activeCall.id,
-            level: Math.round(level * 100) / 100,
-            ts: now
-          }));
+        if (now - lastLevelSentMs > 180) {
+          lastLevelSentMs = now;
+          if (activeCall && ws && ws.readyState === WebSocket.OPEN && !isMuted) {
+            ws.send(JSON.stringify({
+              type: 'audio_level',
+              call_id: activeCall.id,
+              level: Math.round(level * 100) / 100,
+              ts: now
+            }));
+          }
         }
         bars.forEach(function (bar, idx) {
           var val = dataArray[idx % dataArray.length] || 0;
@@ -600,6 +628,8 @@
 
   function closeWebRTC() {
     visualizerActive = false;
+    lastLevelSentMs = 0;
+    pendingIce = [];
     if (localStream) {
       localStream.getTracks().forEach(function (t) { t.stop(); });
       localStream = null;

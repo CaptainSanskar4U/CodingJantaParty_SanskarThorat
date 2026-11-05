@@ -1393,8 +1393,14 @@
       } else if (msg.type === 'webrtc_offer') {
         this.handleWebRTCOffer(msg.sdp);
       } else if (msg.type === 'webrtc_ice_candidate') {
-        if (this.pc && this.pc.signalingState !== 'closed' && msg.candidate) {
-          this.pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(console.warn);
+        var iceCand = msg.candidate;
+        if (!iceCand) return;
+        if (this.pc && this.pc.signalingState !== 'closed' && this.pc.remoteDescription) {
+          this.pc.addIceCandidate(new RTCIceCandidate(iceCand)).catch(console.warn);
+        } else {
+          // Peer connection not ready yet (answer is async) - buffer instead of dropping
+          this.pendingIce = this.pendingIce || [];
+          this.pendingIce.push(iceCand);
         }
       } else if (msg.type === 'live_intelligence_update') {
         if (msg.intelligence) {
@@ -1935,6 +1941,7 @@
 
         var card = document.createElement('div');
         card.className = 'translation-card active-seek';
+        var sameLang = trData.pass_through || (trData.source_lang && trData.target_lang && trData.source_lang === trData.target_lang);
         card.innerHTML = '<div class="tr-card-header">' +
           '<div class="tr-speaker">' +
             '<span class="tr-spk-tag ' + (isCaller ? 'caller' : 'operator') + '">' + (isCaller ? 'Caller (Mobile)' : 'Operator') + '</span>' +
@@ -1942,6 +1949,7 @@
           '</div>' +
           '<div class="tr-meta">' +
             '<span class="lang-tag">' + (trData.source_flag || '🇮🇳') + ' ' + esc(trData.source_lang_name || 'Detected') + '</span>' +
+            '<span class="lang-tag">' + (trData.target_flag || '🌐') + ' ' + esc(trData.target_lang_name || (S.targetLang || 'EN')) + '</span>' +
             '<span class="latency-tag">⚡ ' + (trData.latency_ms || 32) + 'ms</span>' +
           '</div>' +
         '</div>' +
@@ -1952,8 +1960,9 @@
           '</div>' +
           '<div class="tr-arrow">➔</div>' +
           '<div class="tr-box target">' +
-            '<span class="tr-box-label">TRANSLATED (' + esc((S.targetLang || 'EN').toUpperCase()) + '):</span>' +
+            '<span class="tr-box-label">' + (sameLang ? 'SAME LANGUAGE · ' : '') + 'TRANSLATED (' + esc((trData.target_lang || S.targetLang || 'EN').toUpperCase()) + '):</span>' +
             '<div class="tr-box-text">' + esc(trData.translated_text || entry.text) + '</div>' +
+            (trData.engine ? '<span class="latency-tag" style="margin-top:4px;display:inline-block">🧠 ' + esc(trData.engine) + '</span>' : '') +
           '</div>' +
         '</div>';
         trFeed.appendChild(card);
@@ -2058,6 +2067,12 @@
         await this.pc.setRemoteDescription(new RTCSessionDescription(sdp));
         var answer = await this.pc.createAnswer();
         await this.pc.setLocalDescription(answer);
+        // Flush buffered remote ICE candidates now that the remote description exists
+        var pendingIce = this.pendingIce || [];
+        this.pendingIce = [];
+        pendingIce.forEach(function (cand) {
+          self.pc.addIceCandidate(new RTCIceCandidate(cand)).catch(console.warn);
+        });
         if (this.ws && this.ws.readyState === WebSocket.OPEN && this.activeSimCall) {
           this.ws.send(JSON.stringify({
             type: 'webrtc_answer',
@@ -2108,14 +2123,54 @@
       if (!self.levelHistory) self.levelHistory = [];
       var cctx = canvas.getContext('2d');
       var W = canvas.width, H = canvas.height;
+      var mainCanvas = el('wv');
+      var mctx = mainCanvas ? mainCanvas.getContext('2d') : null;
+
+      function drawMainLive() {
+        if (!mctx || !mainCanvas) return;
+        var mw = mainCanvas.width, mh = mainCanvas.height;
+        mctx.fillStyle = '#070709';
+        mctx.fillRect(0, 0, mw, mh);
+        var recent = (Date.now() - (self.lastLevelAt || 0)) < 900;
+        var hist = self.levelHistory || [];
+        var secs = self.activeSimCall ? Math.max(0, Math.round((Date.now() - (self.callStartTime || Date.now())) / 1000)) : 0;
+        var dur = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+        var barCount = Math.max(hist.length, 64);
+        var barW = mw / barCount;
+        var mid = mh * 0.52;
+        var idleT = Date.now() / 240;
+        for (var i = 0; i < barCount; i++) {
+          var raw = recent ? (hist[i] || 0) : 0;
+          var idle = Math.abs(Math.sin(idleT + i * 0.28)) * (mh * 0.018);
+          var amp = Math.max(1.5 + idle, raw * mh * 0.42);
+          mctx.fillStyle = i / barCount > 0.94 ? '#ff2e43' : 'rgba(16,185,129,0.85)';
+          mctx.fillRect(i * barW, mid - amp, Math.max(1, barW - 1.5), amp * 2);
+        }
+        mctx.fillStyle = '#070709';
+        mctx.fillRect(0, mid - 1, mw, 2);
+        mctx.fillStyle = '#10b981';
+        mctx.font = '600 20px Inter, sans-serif';
+        mctx.textAlign = 'left';
+        mctx.fillText('LIVE CALL · ' + dur, 14, 26);
+        mctx.fillStyle = '#8c8c98';
+        mctx.font = '500 15px Inter, sans-serif';
+        mctx.textAlign = 'right';
+        mctx.fillText('Caller voice telemetry · listening', mw - 14, 26);
+      }
 
       function drawFrame() {
         if (!self.activeSimCall) {
           canvas.style.display = 'none';
           self.waveLoopRunning = false;
+          if (mctx && mainCanvas && !S.playing) {
+            // Hand the main panel back to the recording renderer
+            mctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+            if (S.detail) renderWaveform(S.detail.waveform || []);
+          }
           return;
         }
         requestAnimationFrame(drawFrame);
+        drawMainLive();
 
         var useAnalyser = !!self.waveAnalyser;
         var recent = (Date.now() - (self.lastLevelAt || 0)) < 900;
@@ -2254,6 +2309,14 @@
         try { this.pc.close(); } catch (e) {}
         this.pc = null;
       }
+      this.pendingIce = [];
+      this.levelHistory = [];
+      this.lastLevelAt = 0;
+      this.waveAnalyser = null;
+      this.waveFreqData = null;
+      // Let the live wave loop retire cleanly
+      this.activeSimCall = null;
+      this.waveLoopRunning = false;
     }
   };
 
@@ -3668,6 +3731,7 @@
         var origText = seg.original_text || seg.text || '';
         var transText = seg.translated_text || seg.translation || origText;
         var latency = seg.latency_ms || 32;
+        var sameLang = (seg.source_lang && seg.source_lang === S.targetLang);
 
         return '<div class="translation-card" data-start="' + esc(seg.start_s) + '">' +
           '<div class="tr-card-header">' +
@@ -3687,8 +3751,9 @@
             '</div>' +
             '<div class="tr-arrow">➔</div>' +
             '<div class="tr-box target">' +
-              '<span class="tr-box-label">TRANSLATED (' + esc(S.targetLang.toUpperCase()) + '):</span>' +
+              '<span class="tr-box-label">' + (sameLang ? 'SAME LANGUAGE · ' : '') + 'TRANSLATED (' + esc(S.targetLang.toUpperCase()) + '):</span>' +
               '<div class="tr-box-text">' + esc(transText) + '</div>' +
+              (seg.engine ? '<span class="latency-tag" style="margin-top:4px;display:inline-block">🧠 ' + esc(seg.engine) + '</span>' : '') +
             '</div>' +
           '</div>' +
         '</div>';

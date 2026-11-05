@@ -52,6 +52,12 @@ async def security_headers(request: Request, call_next):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "no-referrer")
+    # Cache-bust static JS/CSS: browsers must revalidate so an update is always
+    # served on reload instead of a stale heuristic-cached copy.
+    if request.url.path.startswith("/static/") and (
+        request.url.path.endswith(".js") or request.url.path.endswith(".css")
+    ):
+        response.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
     response.headers.setdefault(
         "Content-Security-Policy",
         "default-src 'self'; img-src 'self' data: blob: https://tile.openstreetmap.org "

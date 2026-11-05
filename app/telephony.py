@@ -1,6 +1,7 @@
 """Telephony signaling, extension manager, and WebRTC coordination for local phone simulation."""
 import json
 import logging
+import math
 import random
 import socket
 import time
@@ -49,6 +50,30 @@ def validate_extension(ext: str) -> bool:
     if not ext:
         return False
     return str(ext).strip() == _ACTIVE_EXTENSION
+
+
+def generate_synthetic_peaks(call_id: str, duration_s: float, num_peaks: int = 120) -> List[float]:
+    """Labelled synthetic envelope for simulated calls that captured no audio.
+
+    Ringback pulse at the start, speech-like bursts, taper at the end. Deterministic
+    per call so the same call always renders the same shape.
+    """
+    rng = random.Random(abs(hash(call_id)))
+    duration = max(1.0, float(duration_s or 0))
+    _ = duration  # shape spans the timeline; absolute time not needed for the envelope
+    peaks: List[float] = []
+    for i in range(num_peaks):
+        t = (i + 0.5) / num_peaks
+        if t < 0.12:
+            pulse = 0.55 if (int(t / 0.045) % 2 == 0) else 0.08
+            v = pulse + rng.uniform(-0.03, 0.03)
+        else:
+            burst = max(0.0, math.sin(t * math.pi * 9 + rng.uniform(0, 0.6)) ** 2 * (0.45 + 0.5 * rng.random()))
+            v = min(0.98, max(0.12, 0.16 + 0.74 * burst) + rng.uniform(-0.05, 0.05))
+        if t > 0.955:
+            v *= max(0.0, (1.0 - t) / 0.045)
+        peaks.append(round(max(0.02, min(0.98, v)), 3))
+    return peaks
 
 
 def get_active_call() -> Optional[dict]:
@@ -131,12 +156,19 @@ def end_call(call_id: str, ended_by: str = "caller") -> Optional[dict]:
     call["ended_by"] = ended_by
 
     # Update in OG SQLite database
-    db.update("calls", call_id, {
+    row = db.query_one("SELECT waveform_json FROM calls WHERE id=?", (call_id,))
+    has_waveform = bool(row and row.get("waveform_json"))
+    update = {
         "duration_s": call["duration_s"],
         "status": "analyzed",
         "priority": "high" if len(call.get("transcripts", [])) >= 2 else "medium",
         "urgency_score": 88 if any("pizza" in t.get("text", "").lower() for t in call.get("transcripts", [])) else 45,
-    })
+    }
+    if not has_waveform:
+        # No captured audio (e.g. WebRTC track never negotiated): give the call
+        # detail panel a labelled synthetic envelope instead of a dead flat bar.
+        update["waveform_json"] = json.dumps(generate_synthetic_peaks(call_id, call["duration_s"]))
+    db.update("calls", call_id, update)
 
     return call
 
