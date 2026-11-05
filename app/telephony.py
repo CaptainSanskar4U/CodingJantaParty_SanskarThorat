@@ -16,6 +16,10 @@ _ACTIVE_EXTENSION = "966"
 _ACTIVE_CALLS: Dict[str, dict] = {}
 _CONNECTED_OPERATORS: List[WebSocket] = []
 _ACTIVE_SESSIONS: Dict[str, dict] = {}
+# Per-call count of audio samples (16 kHz) already transcribed by the live
+# server-side ASR; lets growing recordings be re-uploaded while only the
+# new tail is transcribed (no duplicate transcript lines).
+LIVE_ASR_POS: Dict[str, int] = {}
 
 
 def get_local_ip() -> str:
@@ -169,6 +173,7 @@ def end_call(call_id: str, ended_by: str = "caller") -> Optional[dict]:
         # detail panel a labelled synthetic envelope instead of a dead flat bar.
         update["waveform_json"] = json.dumps(generate_synthetic_peaks(call_id, call["duration_s"]))
     db.update("calls", call_id, update)
+    LIVE_ASR_POS.pop(call_id, None)  # retire the live-ASR cursor for this call
 
     return call
 
@@ -268,12 +273,21 @@ class TelephonyHub:
 hub = TelephonyHub()
 
 
-def save_call_audio(call_id: str, file_bytes: bytes, original_name: str = "call.webm") -> dict:
+def save_call_audio(call_id: str, file_bytes: bytes, original_name: str = "call.webm", skip_if_saved: bool = False) -> dict:
     """Save recorded phone call audio, convert to 16kHz mono WAV, and extract forensic acoustics."""
     import subprocess
     import tempfile
     from pathlib import Path
     from . import acoustic_engine
+
+    # Skip duplicate uploads when another side of the call already saved the audio
+    if skip_if_saved:
+        existing = db.query_one("SELECT audio_name FROM calls WHERE id=?", (call_id,))
+        existing_name = (existing or {}).get("audio_name")
+        if existing_name:
+            existing_path = config.UPLOAD_DIR / Path(existing_name).name
+            if existing_path.exists() and existing_path.stat().st_size > 0:
+                return {"ok": True, "skipped": True, "call_id": call_id}
 
     upload_dir = config.UPLOAD_DIR
     upload_dir.mkdir(parents=True, exist_ok=True)
@@ -306,6 +320,7 @@ def save_call_audio(call_id: str, file_bytes: bytes, original_name: str = "call.
     peaks = acoustic_engine.generate_waveform_peaks(out_wav_path, num_peaks=120)
 
     db.update("calls", call_id, {
+        "audio_name": out_wav_path.name,
         "status": "completed",
         "duration_s": duration,
         "sample_rate": 16000,

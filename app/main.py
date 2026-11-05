@@ -39,7 +39,7 @@ app = FastAPI(title="Dhvani Emergency Response Intelligence", version=VERSION, l
 async def require_authenticated_api(request: Request, call_next):
     path = request.url.path
     if config.AUTH_ENABLED and path.startswith("/api/") and path not in {
-        "/api/auth/login", "/api/health", "/api/me", "/api/languages", "/api/translate/live", "/api/telephony/extension", "/api/telephony/regenerate", "/api/telephony/dossier", "/api/telephony/save_recording"
+        "/api/auth/login", "/api/health", "/api/me", "/api/languages", "/api/translate/live", "/api/telephony/extension", "/api/telephony/regenerate", "/api/telephony/dossier", "/api/telephony/save_recording", "/api/telephony/live_transcribe"
     }:
         if not auth.current_user(request):
             return JSONResponse(status_code=401, content={"detail": "Authentication required"})
@@ -1074,9 +1074,99 @@ def regenerate_telephony_extension():
 async def save_telephony_recording(
     call_id: str = Form(...),
     audio: UploadFile = File(...),
+    skip_if_saved: str = Form("0"),
 ):
     content = await audio.read()
-    return telephony.save_call_audio(call_id, content, audio.filename or "call.webm")
+    return telephony.save_call_audio(
+        call_id, content, audio.filename or "call.webm",
+        skip_if_saved=(str(skip_if_saved).lower() in ("1", "true", "yes")),
+    )
+
+
+@app.post("/api/telephony/live_transcribe")
+async def telephony_live_transcribe(call_id: str = Form(...), audio: UploadFile = File(...)):
+    """Server-side live ASR of the caller's real call audio (reliable transcript path).
+
+    The dialer (or console) uploads the cumulative call recording every ~10 s. The server
+    decodes it to 16 kHz mono, transcribes ONLY the new tail since the previous upload with
+    the local Whisper model (auto language detect - English/Hindi/... all supported), then
+    reuses the shared live-utterance pipeline: VEXYL translation -> persist -> broadcast.
+    """
+    import subprocess
+
+    content = await audio.read()
+    if len(content) < 2000:
+        return {"ok": True, "text": ""}
+
+    active = telephony.get_active_call()
+    if not active or active.get("id") != call_id:
+        return {"ok": True, "text": "", "skipped": "call_not_active"}
+
+    tmp_in = None
+    tmp_wav = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as fh:
+            fh.write(content)
+            tmp_in = Path(fh.name)
+        tmp_wav = tmp_in.with_suffix(".wav")
+        proc = await asyncio.to_thread(
+            subprocess.run,
+            ["ffmpeg", "-y", "-v", "error", "-i", str(tmp_in),
+             "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", str(tmp_wav)],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        if not tmp_wav.exists() or tmp_wav.stat().st_size == 0:
+            return {"ok": True, "text": "", "skipped": "decode_failed"}
+
+        def _prepare_tail():
+            """Decode, resample if needed, and slice the untranscribed tail. Returns (tail, skip_reason)."""
+            import numpy as np
+            pcm, sr = pipeline._load_audio(tmp_wav)  # type: ignore[arg-type]
+            if sr != 16000:
+                ratio = sr / 16000.0
+                pcm = pcm[np.arange(0, pcm.shape[0], ratio).astype("int64")]
+            total = int(pcm.shape[0])
+            pos = telephony.LIVE_ASR_POS.get(call_id, 0)
+            if total <= pos:
+                return None, "no_new_audio"
+            telephony.LIVE_ASR_POS[call_id] = total
+            if (total - pos) < 16000 * 0.7:  # ignore very short new tails (<~0.7 s)
+                return None, "tail_too_short"
+            return pcm[pos:].astype("float32"), None
+
+        tail, skip_reason = await asyncio.to_thread(_prepare_tail)
+        if tail is None:
+            return {"ok": True, "text": "", "skipped": skip_reason}
+
+        asr = await asyncio.to_thread(
+            models.transcribe, tail, config.WHISPER_MODEL, "transcribe", None,
+        )
+        text = (asr.get("text") or "").strip()
+        if not text:
+            return {"ok": True, "text": ""}
+
+        payload = await ingest_live_utterance(
+            active, call_id, text, "caller",
+            src_lang_hint=(asr.get("language") or "auto"),
+            provider="webrtc_telephony",
+            model_name="server_whisper_live",
+        )
+        return {
+            "ok": True,
+            "text": text,
+            "language": asr.get("language"),
+            "translated_text": payload.get("translated_text", ""),
+        }
+    except Exception as exc:  # never crash the live call UI on a bad chunk
+        return {"ok": False, "error": str(exc)[:200]}
+    finally:
+        for p in (tmp_in, tmp_wav):
+            if p is None:
+                continue
+            try:
+                p.unlink(missing_ok=True)
+            except Exception:
+                pass
 
 
 @app.get("/api/telephony/dossier")
@@ -1085,6 +1175,94 @@ def get_telephony_dossier(request: Request, call_id: str | None = None):
     display_name = user["display_name"] if user else "Senior Inspector Mehta"
     html_content = reports.render_telephony_dossier(call_id, investigator=display_name)
     return Response(content=html_content, media_type="text/html")
+
+
+async def ingest_live_utterance(
+    call: dict,
+    call_id: str,
+    text: str,
+    speaker: str = "caller",
+    src_lang_hint: str = "auto",
+    provider: str = "webrtc_telephony",
+    model_name: str = "speech_recognition",
+) -> dict:
+    """Persist + live-translate one final utterance and broadcast it to the control room.
+
+    Shared by the WebSocket transcript_utterance path (phone speech recognition) and the
+    /api/telephony/live_transcribe path (server-side Whisper on the caller's real audio).
+    """
+    timestamp_ms = int(time.time() * 1000)
+    entry = {
+        "speaker": speaker,
+        "text": text,
+        "timestamp_ms": timestamp_ms,
+    }
+    call["transcripts"].append(entry)
+
+    start_sec = round(time.time() - (call.get("answered_at") or call["started_at"]), 1)
+    end_sec = round(start_sec + 2.5, 1)
+
+    # VEXYL live translation into the active investigator language (Hindi / Marathi / English).
+    # Runs in a worker thread so the event loop never blocks on network calls.
+    active_target = (call.get("target_lang") or telephony.hub.get_operator_target_lang() or "hi")
+    translation_payload = await asyncio.to_thread(
+        translation_engine.translate_live_utterance,
+        text,
+        src_lang_hint if src_lang_hint else "auto",
+        active_target,
+    )
+    detected_lang = translation_payload.get("source_lang", "en")
+    translated_text = translation_payload.get("translated_text", "")
+
+    entry["language"] = detected_lang
+    entry["translation"] = translation_payload
+
+    db.insert("transcripts", {
+        "id": db.new_id("trx"),
+        "call_id": call_id,
+        "text": text,
+        "language": detected_lang,
+        "translation": translated_text,
+        "provider": provider,
+        "model": model_name,
+        "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    })
+    db.insert("segments", {
+        "id": db.new_id("seg"),
+        "call_id": call_id,
+        "idx": len(call["transcripts"]),
+        "speaker": speaker,
+        "text": text,
+        "start_s": start_sec,
+        "end_s": end_sec,
+        "translation": translated_text,
+        "language": detected_lang,
+    })
+
+    full_text = " ".join(t["text"] for t in call["transcripts"])
+    duration = round(time.time() - (call.get("answered_at") or call["started_at"]), 1)
+    intelligence = live_analyzer.analyze_utterance(
+        transcript=full_text,
+        call_duration_s=duration,
+        acoustic_prosody=call.get("latest_acoustics"),
+    )
+
+    await telephony.hub.broadcast_operators({
+        "type": "live_intelligence_update",
+        "call_id": call_id,
+        "entry": entry,
+        "intelligence": intelligence,
+        "translation": translation_payload,
+    })
+
+    if speaker == "operator":
+        for d_id in list(telephony.hub.dialers.keys()):
+            await telephony.hub.send_to_dialer(d_id, {
+                "type": "operator_speech",
+                "text": text,
+                "translation": translation_payload,
+            })
+    return translation_payload
 
 
 @app.websocket("/ws/telephony")
@@ -1227,77 +1405,8 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                             })
                             continue
 
-                        entry = {
-                            "speaker": speaker,
-                            "text": text,
-                            "timestamp_ms": timestamp_ms,
-                        }
-                        active["transcripts"].append(entry)
-
-                        start_sec = round(time.time() - (active.get("answered_at") or active["started_at"]), 1)
-                        end_sec = round(start_sec + 2.5, 1)
-
-                        # VEXYL live translation into active investigator language (Hindi / Marathi / English).
-                        # Runs in a worker thread so the WebSocket hub never blocks on network calls.
-                        active_target = (active.get("target_lang") or telephony.hub.get_operator_target_lang() or "hi")
                         src_lang_hint = (data.get("lang") or "auto").split("-")[0]
-                        translation_payload = await asyncio.to_thread(
-                            translation_engine.translate_live_utterance,
-                            text,
-                            src_lang_hint if src_lang_hint else "auto",
-                            active_target,
-                        )
-                        detected_lang = translation_payload.get("source_lang", "en")
-                        translated_text = translation_payload.get("translated_text", "")
-
-                        entry["language"] = detected_lang
-                        entry["translation"] = translation_payload
-
-                        db.insert("transcripts", {
-                            "id": db.new_id("trx"),
-                            "call_id": call_id,
-                            "text": text,
-                            "language": detected_lang,
-                            "translation": translated_text,
-                            "provider": "webrtc_telephony",
-                            "model": "speech_recognition",
-                            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                        })
-                        db.insert("segments", {
-                            "id": db.new_id("seg"),
-                            "call_id": call_id,
-                            "idx": len(active["transcripts"]),
-                            "speaker": speaker,
-                            "text": text,
-                            "start_s": start_sec,
-                            "end_s": end_sec,
-                            "translation": translated_text,
-                            "language": detected_lang,
-                        })
-
-                        full_text = " ".join(t["text"] for t in active["transcripts"])
-                        duration = round(time.time() - (active.get("answered_at") or active["started_at"]), 1)
-                        intelligence = live_analyzer.analyze_utterance(
-                            transcript=full_text,
-                            call_duration_s=duration,
-                            acoustic_prosody=active.get("latest_acoustics"),
-                        )
-
-                        await telephony.hub.broadcast_operators({
-                            "type": "live_intelligence_update",
-                            "call_id": call_id,
-                            "entry": entry,
-                            "intelligence": intelligence,
-                            "translation": translation_payload,
-                        })
-
-                        if speaker == "operator":
-                            for d_id in list(telephony.hub.dialers.keys()):
-                                await telephony.hub.send_to_dialer(d_id, {
-                                    "type": "operator_speech",
-                                    "text": text,
-                                    "translation": translation_payload,
-                                })
+                        await ingest_live_utterance(active, call_id, text, speaker, src_lang_hint)
 
     except WebSocketDisconnect:
         if role == "operator":
