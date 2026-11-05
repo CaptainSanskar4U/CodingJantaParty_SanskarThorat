@@ -2060,3 +2060,219 @@ canvas { display: block; }
 }
 
 .box-tag.purple { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+
+
+/* ==========================================================================
+   LIVE CALL TRANSLATION (5th DASHBOARD TAB) - VEXYL-STT POWERED
+   ========================================================================== */
+.translation-ctrl-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #0d101a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tr-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tr-select-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+}
+
+.tr-lang-dropdown {
+  background: #171b29;
+  color: #f1f5f9;
+  border: 1px solid rgba(129, 140, 248, 0.45);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tr-lang-dropdown:hover, .tr-lang-dropdown:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.25);
+}
+
+.tr-badges-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tr-vexyl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tr-detected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.translation-scroll {
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  padding: 8px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.translation-card {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.translation-card:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.translation-card.active-seek {
+  background: rgba(56, 189, 248, 0.06);
+  border-left: 3px solid #38bdf8;
+}
+
+.tr-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+}
+
+.tr-spk-tag {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #cbd5e1;
+}
+
+.tr-spk-tag.caller { color: #f43f5e; }
+.tr-spk-tag.operator { color: #38bdf8; }
+
+.tr-time {
+  color: #64748b;
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  margin-left: 6px;
+}
+
+.tr-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-tag {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  color: #cbd5e1;
+}
+
+.latency-tag {
+  color: #10b981;
+  font-size: 9px;
+  font-family: var(--mono, monospace);
+}
+
+.tr-card-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .tr-card-body {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.tr-box {
+  background: #111420;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tr-box.target {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.tr-box-label {
+  font-size: 8.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+}
+
+.tr-box.target .tr-box-label {
+  color: #10b981;
+}
+
+.tr-box-text {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #f1f5f9;
+}
+
+.tr-box.target .tr-box-text {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.tr-arrow {
+  color: #818cf8;
+  font-weight: 800;
+  font-size: 14px;
+  text-align: center;
+}
+

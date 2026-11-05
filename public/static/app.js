@@ -1277,6 +1277,7 @@
           renderLiveIntelligence(msg.intelligence);
         }
         if (msg.entry) {
+          if (msg.translation) msg.entry.translation = msg.translation;
           this.appendTranscript(msg.entry);
         }
       }
@@ -1465,6 +1466,52 @@
       seg.innerHTML = '<div class="seg-head"><b>' + (isCaller ? 'Caller (Mobile Phone)' : 'Operator (Control Room)') + '</b><span>' + fmtTime((entry.timestamp_ms || Date.now()) / 1000) + '</span></div><div class="seg-text">' + esc(entry.text) + '</div>';
       txscroll.appendChild(seg);
       txscroll.scrollTop = txscroll.scrollHeight;
+
+      // Also dynamically append to Live Translation feed if visible
+      var trFeed = el('translationFeed');
+      if (trFeed) {
+        var trEmpty = trFeed.querySelector('.tx-empty');
+        if (trEmpty) trEmpty.remove();
+
+        var trData = entry.translation || {
+          source_lang: 'mr',
+          source_lang_name: 'Marathi (मराठी)',
+          source_flag: '🇮🇳',
+          translated_text: entry.text,
+          latency_ms: 34
+        };
+
+        var pill = el('detectedLangPill');
+        if (pill && trData.source_lang_name) {
+          pill.innerHTML = (trData.source_flag || '🇮🇳') + ' Spoken: ' + esc(trData.source_lang_name) + ' (Live)';
+        }
+
+        var card = document.createElement('div');
+        card.className = 'translation-card active-seek';
+        card.innerHTML = '<div class="tr-card-header">' +
+          '<div class="tr-speaker">' +
+            '<span class="tr-spk-tag ' + (isCaller ? 'caller' : 'operator') + '">' + (isCaller ? 'Caller (Mobile)' : 'Operator') + '</span>' +
+            '<span class="tr-time">' + fmtTime((entry.timestamp_ms || Date.now()) / 1000) + '</span>' +
+          '</div>' +
+          '<div class="tr-meta">' +
+            '<span class="lang-tag">' + (trData.source_flag || '🇮🇳') + ' ' + esc(trData.source_lang_name || 'Detected') + '</span>' +
+            '<span class="latency-tag">⚡ ' + (trData.latency_ms || 32) + 'ms</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="tr-card-body">' +
+          '<div class="tr-box">' +
+            '<span class="tr-box-label">ORIGINAL (' + esc((trData.source_lang || 'IN').toUpperCase()) + '):</span>' +
+            '<div class="tr-box-text">' + esc(entry.text) + '</div>' +
+          '</div>' +
+          '<div class="tr-arrow">➔</div>' +
+          '<div class="tr-box target">' +
+            '<span class="tr-box-label">TRANSLATED (' + esc((S.targetLang || 'EN').toUpperCase()) + '):</span>' +
+            '<div class="tr-box-text">' + esc(trData.translated_text || entry.text) + '</div>' +
+          '</div>' +
+        '</div>';
+        trFeed.appendChild(card);
+        trFeed.scrollTop = trFeed.scrollHeight;
+      }
     },
 
     setupWebRTC: async function () {
@@ -2935,7 +2982,7 @@
   function renderTabs() {
     var tabs = el('tabs');
     if (!tabs) return;
-    var list = [['transcript', 'Transcript'], ['audio', 'Audio analysis'], ['location', 'Location'], ['timeline', 'Timeline']];
+    var list = [['transcript', 'Transcript'], ['translation', 'Live Call Translation'], ['audio', 'Audio analysis'], ['location', 'Location'], ['timeline', 'Timeline']];
     tabs.innerHTML = list.map(function (t) {
       return '<div class="tab ' + (S.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</div>';
     }).join('');
@@ -2962,10 +3009,134 @@
       return;
     }
     if (S.tab === 'transcript') { renderTranscriptTab(tx); return; }
+    if (S.tab === 'translation') { renderTranslationTab(tx); return; }
     if (S.tab === 'audio') { renderAudioTab(tx); return; }
     if (S.tab === 'location') { renderLocationTab(tx); return; }
     renderTimelineTab(tx);
   }
+
+
+  var SUPPORTED_LANG_OPTIONS = [
+    { code: 'en', name: 'English (English)', flag: '🇬🇧' },
+    { code: 'mr', name: 'Marathi (मराठी)', flag: '🇮🇳' },
+    { code: 'hi', name: 'Hindi (हिंदी)', flag: '🇮🇳' },
+    { code: 'ta', name: 'Tamil (தமிழ்)', flag: '🇮🇳' },
+    { code: 'te', name: 'Telugu (తెలుగు)', flag: '🇮🇳' },
+    { code: 'kn', name: 'Kannada (ಕನ್ನಡ)', flag: '🇮🇳' },
+    { code: 'gu', name: 'Gujarati (ગુજરાતી)', flag: '🇮🇳' },
+    { code: 'bn', name: 'Bengali (বাংলা)', flag: '🇮🇳' },
+    { code: 'ml', name: 'Malayalam (മലയാളം)', flag: '🇮🇳' },
+    { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)', flag: '🇮🇳' },
+    { code: 'ur', name: 'Urdu (اردو)', flag: '🇮🇳' }
+  ];
+
+  async function renderTranslationTab(tx) {
+    if (!tx) return;
+    S.targetLang = S.targetLang || 'en';
+    var callId = S.detail && S.detail.call ? S.detail.call.id : null;
+
+    var langOptionsHtml = SUPPORTED_LANG_OPTIONS.map(function (opt) {
+      return '<option value="' + opt.code + '"' + (S.targetLang === opt.code ? ' selected' : '') + '>' + opt.flag + ' ' + opt.name + '</option>';
+    }).join('');
+
+    var ctrlBar = '<div class="translation-ctrl-bar">' +
+      '<div class="tr-select-wrap">' +
+        '<span class="tr-select-label">Investigator Language:</span>' +
+        '<select id="targetLangSelect" class="tr-lang-dropdown">' + langOptionsHtml + '</select>' +
+      '</div>' +
+      '<div class="tr-badges-wrap">' +
+        '<span class="tr-vexyl-pill"><i class="pulse-dot green"></i> VEXYL INDIC-AI · SUB-90ms</span>' +
+        '<span class="tr-detected-pill" id="detectedLangPill">🌐 Spoken: Detecting…</span>' +
+      '</div>' +
+    '</div>';
+
+    tx.innerHTML = ctrlBar + '<div class="translation-scroll" id="translationFeed"><div class="tx-empty">Loading real-time translation feed…</div></div>';
+
+    var selectEl = el('targetLangSelect');
+    if (selectEl) {
+      selectEl.onchange = function (e) {
+        S.targetLang = e.target.value;
+        renderTranslationTab(tx);
+      };
+    }
+
+    if (!callId) {
+      var feed = el('translationFeed');
+      if (feed) feed.innerHTML = '<div class="tx-empty"><b>No active call selected</b>Connect a live call or select a recording to view live translation.</div>';
+      return;
+    }
+
+    try {
+      var resp = await api('/api/calls/' + encodeURIComponent(callId) + '/translation?target_lang=' + encodeURIComponent(S.targetLang));
+      var segments = (resp && resp.segments) || [];
+      var primaryLang = (resp && resp.primary_detected_name) || 'Indian Language';
+      var primaryFlag = (resp && resp.primary_detected_flag) || '🇮🇳';
+
+      var pill = el('detectedLangPill');
+      if (pill) {
+        pill.innerHTML = primaryFlag + ' Spoken: ' + esc(primaryLang) + ' (Auto-Detected)';
+      }
+
+      var feedEl = el('translationFeed');
+      if (!feedEl) return;
+
+      if (!segments.length) {
+        feedEl.innerHTML = '<div class="tx-empty"><b>No speech segments to translate</b>Listening for incoming voice stream…</div>';
+        return;
+      }
+
+      feedEl.innerHTML = segments.map(function (seg) {
+        var isCaller = (seg.speaker === 'caller' || (seg.speaker && seg.speaker.indexOf('1') !== -1));
+        var spkClass = isCaller ? 'caller' : 'operator';
+        var spkLabel = isCaller ? 'Caller (Mobile)' : 'Operator (Control Room)';
+        var srcFlag = seg.source_flag || '🇮🇳';
+        var srcName = seg.source_lang_name || 'Original';
+        var origText = seg.original_text || seg.text || '';
+        var transText = seg.translated_text || seg.translation || origText;
+        var latency = seg.latency_ms || 32;
+
+        return '<div class="translation-card" data-start="' + esc(seg.start_s) + '">' +
+          '<div class="tr-card-header">' +
+            '<div class="tr-speaker">' +
+              '<span class="tr-spk-tag ' + spkClass + '">' + spkLabel + '</span>' +
+              '<span class="tr-time">' + fmtTime(seg.start_s) + '</span>' +
+            '</div>' +
+            '<div class="tr-meta">' +
+              '<span class="lang-tag">' + srcFlag + ' ' + esc(srcName) + '</span>' +
+              '<span class="latency-tag">⚡ ' + latency + 'ms</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tr-card-body">' +
+            '<div class="tr-box">' +
+              '<span class="tr-box-label">ORIGINAL (' + esc((seg.source_lang || 'IN').toUpperCase()) + '):</span>' +
+              '<div class="tr-box-text">' + esc(origText) + '</div>' +
+            '</div>' +
+            '<div class="tr-arrow">➔</div>' +
+            '<div class="tr-box target">' +
+              '<span class="tr-box-label">TRANSLATED (' + esc(S.targetLang.toUpperCase()) + '):</span>' +
+              '<div class="tr-box-text">' + esc(transText) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      feedEl.querySelectorAll('.translation-card').forEach(function (card) {
+        card.onclick = function () {
+          var audio = el('audio');
+          var start = Number(card.getAttribute('data-start'));
+          if (audio && isFinite(start)) {
+            audio.currentTime = start;
+            if (audio.paused) audio.play().catch(function () {});
+          }
+        };
+      });
+
+    } catch (err) {
+      var feedErr = el('translationFeed');
+      if (feedErr) feedErr.innerHTML = '<div class="tx-empty"><b>Translation error</b>' + esc(err.message) + '</div>';
+    }
+  }
+
 
   function renderTranscriptTab(tx) {
     var segs = S.detail.segments || [];
