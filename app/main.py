@@ -1,6 +1,7 @@
 """Orbitwin FastAPI application."""
 from __future__ import annotations
 
+import asyncio
 import json
 import math
 import re
@@ -1179,29 +1180,81 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                         for d_id in list(telephony.hub.dialers.keys()):
                             await telephony.hub.send_to_dialer(d_id, data)
 
+            elif msg_type == "audio_level":
+                # Caller mic level telemetry (dialer visualizer) -> control room live waveform
+                if role == "dialer":
+                    try:
+                        level = float(data.get("level", 0.0))
+                    except (TypeError, ValueError):
+                        level = 0.0
+                    await telephony.hub.broadcast_operators({
+                        "type": "audio_level",
+                        "call_id": data.get("call_id"),
+                        "dialer_id": dialer_id,
+                        "level": max(0.0, min(1.0, level)),
+                        "ts": data.get("ts"),
+                    })
+
             elif msg_type == "transcript_utterance":
                 call_id = data.get("call_id")
                 speaker = data.get("speaker", "caller")
                 text = data.get("text", "").strip()
+                is_interim = bool(data.get("interim"))
                 if text:
                     active = telephony.get_active_call()
                     if active and active.get("id") == call_id:
+                        timestamp_ms = int(time.time() * 1000)
+
+                        # Interim (partial) speech: broadcast for live display only,
+                        # never persisted to evidence tables.
+                        if is_interim:
+                            await telephony.hub.broadcast_operators({
+                                "type": "live_intelligence_update",
+                                "call_id": call_id,
+                                "entry": {
+                                    "speaker": speaker,
+                                    "text": text,
+                                    "interim": True,
+                                    "timestamp_ms": timestamp_ms,
+                                    "lang": data.get("lang"),
+                                },
+                            })
+                            continue
+
                         entry = {
                             "speaker": speaker,
                             "text": text,
-                            "timestamp_ms": int(time.time() * 1000),
+                            "timestamp_ms": timestamp_ms,
                         }
                         active["transcripts"].append(entry)
 
                         start_sec = round(time.time() - (active.get("answered_at") or active["started_at"]), 1)
                         end_sec = round(start_sec + 2.5, 1)
+
+                        # VEXYL live translation into active investigator language (Hindi / Marathi / English).
+                        # Runs in a worker thread so the WebSocket hub never blocks on network calls.
+                        active_target = (active.get("target_lang") or telephony.hub.get_operator_target_lang() or "hi")
+                        src_lang_hint = (data.get("lang") or "auto").split("-")[0]
+                        translation_payload = await asyncio.to_thread(
+                            translation_engine.translate_live_utterance,
+                            text,
+                            src_lang_hint if src_lang_hint else "auto",
+                            active_target,
+                        )
+                        detected_lang = translation_payload.get("source_lang", "en")
+                        translated_text = translation_payload.get("translated_text", "")
+
+                        entry["language"] = detected_lang
+                        entry["translation"] = translation_payload
+
                         db.insert("transcripts", {
                             "id": db.new_id("trx"),
                             "call_id": call_id,
                             "text": text,
-                            "language": "en",
+                            "language": detected_lang,
+                            "translation": translated_text,
                             "provider": "webrtc_telephony",
-                            "model": "whisper_local",
+                            "model": "speech_recognition",
                             "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                         })
                         db.insert("segments", {
@@ -1212,6 +1265,8 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                             "text": text,
                             "start_s": start_sec,
                             "end_s": end_sec,
+                            "translation": translated_text,
+                            "language": detected_lang,
                         })
 
                         full_text = " ".join(t["text"] for t in active["transcripts"])
@@ -1221,14 +1276,6 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                             call_duration_s=duration,
                             acoustic_prosody=active.get("latest_acoustics"),
                         )
-
-                        # VEXYL live translation into active investigator language (Hindi / Marathi / English)
-                        active_target = (active.get("target_lang") or telephony.hub.get_operator_target_lang() or "hi")
-                        translation_payload = translation_engine.translate_live_utterance(
-                            text=text,
-                            target_lang=active_target
-                        )
-                        entry["translation"] = translation_payload
 
                         await telephony.hub.broadcast_operators({
                             "type": "live_intelligence_update",

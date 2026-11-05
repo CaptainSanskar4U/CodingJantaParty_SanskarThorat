@@ -1405,6 +1405,15 @@
           if (msg.translation) msg.entry.translation = msg.translation;
           this.appendTranscript(msg.entry);
         }
+      } else if (msg.type === 'audio_level') {
+        // Caller mic level (phone dialer) -> live caller waveform
+        var targetId = this.activeSimCall && this.activeSimCall.id;
+        if (typeof msg.level === 'number' && msg.call_id === targetId) {
+          var hist = this.levelHistory || (this.levelHistory = []);
+          hist.push(Math.max(0, Math.min(1, msg.level)));
+          if (hist.length > 48) hist.shift();
+          this.lastLevelAt = Date.now();
+        }
       }
     },
 
@@ -1816,6 +1825,7 @@
       }
 
       this.setupWebRTC();
+      this.startCallerWave();
       this.callStartTime = Date.now();
       this.latestServerIntelligence = null;
       this.startLiveTelemetry();
@@ -1872,6 +1882,13 @@
 
     appendTranscript: function (entry) {
       var isCaller = entry.speaker === 'caller';
+
+      // Interim (partial) speech: show as a live "speaking now" strip, never as a card
+      if (entry.interim) {
+        this.showInterimText(entry, isCaller);
+        return;
+      }
+      this.clearInterimText();
 
       // 1. Append to transcript tab if visible
       var txscroll = document.querySelector('#tx .txscroll');
@@ -1942,6 +1959,27 @@
         trFeed.appendChild(card);
         trFeed.scrollTop = trFeed.scrollHeight;
       }
+    },
+
+    showInterimText: function (entry, isCaller) {
+      // Replace (not append) so partial speech updates in place while the caller speaks
+      var interim = el('liveInterimText');
+      if (!interim) {
+        var host = document.querySelector('#tx');
+        if (!host) return;
+        interim = document.createElement('div');
+        interim.id = 'liveInterimText';
+        host.appendChild(interim);
+      }
+      interim.className = 'live-interim';
+      interim.innerHTML = '<span class="pulse-dot green"></span> ' +
+        (isCaller ? 'Caller speaking…' : 'Operator speaking…') +
+        ' <i>' + esc(entry.text.slice(-120)) + '</i>';
+    },
+
+    clearInterimText: function () {
+      var interim = el('liveInterimText');
+      if (interim) interim.remove();
     },
 
     setupWebRTC: async function () {
@@ -2033,46 +2071,82 @@
     },
 
     startOscilloscope: function (stream) {
+      // Real WebRTC remote audio path; falls back to / blends with WS level telemetry
       var canvas = el('liveAudioOscilloscope');
       if (!canvas) return;
       canvas.style.display = 'block';
+      var self = this;
       try {
         var ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
         var source = ctx.createMediaStreamSource(stream);
         var analyser = ctx.createAnalyser();
-        analyser.fftSize = 64;
+        analyser.fftSize = 128;
         source.connect(analyser);
-        var dataArray = new Uint8Array(analyser.frequencyBinCount);
-        var cctx = canvas.getContext('2d');
-        var self = this;
-
-        function drawFrame() {
-          if (!self.activeSimCall) {
-            canvas.style.display = 'none';
-            return;
-          }
-          requestAnimationFrame(drawFrame);
-          analyser.getByteFrequencyData(dataArray);
-          cctx.fillStyle = '#07080c';
-          cctx.fillRect(0, 0, canvas.width, canvas.height);
-          var barWidth = (canvas.width / dataArray.length);
-          var x = 0;
-          for (var i = 0; i < dataArray.length; i++) {
-            var barHeight = (dataArray[i] / 255) * (canvas.height - 12);
-            var grad = cctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-            grad.addColorStop(0, '#10b981');
-            grad.addColorStop(0.6, '#38bdf8');
-            grad.addColorStop(1, '#ff2e43');
-            cctx.fillStyle = grad;
-            cctx.fillRect(x, canvas.height - barHeight, barWidth - 3, Math.max(3, barHeight));
-            x += barWidth;
-          }
-        }
-        drawFrame();
+        self.waveAnalyser = analyser;
+        self.waveFreqData = new Uint8Array(analyser.frequencyBinCount);
       } catch (e) {
-        console.warn('Oscilloscope error:', e);
+        console.warn('Oscilloscope analyser unavailable, using caller level telemetry:', e);
+        self.waveAnalyser = null;
       }
+      self.ensureCallerWave();
+    },
+
+    startCallerWave: function () {
+      // Pulls the caller's voice wave from WebSocket level telemetry (always available)
+      var canvas = el('liveAudioOscilloscope');
+      if (!canvas) return;
+      canvas.style.display = 'block';
+      this.ensureCallerWave();
+    },
+
+    ensureCallerWave: function () {
+      var self = this;
+      var canvas = el('liveAudioOscilloscope');
+      if (!canvas || self.waveLoopRunning) return;
+      self.waveLoopRunning = true;
+      if (!self.levelHistory) self.levelHistory = [];
+      var cctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+
+      function drawFrame() {
+        if (!self.activeSimCall) {
+          canvas.style.display = 'none';
+          self.waveLoopRunning = false;
+          return;
+        }
+        requestAnimationFrame(drawFrame);
+
+        var useAnalyser = !!self.waveAnalyser;
+        var recent = (Date.now() - (self.lastLevelAt || 0)) < 900;
+        var hist = self.levelHistory || [];
+        var idleT = Date.now() / 260;
+        var barCount = useAnalyser ? (self.waveFreqData ? self.waveFreqData.length : 48) : Math.max(hist.length, 40);
+        var barW = W / barCount;
+
+        cctx.fillStyle = '#07080c';
+        cctx.fillRect(0, 0, W, H);
+
+        for (var i = 0; i < barCount; i++) {
+          var h = 0;
+          if (useAnalyser) {
+            var v = self.waveFreqData ? (self.waveFreqData[Math.floor(i * self.waveFreqData.length / barCount)] || 0) : 0;
+            h = Math.max(3, (v / 255) * (H - 10));
+          } else {
+            var raw = recent ? (hist[i] || 0) : 0;
+            var idle = Math.abs(Math.sin(idleT + i * 0.32)) * 3.5; // subtle idle breathing
+            h = Math.max(2.5 + idle, raw * (H - 12));
+          }
+          if (h < 3) h = 3;
+          var grad = cctx.createLinearGradient(0, H, 0, H - h);
+          grad.addColorStop(0, '#10b981');
+          grad.addColorStop(0.55, '#38bdf8');
+          grad.addColorStop(1, '#ff2e43');
+          cctx.fillStyle = grad;
+          cctx.fillRect(i * barW, H - h, Math.max(1.5, barW - 2), h);
+        }
+      }
+      drawFrame();
     },
 
     startAutoRecording: function (stream) {

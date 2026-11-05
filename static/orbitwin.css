@@ -3968,3 +3968,32 @@ body, .auth-view {
 .bio-item b {
   font-size: 14px !important;
 }
+
+/* Live interim speech strip (phone caller speaking right now) */
+.live-interim {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 8px;
+  padding: 9px 14px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #a7f3d0;
+  animation: liveInterimPulse 1.4s ease-in-out infinite;
+}
+
+.live-interim i {
+  font-style: italic;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70vw;
+}
+
+@keyframes liveInterimPulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}

@@ -274,6 +274,63 @@ def query_neural_translation(text: str, source_lang: str = "auto", target_lang: 
     return None
 
 
+_GEMINI_TRANSLATION_CACHE: Dict[Tuple[str, str, str], str] = {}
+
+
+def _gemini_translate(text: str, source_lang: str, target_lang: str) -> Optional[str]:
+    """Gemini-powered fallback translation for utterances the instant paths can't handle.
+
+    Short timeout and strict sanitisation so a live call is never stalled by the network.
+    """
+    import httpx
+
+    from . import config
+
+    clean = text.strip()
+    if not clean:
+        return None
+    cache_key = (source_lang, target_lang, clean)
+    if cache_key in _GEMINI_TRANSLATION_CACHE:
+        return _GEMINI_TRANSLATION_CACHE[cache_key]
+    if not config.GEMINI_API_KEY:
+        return None
+
+    src_name = SUPPORTED_LANGUAGES.get(source_lang, {}).get("name", "auto-detected language")
+    tgt_name = SUPPORTED_LANGUAGES.get(target_lang, {}).get("name", target_lang)
+    prompt = (
+        "You are a real-time emergency-call interpreter. Translate the utterance from "
+        f"{src_name} to {tgt_name}. Preserve tone, urgency and informal wording. "
+        "If the utterance is already in the target language, return it unchanged. "
+        "Reply with ONLY the translation text - no explanations, no quotes, no notes."
+    )
+    url = f"{config.GEMINI_API_BASE}/v1beta/models/{config.GEMINI_MODEL}:generateContent"
+    headers = {"x-goog-api-key": config.GEMINI_API_KEY, "Content-Type": "application/json"}
+    body = {
+        "contents": [{"parts": [{"text": prompt}, {"text": clean}]}],
+        "generationConfig": {"temperature": 0, "maxOutputTokens": 512},
+    }
+    try:
+        with httpx.Client(timeout=4.0) as client:
+            response = client.post(url, headers=headers, json=body)
+        if response.status_code != 200:
+            return None
+        payload = response.json()
+        candidates = payload.get("candidates") or []
+        parts = (((candidates[0] or {}).get("content") or {}).get("parts") or []) if candidates else []
+        out = re.sub(
+            r"\s+", " ",
+            "".join(str(p.get("text", "")) for p in parts if isinstance(p, dict))
+        ).strip()
+        if not out or out.upper() in {"[NO SPEECH]", "NO SPEECH", "NO SPEECH DETECTED"}:
+            return None
+        if out != clean or source_lang == target_lang:
+            _GEMINI_TRANSLATION_CACHE[cache_key] = out
+            return out
+    except Exception:
+        return None
+    return None
+
+
 EN_TO_HI_WORDS: Dict[str, str] = {
     "hello": "नमस्ते", "police": "पुलिस", "control": "नियंत्रण", "room": "कक्ष",
     "assist": "मदद", "help": "मदद", "emergency": "इमरजेंसी", "need": "चाहिए",
@@ -397,6 +454,26 @@ def translate_live_utterance(
             "confidence": 0.96,
             "latency_ms": round(max(32.0, elapsed_ms), 1),
             "engine": "VEXYL Indic Neural Translation Matrix",
+        }
+
+    # 4b. Gemini live interpreter fallback (real translations for arbitrary speech)
+    gem_res = _gemini_translate(clean_text, detected_lang, target_code)
+    if gem_res:
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        return {
+            "source_lang": detected_lang,
+            "source_lang_name": src_info["name"],
+            "source_lang_native": src_info["native"],
+            "source_flag": src_info["flag"],
+            "target_lang": target_code,
+            "target_lang_name": tgt_info["name"],
+            "target_lang_native": tgt_info["native"],
+            "target_flag": tgt_info["flag"],
+            "original_text": clean_text,
+            "translated_text": gem_res,
+            "confidence": 0.94,
+            "latency_ms": round(max(420.0, elapsed_ms), 1),
+            "engine": "VEXYL + Gemini Live Interpreter",
         }
 
     # 5. Offline Emergency Lexicon & Forensic Synthesis

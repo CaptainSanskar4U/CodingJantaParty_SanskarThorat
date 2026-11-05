@@ -52,6 +52,8 @@
   var ws = null;
   var dialerId = 'dialer_' + Math.random().toString(36).slice(2, 9);
   var recognition = null;
+  var recognitionLang = 'hi-IN';
+  var speechRestartTimer = null;
   var visualizerActive = false;
 
   // DOM
@@ -341,57 +343,116 @@
       console.warn('SpeechRecognition API not available in this browser');
       return;
     }
+    stopSpeechRestartTimer();
     try {
       if (recognition) {
-        try { recognition.stop(); } catch (e) {}
+        try { recognition.onend = null; recognition.stop(); } catch (e) {}
+        recognition = null;
       }
       recognition = new SpeechRec();
       recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = 'en-IN';
+      recognition.interimResults = true;
+      recognition.lang = recognitionLang;
 
       recognition.onresult = function (ev) {
+        var interimText = '';
         for (var i = ev.resultIndex; i < ev.results.length; ++i) {
+          var chunk = ev.results[i][0].transcript.trim();
           if (ev.results[i].isFinal) {
-            var text = ev.results[i][0].transcript.trim();
+            var text = chunk.replace(/\s+/g, ' ');
             if (text && activeCall && ws && ws.readyState === WebSocket.OPEN) {
-              console.log('[Phone Voice Transcribed]:', text);
+              console.log('[Phone Voice Transcribed] (' + recognitionLang + '):', text);
               ws.send(JSON.stringify({
                 type: 'transcript_utterance',
                 call_id: activeCall.id,
                 speaker: 'caller',
-                text: text
+                text: text,
+                lang: recognitionLang
               }));
             }
+          } else {
+            interimText = (interimText + ' ' + chunk).trim();
           }
+        }
+        if (interimText && activeCall && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: 'transcript_utterance',
+            call_id: activeCall.id,
+            speaker: 'caller',
+            text: interimText.slice(-160),
+            lang: recognitionLang,
+            interim: true
+          }));
         }
       };
 
       recognition.onerror = function (e) {
-        console.warn('SpeechRecognition error:', e.error);
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          console.warn('[Dialer] Speech recognition permission blocked. Mic audio continues, no transcript.');
+          stopSpeechRecognition();
+        } else if (e.error === 'not-found') {
+          console.warn('[Dialer] Speech recognition language not supported on this device:', recognitionLang);
+          if (micStatusText) micStatusText.textContent = 'Language not supported · try another';
+        }
       };
 
       recognition.onend = function () {
-        if (activeCall && !isMuted) {
-          try { recognition.start(); } catch (e) {}
+        if (activeCall && !isMuted && recognition) {
+          speechRestartTimer = setTimeout(function () {
+            if (activeCall && !isMuted && ws && ws.readyState === WebSocket.OPEN && recognition) {
+              try { recognition.start(); } catch (e) {}
+            }
+          }, 350);
         }
       };
 
       recognition.start();
-      console.log('[Dialer] Continuous speech recognition started');
+      console.log('[Dialer] Continuous speech recognition started (' + recognitionLang + ')');
     } catch (e) {
       console.warn('Failed to start speech recognition:', e);
     }
   }
 
+  function stopSpeechRestartTimer() {
+    if (speechRestartTimer) {
+      clearTimeout(speechRestartTimer);
+      speechRestartTimer = null;
+    }
+  }
+
   function stopSpeechRecognition() {
+    stopSpeechRestartTimer();
     if (recognition) {
-      try { recognition.stop(); } catch (e) {}
+      try { recognition.onend = null; recognition.stop(); } catch (e) {}
       recognition = null;
     }
   }
 
-  // Visualizer for Caller Voice Waves
+  function setRecognitionLanguage(lang, label) {
+    recognitionLang = lang || 'hi-IN';
+    console.log('[Dialer] Speech recognition language set to', recognitionLang);
+    if (micStatusText) {
+      micStatusText.textContent = 'Listening in ' + (label || recognitionLang);
+      setTimeout(function () {
+        if (micStatusText && activeCall && micStatusText.textContent.indexOf('Listening in') !== -1) {
+          micStatusText.textContent = '2-Way Audio Live';
+        }
+      }, 1200);
+    }
+    if (activeCall && !isMuted) startSpeechRecognition();
+  }
+
+  var callLangSelect = document.getElementById('callLanguageSelect');
+  if (callLangSelect) {
+    var defaultLang = callLangSelect.value || 'hi-IN';
+    recognitionLang = defaultLang;
+    callLangSelect.addEventListener('change', function () {
+      var opt = callLangSelect.options[callLangSelect.selectedIndex];
+      setRecognitionLanguage(callLangSelect.value, opt ? opt.text.split('·')[0].trim() : callLangSelect.value);
+    });
+  }
+
+  // Visualizer for Caller Voice Waves (+ live mic-level telemetry to the console)
   function startVisualizer(stream) {
     if (visualizerActive) return;
     try {
@@ -405,11 +466,29 @@
       visualizerActive = true;
 
       function renderFrame() {
-        if (!activeCall || !visualizerActive) return;
+        if (!visualizerActive) return;
         analyser.getByteFrequencyData(dataArray);
+        var sum = 0, peak = 0;
+        for (var j = 0; j < dataArray.length; j++) {
+          sum += dataArray[j];
+          if (dataArray[j] > peak) peak = dataArray[j];
+        }
+        var avg = dataArray.length ? sum / dataArray.length : 0;
+        // Smoothed 0..1 voice level streamed to the control-room console
+        var level = Math.min(1, (avg / 255) * 1.9 + (peak / 255) * 0.2);
+        var now = Date.now();
+        if (activeCall && ws && ws.readyState === WebSocket.OPEN && !isMuted) {
+          ws.send(JSON.stringify({
+            type: 'audio_level',
+            call_id: activeCall.id,
+            level: Math.round(level * 100) / 100,
+            ts: now
+          }));
+        }
         bars.forEach(function (bar, idx) {
           var val = dataArray[idx % dataArray.length] || 0;
-          var h = Math.max(4, Math.min(26, (val / 255) * 30));
+          var h = Math.max(4, Math.min(26, (val / 255) * 34));
+          if (val < 8) h = 5 + Math.abs(Math.sin(now / 420 + idx * 0.9)) * 3; // subtle idle motion
           bar.style.height = h + 'px';
         });
         requestAnimationFrame(renderFrame);
