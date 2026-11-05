@@ -1,8 +1,8 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dhvani | Emergency Response Intelligence</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dhvani | Emergency Response Intelligence</title><link rel="icon" type="image/png" href="/static/assets/dhvani_shield_transparent.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/static/orbitwin.css"><link rel="stylesheet" href="/static/dhavli-loader.css"><script src="/static/dhavli-loader.js"></script><script src="/static/vendor/qrcode.js"></script></head><body><div id="st" class="auth-view">
 <header class="topbar">
   <div class="brand">
-    <span class="brand-mark"><svg width="26" height="26" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13.5" fill="none" stroke="#ff2e43" stroke-width="7"/><path d="M20.3 1v10.5M20.3 28.5v10.5" stroke="#050506" stroke-width="1.8"/><path d="M26.2 11.6 32 14.6" stroke="#050506" stroke-width="1.6"/></svg></span>
+    <span class="brand-mark"><img src="/static/assets/dhvani_shield_transparent.png" alt="Dhvani Logo" style="width:24px; height:24px; object-fit:contain; filter:drop-shadow(0 0 6px rgba(255,46,67,0.6));"></span>
     <span class="brand-copy"><b>Dhvani</b><small>Response intelligence</small></span>
   </div>
   <div class="searchbar"><span id="si"></span><input id="q" placeholder="Search calls, transcript, locations, cases…" aria-label="Search"><kbd>Ctrl K</kbd></div>
@@ -14,11 +14,11 @@
       <button id="regenExtBtn" type="button" class="ext-regen-btn" title="Regenerate extension">↻</button>
       <button id="openDialerModalBtn" type="button" class="ext-phone-btn" title="Connect mobile phone over Wi-Fi">📱 Phone</button>
     </div>
-    <button id="autoTestCallBtn" type="button" class="btn warning small" style="display:inline-flex; align-items:center; gap:5px; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); color:#f59e0b; font-size:11px; font-weight:600; padding:6px 10px; border-radius:8px; cursor:pointer;" title="Run fail-safe inbound emergency call simulation (Works offline without phone Wi-Fi)">⚡ Sim Inbound</button>
-    <button id="inspectAiBtn" type="button" class="btn ghost small" style="display:inline-flex; align-items:center; gap:5px; background:rgba(129,140,248,0.12); border:1px solid rgba(129,140,248,0.35); color:#a5b4fc; font-size:11px; font-weight:600; padding:6px 10px; border-radius:8px; cursor:pointer;" title="Inspect real-time DSP mathematical algorithms & Section 65B legal audit">🔬 AI &amp; DSP</button>
-    <button id="sys" class="engine" title="Checking local engine…"><i id="sysDot"></i><span id="sysText">Connecting…</span></button>
-    <button id="liveBtn" class="btn"><span id="liveIc"></span>Go live</button>
-    <button id="uploadBtn" class="btn primary" title="Upload a recording or load a labelled demo"><span id="upIc"></span>New recording</button>
+    <button id="autoTestCallBtn" type="button" class="tactical-pill amber-pill" title="Run fail-safe inbound emergency call simulation (Works offline without phone Wi-Fi)">⚡ Sim Inbound</button>
+    <button id="inspectAiBtn" type="button" class="tactical-pill indigo-pill" title="Inspect real-time DSP mathematical algorithms & Section 65B legal audit">🔬 AI &amp; DSP</button>
+    <button id="sys" class="engine tactical-pill engine-pill" title="Checking local engine…"><i id="sysDot"></i><span id="sysText">Connecting…</span></button>
+    <button id="liveBtn" class="tactical-pill live-pill"><span id="liveIc"></span>Go live</button>
+    <button id="uploadBtn" class="tactical-pill upload-pill" title="Upload a recording or load a labelled demo"><span id="upIc"></span>New recording</button>
     <div class="top-divider"></div>
     <div class="notif-wrap"><button class="icon-btn" id="bell" aria-label="Alerts"></button><i id="bellBadge">0</i></div>
     <button class="profile" id="pf" aria-label="Account"></button>
@@ -194,11 +194,11 @@
       </div>
             <div class="sensevoice-strip" id="sensevoiceStrip" style="margin-top: 10px; padding: 8px 12px; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
         <div style="display:flex; align-items:center; gap:6px;">
-          <span style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; letter-spacing: 0.5px;">SENSEVOICE AI</span>
+          <span class="pulse-dot" style="background:#c084fc; box-shadow:0 0 8px #c084fc; width:6px; height:6px; border-radius:50%; display:inline-block;"></span>
           <span id="svEmotionBadge" style="font-weight: 600; color: #f1f5f9;">😐 NEUTRAL [0.92]</span>
         </div>
         <div id="svEventsContainer" style="display:flex; align-items:center; gap:4px; font-size: 10px; color: #cbd5e1;">
-          <span class="sv-event-pill" style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">No acoustic anomaly</span>
+          <span class="sv-event-pill" style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">Baseline Acoustics</span>
         </div>
       </div>
       <div class="bio-legal-notice">
@@ -269,10 +269,6 @@
       </div>
       <div class="map-frame" id="mapPanel">
         <div id="mw" class="mp map-canvas"></div>
-        <div class="map-radar-overlay" id="mapRadar">
-          <div class="radar-scanner"></div>
-          <div class="radar-target-reticle" id="radarReticle"></div>
-        </div>
         <div class="map-telemetry-badge" id="mapTelemetry">
           <span class="pulse-dot green"></span>
           <span id="mapTelemetryText">MUMBAI, MAHARASHTRA (DEMO REFERENCE)</span>
@@ -325,9 +321,8 @@
   <button class="login-back" id="loginBack" type="button">← Back to overview</button>
   <div class="login-shell">
     <section class="login-intro">
-      <div class="login-brand">
-        <span class="brand-mark"><svg width="32" height="32" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13.5" fill="none" stroke="#ff2e43" stroke-width="7"/><path d="M20.3 1v10.5M20.3 28.5v10.5" stroke="#050506" stroke-width="1.8"/><path d="M26.2 11.6 32 14.6" stroke="#050506" stroke-width="1.6"/></svg></span>
-        <span><b>Dhvani</b><small>Response intelligence</small></span>
+      <div class="login-brand" style="margin-bottom:14px;">
+        <img src="/static/assets/dhvani_logo_transparent.png" alt="Dhvani Logo" style="max-width:180px; height:auto; display:block; filter:drop-shadow(0 0 12px rgba(255,46,67,0.5));">
       </div>
       <div class="login-kicker">Secure operations console</div>
       <h1>Every urgent call.<br><em>Every signal, clear.</em></h1>
@@ -492,9 +487,9 @@
         </div>
       </div>
 
-      <!-- Tier 4: Qwen SenseVoice Foundation Model (SER + AED) -->
+      <!-- Tier 4: Speech Emotion & Acoustic Event Encoder (SER + AED) -->
       <div class="ai-inspector-box">
-        <div class="box-tag purple" style="background:rgba(168,85,247,0.18); color:#c084fc;">TIER 4 · QWEN SENSEVOICE FOUNDATION (SER + AED)</div>
+        <div class="box-tag purple" style="background:rgba(168,85,247,0.18); color:#c084fc;">TIER 4 · SPEECH EMOTION &amp; ACOUSTIC EVENT ENCODER (SER + AED)</div>
         <div class="box-title">Multi-Task Emotion &amp; Sound Event Encoder</div>
         <div class="math-stat-row">
           <div class="math-stat">

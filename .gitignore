@@ -20,3 +20,14 @@ data/ssl/
 local-call-sim/certs/
 local-call-sim/server/*.sqlite
 local-call-sim/server/*.sqlite-journal
+
+# Audit screenshots & temp media
+/*.png
+/*.jpg
+!static/assets/*
+*.db
+video_ai_repos/
+deliverables/raw_recordings/
+deliverables/Dhvani_Cinematic_Demo_1080p.mp4
+deliverables/assets/
+deliverables/voiceover/
