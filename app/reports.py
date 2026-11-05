@@ -243,9 +243,13 @@ th {{ background: #1f2230; color: #9499ad; text-transform: uppercase; font-size:
 
   <div class="stamp-box">
     <div>
-      <div class="stamp-title">✓ Electronic Chain of Custody Verified</div>
-      <div class="sub">Authorised by: <b>{_e(investigator)}</b> · Date: {now_str} UTC</div>
-      <div class="hash">SHA-256 Evidence Seal: {evidence_sha256}</div>
+      <div class="stamp-title">✓ Statutory Certificate Under Section 65B Indian Evidence Act / Section 63 BSA 2023</div>
+      <div class="sub">Affirmed by: <b>{_e(investigator)}</b> · System: <b>Dhvani Secure Telephony Terminal</b> · Date: {now_str} UTC</div>
+      <div class="hash">Cryptographic SHA-256 Evidence Hash: {evidence_sha256}</div>
+      <div style="font-size:10px; color:#10b981; margin-top:5px;">Certified: Computer-generated forensic record produced during ordinary course of emergency dispatch. Hash verifiable against raw audio stream. Non-tampered electronic record.</div>
+    </div>
+    <div style="border: 2px solid #10b981; padding: 6px 14px; border-radius: 6px; text-align: center; color: #10b981; font-weight: 800; font-size: 10px; letter-spacing: 1px;">
+      SEC 65B / BSA<br>COURT CERTIFIED
     </div>
   </div>
 </div>

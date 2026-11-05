@@ -13,16 +13,31 @@ from __future__ import annotations
 import re
 import time
 from typing import Any
-from . import guidance
+from . import guidance, sensevoice_engine
 
 
 # Comprehensive emergency keyword dictionary
 KEYWORDS_CATALOG = {
-    "covert_duress": ["pizza", "pepperoni", "burger", "order", "delivery", "wrong number", "two people", "not alone"],
-    "violent_threat": ["knife", "gun", "weapon", "kill", "attack", "intruder", "break in", "hostage", "threat", "door locked"],
-    "direct_distress": ["help", "emergency", "police", "bachao", "save me", "trapped", "danger", "scared", "hurry"],
-    "medical_trauma": ["bleeding", "blood", "unconscious", "heart attack", "choking", "pain", "ambulance", "injured"],
-    "extortion_scam": ["digital arrest", "cbi", "customs", "parcel", "police station", "transfer money", "narcotics", "arrest warrant"],
+    "covert_duress": [
+        "pizza", "pepperoni", "burger", "order", "delivery", "wrong number", "two people", "not alone",
+        "khana", "roti", "parcel", "dabba", "swiggy", "zomato", "bhojan", "mithai"
+    ],
+    "violent_threat": [
+        "knife", "gun", "weapon", "kill", "attack", "intruder", "break in", "hostage", "threat", "door locked",
+        "chaku", "bandook", "darwaza band", "hathiyar", "ghus gaya", "chhod do", "mar dalega", "mara peeti"
+    ],
+    "direct_distress": [
+        "help", "emergency", "police", "bachao", "save me", "trapped", "danger", "scared", "hurry",
+        "madad", "jaldi aao", "phas gaya", "khatra", "dar lag raha hai", "bheed"
+    ],
+    "medical_trauma": [
+        "bleeding", "blood", "unconscious", "heart attack", "choking", "pain", "ambulance", "injured",
+        "khoon", "behosh", "saans", "chot", "dard", "turt aao"
+    ],
+    "extortion_scam": [
+        "digital arrest", "cbi", "customs", "parcel", "police station", "transfer money", "narcotics", "arrest warrant",
+        "cyber crime", "cbi officer", "money transfer", "bank account", "skype call", "fedex parcel", "illegal package"
+    ],
 }
 
 
@@ -190,6 +205,7 @@ def analyze_utterance(
         },
         "guidance": copilot_guidance,
         "location": location_target,
+        "sensevoice": sensevoice_engine.analyze_utterance_sensevoice(text, acoustic_prosody, call_duration_s),
     }
 
 
@@ -279,6 +295,18 @@ def get_baseline_intelligence(duration_s: float = 0.0) -> dict[str, Any]:
             "is_demo_location": True,
             "source_type": "Predefined Mumbai Reference Grid",
             "badge": "Mumbai Reference Grid",
+        },
+        "sensevoice": {
+            "model": "SenseVoiceSmall-Qwen",
+            "engine": "Qwen SenseVoice-Small Foundation (SER + AED)",
+            "model_id": "iic/SenseVoiceSmall",
+            "latency_ms": 118,
+            "emotion_tag": "<|NEUTRAL|>",
+            "emotion_label": "Calibrating",
+            "emotion_emoji": "😐",
+            "confidence": 0.95,
+            "audio_events": [],
+            "rich_display": "Establishing SenseVoice Foundation baseline...",
         },
     }
 

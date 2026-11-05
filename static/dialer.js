@@ -146,6 +146,15 @@
       showConnected();
       setupWebRTC(true);
       startSpeechRecognition();
+    } else if (msg.type === 'call_transferred') {
+      if (incallStatus) {
+        incallStatus.textContent = 'Transferred · Hold for Secondary Desk';
+        incallStatus.classList.remove('connected');
+      }
+      if (micStatusText) micStatusText.textContent = 'Connecting to Secondary Dispatch...';
+      setTimeout(function () {
+        endCallUI('Transferred to Officer Patel');
+      }, 3500);
     } else if (msg.type === 'call_rejected') {
       endCallUI('Call Declined by Operator');
     } else if (msg.type === 'call_ended') {

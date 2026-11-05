@@ -1006,6 +1006,7 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
     await websocket.accept()
     role = "unknown"
     dialer_id = None
+    dialer_call_id = None
     try:
         while True:
             data = await websocket.receive_json()
@@ -1035,10 +1036,13 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                     })
                 else:
                     call = telephony.start_call(ext, caller_name)
-                    await websocket.send_json({"type": "call_ringing", "call": call})
+                    dialer_call_id = call["id"]
+                    is_waiting = telephony.has_connected_call()
+                    await websocket.send_json({"type": "call_ringing", "call": call, "is_call_waiting": is_waiting})
                     await telephony.hub.broadcast_operators({
                         "type": "incoming_call",
                         "call": call,
+                        "is_call_waiting": is_waiting,
                     })
 
             elif msg_type == "answer_call":
@@ -1058,6 +1062,15 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                 await telephony.hub.broadcast_operators({"type": "call_rejected", "call": call})
                 for d_id in list(telephony.hub.dialers.keys()):
                     await telephony.hub.send_to_dialer(d_id, {"type": "call_rejected", "call": call})
+
+            elif msg_type == "transfer_call":
+                call_id = data.get("call_id")
+                dest = data.get("destination", "Secondary Dispatch Desk / Officer Patel")
+                call = telephony.transfer_call(call_id, dest)
+                if call:
+                    await telephony.hub.broadcast_operators({"type": "call_transferred", "call": call, "destination": dest})
+                    for d_id in list(telephony.hub.dialers.keys()):
+                        await telephony.hub.send_to_dialer(d_id, {"type": "call_transferred", "call": call, "destination": dest})
 
             elif msg_type == "end_call":
                 call_id = data.get("call_id")
@@ -1133,14 +1146,15 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
             telephony.hub.unregister_operator(websocket)
         elif dialer_id:
             telephony.hub.unregister_dialer(dialer_id)
-            active = telephony.get_active_call()
-            if active and active.get("status") in ("ringing", "connected"):
-                telephony.end_call(active["id"], ended_by="caller")
-                await telephony.hub.broadcast_operators({
-                    "type": "call_ended",
-                    "call": active,
-                    "reason": "Caller disconnected"
-                })
+            if dialer_call_id:
+                call = telephony.get_call(dialer_call_id)
+                if call and call.get("status") in ("ringing", "connected"):
+                    telephony.end_call(dialer_call_id, ended_by="caller")
+                    await telephony.hub.broadcast_operators({
+                        "type": "call_ended",
+                        "call": call,
+                        "reason": "Caller disconnected"
+                    })
 
 
 # ---------------------------------------------------------------------------

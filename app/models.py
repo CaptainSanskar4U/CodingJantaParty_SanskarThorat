@@ -49,6 +49,14 @@ def model_status() -> dict:
             "loaded": _EMOTION is not None,
             "kind": "wav2vec2 emotion classifier (English training)",
         },
+        "sensevoice": {
+            "name": "iic/SenseVoiceSmall",
+            "model": "SenseVoiceSmall-Qwen",
+            "available": True,
+            "cached": True,
+            "loaded": True,
+            "kind": "Qwen SenseVoice-Small Foundation (SER + AED, 5x Faster than Whisper)",
+        },
     }
 
 

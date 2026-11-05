@@ -12,7 +12,7 @@ from app import db, pipeline, guidance, config
 logger = logging.getLogger("dhvani.telephony")
 
 _ACTIVE_EXTENSION = "966"
-_ACTIVE_CALL: Optional[dict] = None
+_ACTIVE_CALLS: Dict[str, dict] = {}
 _CONNECTED_OPERATORS: List[WebSocket] = []
 _ACTIVE_SESSIONS: Dict[str, dict] = {}
 
@@ -52,11 +52,28 @@ def validate_extension(ext: str) -> bool:
 
 
 def get_active_call() -> Optional[dict]:
-    return _ACTIVE_CALL
+    # Return first connected call if exists, else first ringing/active call
+    connected = [c for c in _ACTIVE_CALLS.values() if c.get("status") == "connected"]
+    if connected:
+        return connected[0]
+    if _ACTIVE_CALLS:
+        return next(iter(_ACTIVE_CALLS.values()))
+    return None
+
+
+def get_call(call_id: str) -> Optional[dict]:
+    return _ACTIVE_CALLS.get(call_id)
+
+
+def get_active_calls() -> Dict[str, dict]:
+    return _ACTIVE_CALLS
+
+
+def has_connected_call() -> bool:
+    return any(c.get("status") == "connected" for c in _ACTIVE_CALLS.values())
 
 
 def start_call(extension: str, caller_name: str = "Mobile Smartphone") -> dict:
-    global _ACTIVE_CALL
     call_id = f"call_sim_{int(time.time())}_{random.randint(100, 999)}"
     now = db.now()
     
@@ -78,7 +95,7 @@ def start_call(extension: str, caller_name: str = "Mobile Smartphone") -> dict:
         "created_at": now,
     })
 
-    _ACTIVE_CALL = {
+    call_data = {
         "id": call_id,
         "extension": extension,
         "caller_name": caller_name,
@@ -89,48 +106,47 @@ def start_call(extension: str, caller_name: str = "Mobile Smartphone") -> dict:
         "duration_s": 0,
         "transcripts": [],
     }
-    return _ACTIVE_CALL
+    _ACTIVE_CALLS[call_id] = call_data
+    return call_data
 
 
 def answer_call(call_id: str) -> Optional[dict]:
-    global _ACTIVE_CALL
-    if not _ACTIVE_CALL or _ACTIVE_CALL["id"] != call_id:
+    call = _ACTIVE_CALLS.get(call_id)
+    if not call:
         return None
-    _ACTIVE_CALL["status"] = "connected"
-    _ACTIVE_CALL["answered_at"] = time.time()
-    return _ACTIVE_CALL
+    call["status"] = "connected"
+    call["answered_at"] = time.time()
+    return call
 
 
 def end_call(call_id: str, ended_by: str = "caller") -> Optional[dict]:
-    global _ACTIVE_CALL
-    if not _ACTIVE_CALL or _ACTIVE_CALL["id"] != call_id:
+    call = _ACTIVE_CALLS.pop(call_id, None)
+    if not call:
         return None
     now_ts = time.time()
-    duration = round(now_ts - (_ACTIVE_CALL["answered_at"] or _ACTIVE_CALL["started_at"]), 1)
-    _ACTIVE_CALL["status"] = "completed"
-    _ACTIVE_CALL["ended_at"] = now_ts
-    _ACTIVE_CALL["duration_s"] = max(1.0, duration)
-    _ACTIVE_CALL["ended_by"] = ended_by
+    duration = round(now_ts - (call["answered_at"] or call["started_at"]), 1)
+    call["status"] = "completed"
+    call["ended_at"] = now_ts
+    call["duration_s"] = max(1.0, duration)
+    call["ended_by"] = ended_by
 
     # Update in OG SQLite database
     db.update("calls", call_id, {
-        "duration_s": _ACTIVE_CALL["duration_s"],
+        "duration_s": call["duration_s"],
         "status": "analyzed",
-        "priority": "high" if len(_ACTIVE_CALL.get("transcripts", [])) >= 2 else "medium",
-        "urgency_score": 88 if any("pizza" in t.get("text", "").lower() for t in _ACTIVE_CALL.get("transcripts", [])) else 45,
+        "priority": "high" if len(call.get("transcripts", [])) >= 2 else "medium",
+        "urgency_score": 88 if any("pizza" in t.get("text", "").lower() for t in call.get("transcripts", [])) else 45,
     })
 
-    finished = dict(_ACTIVE_CALL)
-    _ACTIVE_CALL = None
-    return finished
+    return call
 
 
 def reject_call(call_id: str) -> Optional[dict]:
-    global _ACTIVE_CALL
-    if not _ACTIVE_CALL or _ACTIVE_CALL["id"] != call_id:
+    call = _ACTIVE_CALLS.pop(call_id, None)
+    if not call:
         return None
-    _ACTIVE_CALL["status"] = "rejected"
-    _ACTIVE_CALL["ended_at"] = time.time()
+    call["status"] = "rejected"
+    call["ended_at"] = time.time()
 
     db.update("calls", call_id, {
         "status": "failed",
@@ -138,9 +154,27 @@ def reject_call(call_id: str) -> Optional[dict]:
         "error": "Call rejected by operator"
     })
 
-    finished = dict(_ACTIVE_CALL)
-    _ACTIVE_CALL = None
-    return finished
+    return call
+
+
+def transfer_call(call_id: str, destination: str = "Secondary Dispatch Desk / Officer Patel") -> Optional[dict]:
+    """Transfer an incoming call (e.g. from call waiting) to another dispatch queue/desk."""
+    call = _ACTIVE_CALLS.pop(call_id, None)
+    if not call:
+        return None
+    now_ts = time.time()
+    call["status"] = "transferred"
+    call["transferred_to"] = destination
+    call["ended_at"] = now_ts
+
+    db.update("calls", call_id, {
+        "status": "processing",
+        "priority": "high",
+        "source_label": f"Transferred to {destination}",
+        "error": f"Transferred to {destination} (Hold Queue)"
+    })
+
+    return call
 
 
 class TelephonyHub:
@@ -160,6 +194,7 @@ class TelephonyHub:
             "local_ip": local_ip,
             "port": 8000,
             "active_call": get_active_call(),
+            "active_calls_count": len(_ACTIVE_CALLS),
         })
 
     def unregister_operator(self, websocket: WebSocket):
