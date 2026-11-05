@@ -371,3 +371,4 @@ def get_supported_languages() -> List[Dict[str, str]]:
         }
         for code, data in SUPPORTED_LANGUAGES.items()
     ]
+

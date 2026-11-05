@@ -529,6 +529,7 @@
 
     decline: function () {
       this.stopRingAudio();
+      this.stopActiveDemoTicker();
       clearInterval(this.countdownTimer);
       clearTimeout(this.autoAnswerTimer);
       var modal = el('incomingCallModal');
@@ -537,6 +538,54 @@
         modal.style.display = 'none';
       }
       toast('Incoming emergency call declined.', 'warn');
+    },
+
+    demoTicker: null,
+    simTime: 0,
+
+    startActiveDemoTicker: function () {
+      this.stopActiveDemoTicker();
+      var self = this;
+      self.simTime = 0;
+      var lastWallClock = Date.now();
+      var audio = el('audio');
+
+      // Immediate tick at t = 0 to establish live baseline and awaken right panel
+      var isPizzaInit = self.demoCallId === 'call_covert_pizza_distress' || (S.detail && S.detail.call && S.detail.call.duration_s > 45);
+      self.updateAIReviewDeck(0, isPizzaInit, false);
+
+      this.demoTicker = setInterval(function () {
+        if (!self.active) {
+          self.stopActiveDemoTicker();
+          return;
+        }
+
+        var now = Date.now();
+        var delta = (now - lastWallClock) / 1000;
+        lastWallClock = now;
+
+        if (audio && !audio.paused && audio.currentTime > 0) {
+          self.simTime = audio.currentTime;
+        } else {
+          self.simTime += delta;
+        }
+
+        var callDur = (S.detail && S.detail.call && S.detail.call.duration_s) || (audio && audio.duration) || 92.0;
+        if (self.simTime >= callDur) {
+          self.simTime = callDur;
+          self.stopActiveDemoTicker();
+          self.onEnded();
+        }
+
+        updatePlayback(self.simTime);
+      }, 250);
+    },
+
+    stopActiveDemoTicker: function () {
+      if (this.demoTicker) {
+        clearInterval(this.demoTicker);
+        this.demoTicker = null;
+      }
     },
 
     answer: async function () {
@@ -587,6 +636,7 @@
             toast('Click play on waveform to begin audio playback.', 'warn');
           });
         }
+        this.startActiveDemoTicker();
       } catch (err) {
         toast('Quick Demo failed to start: ' + err.message, 'err');
       }
@@ -613,9 +663,9 @@
       for (var i = 0; i < bars.length; i++) {
         var h;
         if (isSpeaking) {
-          h = Math.floor(25 + Math.random() * 70);
+          h = Math.floor(35 + Math.random() * 62);
         } else {
-          h = Math.floor(8 + Math.random() * 14);
+          h = Math.floor(10 + Math.random() * 22);
         }
         bars[i].style.height = h + '%';
       }
@@ -623,20 +673,6 @@
 
     updateAIReviewDeck: function (t, isPizzaDemo, isSpeaking) {
       this.updateSpectrumBars(isSpeaking);
-
-      // If call audio is within initial calibration window (< 3.0s)
-      if (t < 3.0) {
-        if (t > 0 && S.playing) {
-          resetRightPanelToEmptyState('calibrating');
-          return;
-        } else if (t === 0 && S.playing) {
-          return;
-        } else if (!S.playing && S.detail && S.detail.call) {
-          t = S.detail.call.duration_s || 100.0;
-        } else {
-          return;
-        }
-      }
 
       // If this is the covert distress pizza scenario
       if (isPizzaDemo) {
@@ -673,8 +709,8 @@
           : count === 2 ? "Second occurrence of 'PIZZA' detected. Monitoring for conversational context and vocal tremor."
           : "Repeated food-order phrasing ('PIZZA' 3+ times) on emergency channel. Note: AI does not assume victimhood solely from keyword repetition; corroborating vocal stress and closed yes/no safety questions required.";
 
-        var pitchMedian = t >= 72.0 ? 246.0 : t >= 40.0 ? 226.0 : t >= 20.8 ? 208.5 : 185.0;
-        var pitchVar = t >= 72.0 ? 38.2 : t >= 40.0 ? 26.5 : t >= 20.8 ? 16.2 : 8.5;
+        var pitchMedian = t >= 72.0 ? 246.0 : t >= 40.0 ? 226.0 : t >= 20.8 ? 208.5 : (185.0 + Math.sin(t * 2.0) * 2.5);
+        var pitchVar = t >= 72.0 ? 38.2 : t >= 40.0 ? 26.5 : t >= 20.8 ? 16.2 : (8.5 + Math.abs(Math.sin(t)) * 2.0);
         var pauseRatio = t >= 72.0 ? 0.44 : t >= 40.0 ? 0.34 : t >= 20.8 ? 0.22 : 0.12;
         var speechRate = t >= 72.0 ? 1.2 : t >= 40.0 ? 1.5 : t >= 20.8 ? 1.9 : 2.3;
 
@@ -697,8 +733,10 @@
         } else {
           dominantTag = "CALIBRATING / BASELINE";
           tagClass = "tag gray";
-          vocalHint = "Vocal fold tension within normal baseline range";
-          tremor = 18; stress = 22; breath = 15; pretense = 10;
+          vocalHint = "Micro-tremor: speech baseline calibrated. Monitoring vocal fold jitter…";
+          tremor = 18 + Math.round(Math.sin(t * 1.5) * 3);
+          stress = 22 + Math.round(Math.cos(t * 1.5) * 3);
+          breath = 15; pretense = 10;
         }
 
         var gPhase, gColor, gPrompt, gAction, gRationale, gChecklist;
@@ -954,6 +992,34 @@
         });
       }
 
+      // Dynamically reveal and highlight active translation cards in Live Translation Tab
+      var trScroll = el('translationFeed');
+      if (trScroll) {
+        var trCards = trScroll.querySelectorAll('.translation-card');
+        if (trCards && trCards.length > 0) {
+          var activeCard = null;
+          trCards.forEach(function (card) {
+            var cStart = Number(card.getAttribute('data-start') || 0);
+            if (cStart <= t) {
+              card.style.display = '';
+              if (t >= cStart && t <= cStart + 4.5) {
+                card.classList.add('active-seek');
+                activeSpeaking = true;
+                activeCard = card;
+              } else {
+                card.classList.remove('active-seek');
+              }
+            } else {
+              card.style.display = 'none';
+              card.classList.remove('active-seek');
+            }
+          });
+          if (activeCard && activeCard.scrollIntoView) {
+            activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      }
+
       // Update the 5 AI Review Deck components in the right column
       this.updateAIReviewDeck(t, isPizzaDemo, activeSpeaking);
 
@@ -978,6 +1044,7 @@
     },
 
     onEnded: function () {
+      this.stopActiveDemoTicker();
       if (!this.active || !S.detail || S.detail.call.id !== this.demoCallId) return;
       this.ended = true;
 
@@ -1411,6 +1478,25 @@
       }
     },
 
+    telemetryTicker: null,
+    startLiveTelemetry: function () {
+      this.stopLiveTelemetry();
+      var self = this;
+      this.telemetryTicker = setInterval(function () {
+        if (!self.activeSimCall || self.activeSimCall.status !== 'connected') {
+          self.stopLiveTelemetry();
+          return;
+        }
+        QuickDemo.updateSpectrumBars(true);
+      }, 200);
+    },
+    stopLiveTelemetry: function () {
+      if (this.telemetryTicker) {
+        clearInterval(this.telemetryTicker);
+        this.telemetryTicker = null;
+      }
+    },
+
     answerCall: async function (callId) {
       var self = this;
       if (this.activeSimCall && this.activeSimCall.id === callId) {
@@ -1424,6 +1510,7 @@
       }
 
       this.setupWebRTC();
+      this.startLiveTelemetry();
       var recBadge = el('callRecBadge'); if (recBadge) recBadge.style.display = 'inline-flex';
 
       try {
@@ -1447,6 +1534,7 @@
     },
 
     declineCall: function (callId) {
+      this.stopLiveTelemetry();
       this.hideIncomingCall();
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.ws.send(JSON.stringify({ type: 'reject_call', call_id: callId }));
@@ -2905,11 +2993,10 @@
     if (pp) pp.innerHTML = icon(S.playing ? 'pause' : 'play', 15, '#0b0b0d');
   }
 
-  function updatePlayback() {
+  function updatePlayback(overrideCurrent) {
     var audio = el('audio');
-    if (!audio) return;
-    var duration = audio.duration && isFinite(audio.duration) ? audio.duration : (S.detail && S.detail.call ? S.detail.call.duration_s : 0) || 0;
-    var current = audio.currentTime || 0;
+    var duration = (audio && audio.duration && isFinite(audio.duration)) ? audio.duration : (S.detail && S.detail.call ? S.detail.call.duration_s : 0) || 0;
+    var current = (typeof overrideCurrent === 'number' && !isNaN(overrideCurrent)) ? overrideCurrent : ((audio && typeof audio.currentTime === 'number') ? audio.currentTime : 0);
     var ratio = duration ? Math.min(1, current / duration) : 0;
     setText('pt', fmtTime(current) + ' / ' + fmtTime(duration));
     var pg = el('pg'); if (pg) pg.style.width = (ratio * 100) + '%';
@@ -3119,6 +3206,21 @@
           '</div>' +
         '</div>';
       }).join('');
+
+      if (QuickDemo.active) {
+        var curSimTime = QuickDemo.simTime || 0;
+        feedEl.querySelectorAll('.translation-card').forEach(function (card) {
+          var start = Number(card.getAttribute('data-start') || 0);
+          if (start <= curSimTime) {
+            card.style.display = '';
+            if (curSimTime >= start && curSimTime <= start + 4.5) {
+              card.classList.add('active-seek');
+            }
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
 
       feedEl.querySelectorAll('.translation-card').forEach(function (card) {
         card.onclick = function () {

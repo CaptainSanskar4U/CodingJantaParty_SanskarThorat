@@ -282,6 +282,7 @@
     chip.addEventListener('click', function () {
       var phrase = chip.getAttribute('data-phrase');
       if (phrase && activeCall && ws && ws.readyState === WebSocket.OPEN) {
+        try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) {}
         ws.send(JSON.stringify({
           type: 'transcript_utterance',
           call_id: activeCall.id,
@@ -289,7 +290,17 @@
           text: phrase
         }));
         chip.style.borderColor = '#10b981';
-        setTimeout(function () { chip.style.borderColor = ''; }, 600);
+        chip.style.transform = 'scale(0.97)';
+        if (micStatusText) micStatusText.textContent = 'Transmitted: "' + phrase.slice(0, 24) + '…"';
+        setTimeout(function () {
+          chip.style.borderColor = '';
+          chip.style.transform = '';
+          if (micStatusText && micStatusText.textContent.indexOf('Transmitted') !== -1) {
+            micStatusText.textContent = '2-Way Audio Live';
+          }
+        }, 800);
+      } else if (!activeCall) {
+        if (dialError) dialError.textContent = 'Connect call first to transmit speech';
       }
     });
   });
