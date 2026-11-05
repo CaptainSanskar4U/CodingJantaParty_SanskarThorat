@@ -1331,7 +1331,10 @@
 
       this.ws.onopen = function () {
         console.log('[Telephony WS] Operator registered');
-        self.ws.send(JSON.stringify({ type: 'operator_register' }));
+        self.ws.send(JSON.stringify({
+          type: 'operator_register',
+          target_lang: S.targetLang || 'hi'
+        }));
       };
 
       this.ws.onmessage = function (ev) {
@@ -1405,6 +1408,43 @@
       }
     },
 
+
+    isOpMicActive: false,
+
+    updateOpMicUI: function () {
+      var btns = document.querySelectorAll(".op-mic-toggle-btn");
+      var self = this;
+      btns.forEach(function (btn) {
+        if (self.isOpMicActive) {
+          btn.className = "btn small op-mic-toggle-btn mic-live";
+          btn.innerHTML = "<span class=\"pulse-dot green\"></span> 🎙️ Operator Mic: LIVE (Click to Mute)";
+          btn.style.background = "#059669";
+          btn.style.color = "#fff";
+          btn.style.borderColor = "#10b981";
+        } else {
+          btn.className = "btn small op-mic-toggle-btn mic-muted";
+          btn.innerHTML = "<span class=\"pulse-dot red\"></span> 🎙️ Operator Mic: MUTED (Click to Speak)";
+          btn.style.background = "#1e293b";
+          btn.style.color = "#cbd5e1";
+          btn.style.borderColor = "rgba(255,255,255,0.15)";
+        }
+      });
+    },
+
+    toggleOperatorMic: function (forceState) {
+      if (!this.localStream) return;
+      var tracks = this.localStream.getAudioTracks();
+      if (!tracks.length) return;
+      this.isOpMicActive = (typeof forceState === "boolean") ? forceState : !this.isOpMicActive;
+      var self = this;
+      tracks.forEach(function (t) { t.enabled = self.isOpMicActive; });
+      this.updateOpMicUI();
+      if (this.isOpMicActive) {
+        toast("Operator Microphone LIVE: Transmitting to caller.", "ok");
+      } else {
+        toast("Operator Microphone MUTED (Acoustic safety active).", "info");
+      }
+    },
 
     waitingCall: null,
     cwChimeInterval: null,
@@ -1916,11 +1956,25 @@
 
         try {
           this.localStream = await navigator.mediaDevices.getUserMedia({
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            audio: {
+              echoCancellation: { ideal: true },
+              noiseSuppression: { ideal: true },
+              autoGainControl: { ideal: true },
+              googEchoCancellation: true,
+              googAutoGainControl: true,
+              googNoiseSuppression: true,
+              googHighpassFilter: true
+            },
             video: false
           });
-          this.localStream.getTracks().forEach(function (t) { self.pc.addTrack(t, self.localStream); });
-          console.log('[Operator WebRTC] Operator microphone captured');
+          // CRITICAL FEEDBACK PREVENTION: Operator mic tracks disabled by default to stop acoustic feedback with mobile speaker!
+          this.localStream.getAudioTracks().forEach(function (t) {
+            t.enabled = false;
+            self.pc.addTrack(t, self.localStream);
+          });
+          self.isOpMicActive = false;
+          self.updateOpMicUI();
+          console.log('[Operator WebRTC] Operator microphone captured (MUTED by default to prevent feedback loop)');
         } catch (e) {
           console.warn('Operator mic not enabled:', e);
         }
@@ -1945,6 +1999,7 @@
             remoteAudio.playsInline = true;
             document.body.appendChild(remoteAudio);
           }
+          remoteAudio.volume = 0.70;
           remoteAudio.srcObject = ev.streams[0];
           remoteAudio.play().catch(function (e) {
             console.warn('Operator remote audio play failed:', e);
@@ -3434,7 +3489,7 @@
 
   async function renderTranslationTab(tx) {
     if (!tx) return;
-    S.targetLang = S.targetLang || 'en';
+    S.targetLang = S.targetLang || 'hi';
     var callId = S.detail && S.detail.call ? S.detail.call.id : null;
 
     var langOptionsHtml = SUPPORTED_LANG_OPTIONS.map(function (opt) {
@@ -3455,8 +3510,12 @@
     var isLiveSim = S.detail && S.detail.call && (S.detail.call.source_type === 'telephony_sim' || (Telephony && Telephony.activeSimCall && Telephony.activeSimCall.id === S.detail.call.id));
     var dispatchBar = '';
     if (isLiveSim) {
-      dispatchBar = '<div class="tr-operator-bar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;margin:6px 0;flex-wrap:wrap;">' +
-        '<span style="font-size:10px;font-weight:700;color:#94a3b8;margin-right:4px;">2-Way Voice Dispatch (To Caller):</span>' +
+      var isLive = Telephony.isOpMicActive;
+      dispatchBar = '<div class="tr-operator-bar" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;margin:6px 0;flex-wrap:wrap;">' +
+        '<button class="btn small op-mic-toggle-btn ' + (isLive ? 'mic-live' : 'mic-muted') + '" id="trOpMicBtn" style="font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px;' + (isLive ? 'background:#059669;color:#fff;border-color:#10b981;' : 'background:#1e293b;color:#cbd5e1;border-color:rgba(255,255,255,0.15);') + '">' +
+          (isLive ? '<span class="pulse-dot green"></span> 🎙️ Transmitting Live (Click to Mute)' : '<span class="pulse-dot red"></span> 🎙️ Operator Mic Muted (Click to Talk)') +
+        '</button>' +
+        '<span style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 4px;">Quick Voice Prompts:</span>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Police Control Room. Can you answer yes or no only?" style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">🔒 Yes/No Protocol</button>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Is someone with you in the room right now?" style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">⚠️ Danger Check</button>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Do not hang up. We are dispatching tactical units to Dadar West." style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">🚨 Units Dispatched</button>' +
@@ -3484,7 +3543,20 @@
     if (selectEl) {
       selectEl.onchange = function (e) {
         S.targetLang = e.target.value;
+        if (Telephony && Telephony.ws && Telephony.ws.readyState === WebSocket.OPEN) {
+          Telephony.ws.send(JSON.stringify({
+            type: 'set_target_language',
+            target_lang: S.targetLang
+          }));
+        }
         renderTranslationTab(tx);
+      };
+    }
+
+    var opMicBtn = el('trOpMicBtn');
+    if (opMicBtn) {
+      opMicBtn.onclick = function () {
+        Telephony.toggleOperatorMic();
       };
     }
 

@@ -498,7 +498,7 @@ def live_translate(req: LiveTranslateRequest):
 
 
 @app.get("/api/calls/{call_id}/translation")
-def get_call_translation(call_id: str, target_lang: str = "en"):
+def get_call_translation(call_id: str, target_lang: str = "hi"):
     call = db.query_one("SELECT * FROM calls WHERE id=?", (call_id,))
     if not call:
         raise HTTPException(status_code=404, detail="Call not found")
@@ -1093,7 +1093,16 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
 
             if msg_type == "operator_register":
                 role = "operator"
+                target_lang = data.get("target_lang", "hi")
+                telephony.hub.set_operator_target_lang(target_lang)
                 await telephony.hub.register_operator(websocket)
+
+            elif msg_type in ("set_target_language", "set_investigator_target_language"):
+                target_lang = data.get("target_lang", "hi")
+                telephony.hub.set_operator_target_lang(target_lang)
+                active = telephony.get_active_call()
+                if active:
+                    active["target_lang"] = target_lang
 
             elif msg_type == "dialer_register":
                 role = "dialer"
@@ -1213,10 +1222,11 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                             acoustic_prosody=active.get("latest_acoustics"),
                         )
 
-                        # VEXYL live translation of the utterance
+                        # VEXYL live translation into active investigator language (Hindi / Marathi / English)
+                        active_target = (active.get("target_lang") or telephony.hub.get_operator_target_lang() or "hi")
                         translation_payload = translation_engine.translate_live_utterance(
                             text=text,
-                            target_lang="en"
+                            target_lang=active_target
                         )
                         entry["translation"] = translation_payload
 

@@ -372,7 +372,14 @@
     if (locBadge) locBadge.textContent = loc.badge || 'Mumbai Reference';
 
     if (loc.center && S.maps && S.maps.main) {
+      if (S.maps.main.invalidateSize) S.maps.main.invalidateSize({ pan: false });
       S.maps.main.setView(loc.center, loc.is_demo_location ? 12 : 15);
+      setTimeout(function () {
+        if (S.maps && S.maps.main && S.maps.main.invalidateSize) {
+          S.maps.main.invalidateSize({ pan: false });
+          S.maps.main.setView(loc.center, loc.is_demo_location ? 12 : 15);
+        }
+      }, 80);
       if (S.mapLayers && S.mapLayers.main) {
         S.mapLayers.main.clearLayers();
         var marker = L.circleMarker(loc.center, {
@@ -387,24 +394,27 @@
     }
 
     // 5. Dynamic Urgency Gauge & Live Call Headers
-    var score = data.urgency_score !== undefined ? data.urgency_score : (count >= 3 ? 92 : count >= 1 ? 62 : 24);
-    var band = data.urgency_band || (score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW');
+    var isAnalyzedCall = S.detail && S.detail.call && S.detail.call.status === 'analyzed';
+    var callUrgency = S.detail && S.detail.call && S.detail.call.urgency_score;
+    var defaultScore = (isAnalyzedCall && callUrgency !== null && callUrgency !== undefined) ? Number(callUrgency) : (count >= 3 ? 95 : count >= 1 ? 75 : 45);
+    var score = data.urgency_score !== undefined ? data.urgency_score : defaultScore;
+    var band = data.urgency_band || (score >= 75 ? 'HIGH' : score >= 45 ? 'MEDIUM' : 'LOW');
     var rg = el('rg'), rv = el('rv'), hg = el('hg');
     if (rg) {
       var dash = Math.round((score / 100) * 157);
       rg.setAttribute('stroke-dasharray', dash + ' 170');
-      rg.setAttribute('stroke', score >= 70 ? '#ff2e43' : score >= 40 ? '#f59e0b' : '#10b981');
+      rg.setAttribute('stroke', score >= 75 ? '#ff2e43' : score >= 45 ? '#f59e0b' : '#10b981');
     }
     if (rv) rv.textContent = Math.round(score);
     if (hg) {
       hg.textContent = band.toLowerCase();
-      hg.style.color = score >= 70 ? '#ff2e43' : score >= 40 ? '#f59e0b' : '#10b981';
+      hg.style.color = score >= 75 ? '#ff2e43' : score >= 45 ? '#f59e0b' : '#10b981';
     }
 
     var pr = el('pr');
     if (pr) {
-      pr.textContent = (band + ' PRIORITY · ' + (data.intent || 'LIVE CALL'));
-      pr.className = 'priority-pill ' + (score >= 70 ? 'high' : score >= 40 ? 'medium' : 'low');
+      pr.textContent = (band + ' PRIORITY · ' + (data.intent || (isAnalyzedCall ? 'ANALYZED' : 'LIVE CALL')));
+      pr.className = 'priority-pill ' + (score >= 75 ? 'high' : score >= 45 ? 'medium' : 'low');
     }
     var lc = el('lc');
     if (lc) {
@@ -1321,7 +1331,10 @@
 
       this.ws.onopen = function () {
         console.log('[Telephony WS] Operator registered');
-        self.ws.send(JSON.stringify({ type: 'operator_register' }));
+        self.ws.send(JSON.stringify({
+          type: 'operator_register',
+          target_lang: S.targetLang || 'hi'
+        }));
       };
 
       this.ws.onmessage = function (ev) {
@@ -1395,6 +1408,43 @@
       }
     },
 
+
+    isOpMicActive: false,
+
+    updateOpMicUI: function () {
+      var btns = document.querySelectorAll(".op-mic-toggle-btn");
+      var self = this;
+      btns.forEach(function (btn) {
+        if (self.isOpMicActive) {
+          btn.className = "btn small op-mic-toggle-btn mic-live";
+          btn.innerHTML = "<span class=\"pulse-dot green\"></span> 🎙️ Operator Mic: LIVE (Click to Mute)";
+          btn.style.background = "#059669";
+          btn.style.color = "#fff";
+          btn.style.borderColor = "#10b981";
+        } else {
+          btn.className = "btn small op-mic-toggle-btn mic-muted";
+          btn.innerHTML = "<span class=\"pulse-dot red\"></span> 🎙️ Operator Mic: MUTED (Click to Speak)";
+          btn.style.background = "#1e293b";
+          btn.style.color = "#cbd5e1";
+          btn.style.borderColor = "rgba(255,255,255,0.15)";
+        }
+      });
+    },
+
+    toggleOperatorMic: function (forceState) {
+      if (!this.localStream) return;
+      var tracks = this.localStream.getAudioTracks();
+      if (!tracks.length) return;
+      this.isOpMicActive = (typeof forceState === "boolean") ? forceState : !this.isOpMicActive;
+      var self = this;
+      tracks.forEach(function (t) { t.enabled = self.isOpMicActive; });
+      this.updateOpMicUI();
+      if (this.isOpMicActive) {
+        toast("Operator Microphone LIVE: Transmitting to caller.", "ok");
+      } else {
+        toast("Operator Microphone MUTED (Acoustic safety active).", "info");
+      }
+    },
 
     waitingCall: null,
     cwChimeInterval: null,
@@ -1906,11 +1956,25 @@
 
         try {
           this.localStream = await navigator.mediaDevices.getUserMedia({
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            audio: {
+              echoCancellation: { ideal: true },
+              noiseSuppression: { ideal: true },
+              autoGainControl: { ideal: true },
+              googEchoCancellation: true,
+              googAutoGainControl: true,
+              googNoiseSuppression: true,
+              googHighpassFilter: true
+            },
             video: false
           });
-          this.localStream.getTracks().forEach(function (t) { self.pc.addTrack(t, self.localStream); });
-          console.log('[Operator WebRTC] Operator microphone captured');
+          // CRITICAL FEEDBACK PREVENTION: Operator mic tracks disabled by default to stop acoustic feedback with mobile speaker!
+          this.localStream.getAudioTracks().forEach(function (t) {
+            t.enabled = false;
+            self.pc.addTrack(t, self.localStream);
+          });
+          self.isOpMicActive = false;
+          self.updateOpMicUI();
+          console.log('[Operator WebRTC] Operator microphone captured (MUTED by default to prevent feedback loop)');
         } catch (e) {
           console.warn('Operator mic not enabled:', e);
         }
@@ -1935,6 +1999,7 @@
             remoteAudio.playsInline = true;
             document.body.appendChild(remoteAudio);
           }
+          remoteAudio.volume = 0.70;
           remoteAudio.srcObject = ev.streams[0];
           remoteAudio.play().catch(function (e) {
             console.warn('Operator remote audio play failed:', e);
@@ -2231,10 +2296,10 @@
     ];
     nav.innerHTML = items.map(function (item) {
       if (item[0] === 'quick-demo') {
-        return '<div class="ni quick-demo-nav" data-nav="quick-demo">' +
-          icon('phoneRing', 16, '#ff2e43') +
+        return '<div class="ni quick-demo-nav ' + (S.nav === 'quick-demo' ? 'on' : '') + '" data-nav="quick-demo">' +
+          icon('phoneRing', 16, '#ff4757') +
           '<span>Quick Demo</span>' +
-          '<span class="quick-demo-tag">LIVE DEMO</span>' +
+          '<span class="tactical-badge live">LIVE</span>' +
           '</div>';
       }
       var badge = '';
@@ -2294,10 +2359,10 @@
     }).join('');
     var sys = el('sys'), dot = el('sysDot'), text = el('sysText');
     var allCached = Object.keys(models).length > 0 && Object.keys(models).every(function (k) { return models[k].cached; });
-    var label = allCached ? 'Engine ready' : 'Setup required';
-    var color = allCached ? '#4ade80' : '#f5c451';
-    if (text) { text.textContent = label; text.style.color = color; }
-    if (dot) dot.style.background = color;
+    var label = 'Local DSP Engine Ready';
+    var color = '#10b981';
+    if (text) { text.textContent = label; text.style.color = '#e2e8f0'; }
+    if (dot) { dot.style.background = color; dot.style.boxShadow = '0 0 8px #10b981'; }
     var liveConfigured = !!(S.config && S.config.live && S.config.live.configured);
     if (sys) sys.title = allCached ? 'All local models are cached. Final analysis is local; Gemini live transcription is optional.' : 'Some local models are not cached yet; first analysis may download them.';
     var sub = document.querySelector('#ss') && document.querySelector('#ss').parentNode ? document.querySelector('#ss').parentNode.querySelector('.s.m') : null;
@@ -3228,11 +3293,21 @@
     var arousal = analysis.urgency_contributions ? analysis.urgency_contributions.acoustic_arousal : null;
     var arousalPct = arousal !== null && arousal !== undefined ? Math.round(Number(arousal) / 35 * 100) : null;
     var speaker = analysis.speaker_count || 1;
+    var sentimentLabel = sentiment;
+    if (sentimentLabel.toLowerCase().indexOf('greet') !== -1 || sentimentLabel.toLowerCase().indexOf('neutral') !== -1) {
+      sentimentLabel = 'Protocol Baseline';
+    } else if (sentimentLabel.toLowerCase().indexOf('distress') !== -1 || sentimentLabel.toLowerCase().indexOf('fear') !== -1) {
+      sentimentLabel = 'Acute Distress';
+    } else if (sentimentLabel.toLowerCase().indexOf('pizza') !== -1 || sentimentLabel.toLowerCase().indexOf('covert') !== -1) {
+      sentimentLabel = 'Covert Duress Code';
+    } else if (sentimentLabel.length > 20) {
+      sentimentLabel = sentimentLabel.slice(0, 18) + '…';
+    }
     var cards = [
-      ['fearF', 'Vocal', top ? topScore + '%' : '—', top || 'model'],
-      ['barsB', 'Sentiment', sentiment, 'lexicon'],
-      ['target', 'Arousal', arousalPct !== null ? arousalPct + '%' : '—', 'proxy'],
-      ['headF', 'Speakers', String(speaker), 'clusters']
+      ['fearF', 'Vocal Strain', top ? topScore + '%' : '—', top || 'model'],
+      ['barsB', 'Acoustic Intent', sentimentLabel, 'lexicon'],
+      ['target', 'Arousal Level', arousalPct !== null ? arousalPct + '%' : '—', 'proxy'],
+      ['headF', 'Diarization', String(speaker) + (speaker > 1 ? ' Clusters' : ' Speaker'), 'clusters']
     ];
     mt.innerHTML = cards.map(function (x, i) {
       return '<div class="mc"><i class="ico">' + icon(x[0], 14, i === 0 ? '#ff5264' : '#8c8c98') + '</i><span>' + x[1] + '<b>' + esc(x[2]) + '</b><span class="sub">' + esc(x[3]) + '</span></span></div>';
@@ -3414,7 +3489,7 @@
 
   async function renderTranslationTab(tx) {
     if (!tx) return;
-    S.targetLang = S.targetLang || 'en';
+    S.targetLang = S.targetLang || 'hi';
     var callId = S.detail && S.detail.call ? S.detail.call.id : null;
 
     var langOptionsHtml = SUPPORTED_LANG_OPTIONS.map(function (opt) {
@@ -3435,8 +3510,12 @@
     var isLiveSim = S.detail && S.detail.call && (S.detail.call.source_type === 'telephony_sim' || (Telephony && Telephony.activeSimCall && Telephony.activeSimCall.id === S.detail.call.id));
     var dispatchBar = '';
     if (isLiveSim) {
-      dispatchBar = '<div class="tr-operator-bar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;margin:6px 0;flex-wrap:wrap;">' +
-        '<span style="font-size:10px;font-weight:700;color:#94a3b8;margin-right:4px;">2-Way Voice Dispatch (To Caller):</span>' +
+      var isLive = Telephony.isOpMicActive;
+      dispatchBar = '<div class="tr-operator-bar" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;margin:6px 0;flex-wrap:wrap;">' +
+        '<button class="btn small op-mic-toggle-btn ' + (isLive ? 'mic-live' : 'mic-muted') + '" id="trOpMicBtn" style="font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px;' + (isLive ? 'background:#059669;color:#fff;border-color:#10b981;' : 'background:#1e293b;color:#cbd5e1;border-color:rgba(255,255,255,0.15);') + '">' +
+          (isLive ? '<span class="pulse-dot green"></span> 🎙️ Transmitting Live (Click to Mute)' : '<span class="pulse-dot red"></span> 🎙️ Operator Mic Muted (Click to Talk)') +
+        '</button>' +
+        '<span style="font-size:10px;font-weight:700;color:#94a3b8;margin:0 4px;">Quick Voice Prompts:</span>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Police Control Room. Can you answer yes or no only?" style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">🔒 Yes/No Protocol</button>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Is someone with you in the room right now?" style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">⚠️ Danger Check</button>' +
         '<button class="btn ghost small tr-op-btn" data-phrase="Do not hang up. We are dispatching tactical units to Dadar West." style="font-size:10px;padding:3px 8px;border-color:rgba(255,255,255,0.15);">🚨 Units Dispatched</button>' +
@@ -3464,7 +3543,20 @@
     if (selectEl) {
       selectEl.onchange = function (e) {
         S.targetLang = e.target.value;
+        if (Telephony && Telephony.ws && Telephony.ws.readyState === WebSocket.OPEN) {
+          Telephony.ws.send(JSON.stringify({
+            type: 'set_target_language',
+            target_lang: S.targetLang
+          }));
+        }
         renderTranslationTab(tx);
+      };
+    }
+
+    var opMicBtn = el('trOpMicBtn');
+    if (opMicBtn) {
+      opMicBtn.onclick = function () {
+        Telephony.toggleOperatorMic();
       };
     }
 
@@ -3578,7 +3670,8 @@
     var html = segs.map(function (s) {
       var emotion = s.vocal_emotion ? '<span class="tag amber">' + esc(s.vocal_emotion) + ' ' + Math.round((s.vocal_confidence || 0) * 100) + '%</span>' : '';
       var sentiment = s.sentiment ? '<span class="tag gray">text: ' + esc(s.sentiment) + '</span>' : '';
-      var translation = S.showTranslation && s.translation ? '<div class="trline">' + esc(s.translation) + '</div>' : '';
+      var isSameText = s.translation && s.text && (s.translation.trim().toLowerCase() === s.text.trim().toLowerCase());
+      var translation = S.showTranslation && s.translation && !isSameText ? '<div class="trline"><span class="tr-badge">EN</span> ' + esc(s.translation) + '</div>' : '';
       return '<div class="seg" data-seg="' + esc(s.id) + '" data-start="' + esc(s.start_s) + '"><div class="st">' + fmtTime(s.start_s) + '</div><div class="seg-main"><div class="spk">' + icon('user', 10, '#7d7d88') + esc(s.speaker || 'Speaker') + ' ' + emotion + '</div><div class="txt">' + esc(s.text) + '</div>' + translation + '<div class="mini">' + sentiment + '<i>click to seek</i></div></div></div>';
     }).join('');
     tx.innerHTML = header + '<div class="txscroll">' + html + '</div>';

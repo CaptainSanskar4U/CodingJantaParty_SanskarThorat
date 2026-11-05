@@ -65,6 +65,8 @@
   var incallTitle = document.getElementById('incallTitle');
   var incallStatus = document.getElementById('incallStatus');
   var btnMute = document.getElementById('btnMute');
+  var btnSpeaker = document.getElementById('btnSpeaker');
+  var isSpeakerMuted = false;
   var btnHangup = document.getElementById('btnHangup');
   var statusBarTime = document.getElementById('statusBarTime');
   var micStatus = document.getElementById('micStatus');
@@ -287,6 +289,23 @@
     });
   }
 
+  if (btnSpeaker) {
+    btnSpeaker.addEventListener('click', function () {
+      isSpeakerMuted = !isSpeakerMuted;
+      btnSpeaker.classList.toggle('active', isSpeakerMuted);
+      btnSpeaker.textContent = isSpeakerMuted ? '🔇' : '🔊';
+      if (remoteAudioEl) remoteAudioEl.muted = isSpeakerMuted;
+      var a = document.getElementById('remoteAudio');
+      if (a) a.muted = isSpeakerMuted;
+      if (micStatusText) {
+        micStatusText.textContent = isSpeakerMuted ? 'Speaker Muted (Silent)' : 'Speaker Active';
+        setTimeout(function () {
+          if (micStatusText && activeCall) micStatusText.textContent = '2-Way Audio Live';
+        }, 1500);
+      }
+    });
+  }
+
   // Quick Speech Phrase Buttons
   document.querySelectorAll('.phrase-chip').forEach(function (chip) {
     chip.addEventListener('click', function () {
@@ -416,9 +435,13 @@
         try {
           localStream = await navigator.mediaDevices.getUserMedia({
             audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true
+              echoCancellation: { ideal: true },
+              noiseSuppression: { ideal: true },
+              autoGainControl: { ideal: true },
+              googEchoCancellation: true,
+              googAutoGainControl: true,
+              googNoiseSuppression: true,
+              googHighpassFilter: true
             },
             video: false
           });
@@ -457,10 +480,26 @@
           audio.playsInline = true;
           document.body.appendChild(audio);
         }
+        audio.volume = 0.70;
+        audio.muted = isSpeakerMuted;
         audio.srcObject = ev.streams[0];
         audio.play().catch(function (e) {
           console.warn('Remote audio autoplay blocked:', e);
         });
+
+        // Acoustic Safety Feedback Limiter via DynamicsCompressorNode
+        try {
+          var ctx = getAudioContext();
+          var srcNode = ctx.createMediaStreamSource(ev.streams[0]);
+          var comp = ctx.createDynamicsCompressor();
+          comp.threshold.setValueAtTime(-18, ctx.currentTime);
+          comp.knee.setValueAtTime(8, ctx.currentTime);
+          comp.ratio.setValueAtTime(20, ctx.currentTime);
+          comp.attack.setValueAtTime(0.003, ctx.currentTime);
+          comp.release.setValueAtTime(0.25, ctx.currentTime);
+          srcNode.connect(comp);
+          comp.connect(ctx.destination);
+        } catch (e) {}
       };
 
       if (isCaller) {

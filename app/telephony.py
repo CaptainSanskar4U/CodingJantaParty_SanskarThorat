@@ -183,6 +183,13 @@ class TelephonyHub:
     def __init__(self):
         self.operators: List[WebSocket] = []
         self.dialers: Dict[str, WebSocket] = {}
+        self.operator_target_lang: str = "hi"
+
+    def set_operator_target_lang(self, lang: str):
+        self.operator_target_lang = lang or "hi"
+
+    def get_operator_target_lang(self) -> str:
+        return self.operator_target_lang or "hi"
 
     async def register_operator(self, websocket: WebSocket):
         if websocket not in self.operators:
