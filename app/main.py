@@ -1228,6 +1228,14 @@ async def websocket_telephony_endpoint(websocket: WebSocket):
                             "translation": translation_payload,
                         })
 
+                        if speaker == "operator":
+                            for d_id in list(telephony.hub.dialers.keys()):
+                                await telephony.hub.send_to_dialer(d_id, {
+                                    "type": "operator_speech",
+                                    "text": text,
+                                    "translation": translation_payload,
+                                })
+
     except WebSocketDisconnect:
         if role == "operator":
             telephony.hub.unregister_operator(websocket)

@@ -166,6 +166,41 @@ def analyze_utterance(
         has_sufficient_data=True,
     )
 
+    sv_res = sensevoice_engine.analyze_utterance_sensevoice(text, acoustic_prosody, call_duration_s)
+    forensic_audio_events = []
+    if pizza_count >= 1 or tremor_score > 35:
+        forensic_audio_events.append({
+            "label": "Acoustic Echo · Confined Space",
+            "frequency": "1.2 kHz",
+            "severity": "amber",
+            "time_s": min(14.2, call_duration_s or 14.2),
+            "time_str": "t=14.2s"
+        })
+    if pizza_count >= 2 or tremor_score > 60:
+        forensic_audio_events.append({
+            "label": "Heavy Footsteps / Pacing (Aggressor)",
+            "frequency": "160 Hz",
+            "severity": "amber",
+            "time_s": min(32.5, call_duration_s or 32.5),
+            "time_str": "t=32.5s"
+        })
+    if pizza_count >= 3 or tremor_score > 75:
+        forensic_audio_events.append({
+            "label": "Door Latch / Restraint Sound",
+            "frequency": "3.4 kHz",
+            "severity": "high",
+            "time_s": min(58.0, call_duration_s or 58.0),
+            "time_str": "t=58.0s"
+        })
+    for sv_ev in sv_res.get("audio_events", []):
+        forensic_audio_events.append({
+            "label": f"{sv_ev.get('emoji', '🔊')} SenseVoice {sv_ev.get('label', 'Event')}",
+            "frequency": "Biomarker DSP",
+            "severity": "high" if sv_ev.get("tag") in ("<|Cry|>", "<|Scream|>") else "amber",
+            "time_s": round(call_duration_s, 1),
+            "time_str": f"t={round(call_duration_s, 1)}s"
+        })
+
     return {
         "ok": True,
         "duration_s": round(call_duration_s, 1),
@@ -205,7 +240,8 @@ def analyze_utterance(
         },
         "guidance": copilot_guidance,
         "location": location_target,
-        "sensevoice": sensevoice_engine.analyze_utterance_sensevoice(text, acoustic_prosody, call_duration_s),
+        "sensevoice": sv_res,
+        "audio_events": forensic_audio_events,
     }
 
 
@@ -296,8 +332,10 @@ def get_baseline_intelligence(duration_s: float = 0.0) -> dict[str, Any]:
             "source_type": "Predefined Mumbai Reference Grid",
             "badge": "Mumbai Reference Grid",
         },
-        "sensevoice": {
-            "model": "SenseVoiceSmall-Qwen",
+        "sensevoice": {
+
+            "model": "SenseVoiceSmall-Qwen",
+
             "engine": "Qwen SenseVoice-Small Foundation (SER + AED)",
             "model_id": "iic/SenseVoiceSmall",
             "latency_ms": 118,

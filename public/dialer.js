@@ -157,6 +157,16 @@
       }, 3500);
     } else if (msg.type === 'call_rejected') {
       endCallUI('Call Declined by Operator');
+    } else if (msg.type === 'operator_speech') {
+      if (micStatusText) {
+        var opText = (msg.translation && msg.translation.translated_text) || msg.text || '';
+        micStatusText.textContent = 'Control Room: "' + opText.slice(0, 36) + '…"';
+        micStatusText.style.color = '#38bdf8';
+        try { if (navigator.vibrate) navigator.vibrate([30, 50, 30]); } catch (e) {}
+        setTimeout(function () {
+          if (micStatusText) micStatusText.style.color = '';
+        }, 4000);
+      }
     } else if (msg.type === 'call_ended') {
       endCallUI('Call Ended');
     } else if (msg.type === 'call_error') {
