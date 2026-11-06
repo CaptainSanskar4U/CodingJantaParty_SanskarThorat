@@ -165,8 +165,8 @@ def end_call(call_id: str, ended_by: str = "caller") -> Optional[dict]:
     update = {
         "duration_s": call["duration_s"],
         "status": "analyzed",
-        "priority": "high" if len(call.get("transcripts", [])) >= 2 else "medium",
-        "urgency_score": 88 if any("pizza" in t.get("text", "").lower() for t in call.get("transcripts", [])) else 45,
+        "priority": "critical" if call.get("covert_fired") else ("high" if len(call.get("transcripts", [])) >= 2 else "medium"),
+        "urgency_score": 97 if call.get("covert_fired") else (88 if any("pizza" in t.get("text", "").lower() for t in call.get("transcripts", [])) else 45),
     }
     if not has_waveform:
         # No captured audio (e.g. WebRTC track never negotiated): give the call

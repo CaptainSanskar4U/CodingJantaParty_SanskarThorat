@@ -2478,6 +2478,7 @@
     var ovlClose = el('ovlClose'); if (ovlClose) ovlClose.onclick = closeOverlay;
     var overlay = el('overlay'); if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeOverlay(); });
     var fullClose = el('fx'); if (fullClose) fullClose.onclick = closeFullMap;
+    var fullCloseFloat = el('fxFloating'); if (fullCloseFloat) fullCloseFloat.onclick = closeFullMap;
 
     var bell = el('bell'); if (bell) bell.onclick = function (e) {
       e.stopPropagation();

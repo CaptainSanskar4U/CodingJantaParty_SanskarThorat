@@ -1420,6 +1420,8 @@
           if (hist.length > 48) hist.shift();
           this.lastLevelAt = Date.now();
         }
+      } else if (msg.type === 'covert_signal') {
+        Telephony.showCovertSignal(msg);
       }
     },
 
@@ -2293,6 +2295,41 @@
       });
     },
 
+    showCovertSignal: function (msg) {
+      if (el('covertBanner')) return; // banner already up
+      var n = msg.mentions || 2;
+      var b = document.createElement('div');
+      b.id = 'covertBanner';
+      b.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99999;' +
+        'background:linear-gradient(90deg,#ff2e43,#b91c1c);color:#fff;padding:14px 20px;border-radius:0 0 14px 14px;' +
+        'font-weight:700;font-size:15px;letter-spacing:.4px;box-shadow:0 10px 40px rgba(255,46,67,.45);' +
+        'display:flex;gap:14px;align-items:center;white-space:nowrap;';
+      b.innerHTML = '🚨 HIDDEN DISTRESS SIGNAL · 🍕 ×' + n + ' · CALL ' + esc(msg.call_id || '') +
+        '<button id="covertClose" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:6px;' +
+        'padding:4px 10px;cursor:pointer;font-weight:700;">✕</button>';
+      document.body.appendChild(b);
+      var closeBtn = el('covertClose');
+      if (closeBtn) closeBtn.onclick = function () { if (b.parentNode) b.parentNode.removeChild(b); };
+      setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 30000);
+      toast('🚨 Covert distress signal detected ("pizza" ×' + n + ') · call escalated to CRITICAL', 'err');
+      loadCalls();
+      loadAlerts();
+      // Three urgent beeps (WebAudio), safe to fail silently
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        for (var i = 0; i < 3; i++) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine'; o.frequency.value = 880;
+          var t0 = ctx.currentTime + i * 0.35;
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(0.22, t0 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.28);
+          o.start(t0); o.stop(t0 + 0.3);
+        }
+      } catch (e) {}
+    },
+
     closeWebRTC: function () {
       var canvas = el('liveAudioOscilloscope');
       if (canvas) canvas.style.display = 'none';
@@ -2615,6 +2652,7 @@
     var ovlClose = el('ovlClose'); if (ovlClose) ovlClose.onclick = closeOverlay;
     var overlay = el('overlay'); if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeOverlay(); });
     var fullClose = el('fx'); if (fullClose) fullClose.onclick = closeFullMap;
+    var fullCloseFloat = el('fxFloating'); if (fullCloseFloat) fullCloseFloat.onclick = closeFullMap;
 
     var bell = el('bell'); if (bell) bell.onclick = function (e) {
       e.stopPropagation();

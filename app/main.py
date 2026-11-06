@@ -1177,6 +1177,29 @@ def get_telephony_dossier(request: Request, call_id: str | None = None):
     return Response(content=html_content, media_type="text/html")
 
 
+# Covert protection word "pizza" — spoken twice during a call = hidden distress signal
+_COVERT_WORD_RE = re.compile(r"(pizza|पिज़्ज़ा|पिज्जा|पिज़्जा|पिज़ा)", re.IGNORECASE)
+
+
+def _insert_covert_alert(call: dict, mentions: int) -> None:
+    """Persist the CRITICAL alert row for the covert keyword (deduped per call)."""
+    key = f"{call['id']}:covert_signal:pizza_x2"
+    if db.query_one("SELECT id FROM alerts WHERE dedupe_key=?", (key,)):
+        return
+    db.insert("alerts", {
+        "id": db.new_id("alr"),
+        "call_id": call["id"],
+        "case_id": call.get("case_id"),
+        "type": "covert_signal",
+        "severity": "critical",
+        "title": "Hidden distress signal — keyword 'pizza' ×2",
+        "detail": f"Secret protection word detected {mentions}× during live call. Automatic CRITICAL escalation triggered.",
+        "dedupe_key": key,
+        "status": "unread",
+        "created_at": db.now(),
+    })
+
+
 async def ingest_live_utterance(
     call: dict,
     call_id: str,
@@ -1254,6 +1277,26 @@ async def ingest_live_utterance(
         "intelligence": intelligence,
         "translation": translation_payload,
     })
+
+    # --- Covert "pizza" hidden-distress signal --------------------------------
+    # The secret protection word spoken twice (any language variant) escalates
+    # the live call to CRITICAL: alert + console banner + phone flash, once per call.
+    mentions = len(_COVERT_WORD_RE.findall(full_text))
+    call["pizza_mentions"] = mentions
+    if mentions >= 2 and not call.get("covert_fired"):
+        call["covert_fired"] = True
+        db.update("calls", call_id, {"priority": "critical", "urgency_score": 97})
+        _insert_covert_alert(call, mentions)
+        signal = {
+            "type": "covert_signal",
+            "call_id": call_id,
+            "mentions": mentions,
+            "keyword": "pizza",
+            "message": "Hidden distress signal - protection word spoken twice",
+        }
+        await telephony.hub.broadcast_operators(signal)
+        for d_id in list(telephony.hub.dialers.keys()):
+            await telephony.hub.send_to_dialer(d_id, signal)
 
     if speaker == "operator":
         for d_id in list(telephony.hub.dialers.keys()):
