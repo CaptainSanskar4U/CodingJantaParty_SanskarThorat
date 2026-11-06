@@ -2279,3 +2279,1724 @@ canvas { display: block; }
   text-align: center;
 }
 
+
+
+/* ==========================================================================
+   DHVANI MASTERPIECE COMMAND CENTER ELEVATION LAYER
+   Engineered for National Defense & Real-Time Emergency Operations
+   ========================================================================== */
+
+:root {
+  --bg-master: #07080b;
+  --bg-deep: #030406;
+  --surface-glass: rgba(13, 16, 24, 0.76);
+  --surface-glass-hover: rgba(20, 25, 38, 0.82);
+  --surface-card: rgba(18, 22, 33, 0.65);
+  --line-subtle: rgba(255, 255, 255, 0.06);
+  --line-glass: rgba(255, 255, 255, 0.08);
+  --line-glow-red: rgba(255, 46, 67, 0.35);
+  --line-glow-amber: rgba(245, 158, 11, 0.35);
+  --line-glow-green: rgba(16, 185, 129, 0.35);
+  --line-glow-indigo: rgba(129, 140, 248, 0.35);
+  
+  --master-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+  --master-card-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Master Obsidian Canvas Background */
+body {
+  background: var(--bg-master) !important;
+  color: #f8fafc !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 900px at 50% -15%, rgba(255, 46, 67, 0.05), transparent 70%),
+    radial-gradient(circle 700px at 85% 15%, rgba(99, 102, 241, 0.035), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px) !important;
+  background-size: auto, auto, 48px 48px, 48px 48px !important;
+  z-index: 0;
+}
+
+#st {
+  background: var(--bg-master) !important;
+}
+
+/* Master Top Navigation Bar */
+.topbar {
+  background: rgba(9, 11, 16, 0.88) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid var(--line-glass) !important;
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.45) !important;
+  height: 64px !important;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, rgba(255, 46, 67, 0.14), rgba(255, 46, 67, 0.03)) !important;
+  border: 1px solid rgba(255, 46, 67, 0.35) !important;
+  box-shadow: 0 0 18px -2px rgba(255, 46, 67, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+}
+
+.brand-copy b {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+}
+
+.brand-copy small {
+  color: #94a3b8 !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.searchbar {
+  background: rgba(18, 22, 33, 0.6) !important;
+  border: 1px solid var(--line-glass) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.searchbar:focus-within {
+  border-color: rgba(255, 46, 67, 0.45) !important;
+  background: rgba(22, 27, 40, 0.85) !important;
+  box-shadow: 0 0 0 3px rgba(255, 46, 67, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Master Tactical Pills (Action Header) */
+.telephony-ext-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  height: 34px !important;
+  padding: 0 10px 0 12px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 100%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.telephony-ext-badge .telephony-label {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #10b981 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.telephony-ext-badge .ext-val {
+  font-family: var(--mono) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.ext-phone-btn {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  color: #a7f3d0 !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+
+.ext-phone-btn:hover {
+  background: rgba(16, 185, 129, 0.35) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Master Button Styles */
+.btn.primary {
+  height: 36px !important;
+  padding: 0 16px !important;
+  border-radius: 9px !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  background: linear-gradient(180deg, #ff384d 0%, #d61427 100%) !important;
+  border: 1px solid rgba(255, 82, 100, 0.8) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 16px rgba(255, 46, 67, 0.35) !important;
+  color: #ffffff !important;
+}
+
+.btn.primary:hover {
+  background: linear-gradient(180deg, #ff4d61 0%, #e0182c 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 22px rgba(255, 46, 67, 0.45) !important;
+}
+
+#liveBtn {
+  height: 36px !important;
+  border-radius: 9px !important;
+  background: rgba(255, 46, 67, 0.08) !important;
+  border: 1px solid rgba(255, 46, 67, 0.3) !important;
+  color: #ff8b97 !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+#liveBtn:hover {
+  background: rgba(255, 46, 67, 0.18) !important;
+  border-color: rgba(255, 46, 67, 0.5) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(255, 46, 67, 0.3) !important;
+}
+
+#liveBtn.on {
+  background: linear-gradient(180deg, #ff2e43 0%, #c41224 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(255, 46, 67, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Master Glassmorphic Panels */
+.panel {
+  background: var(--surface-glass) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid var(--line-glass) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--master-shadow) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.panel:hover {
+  border-color: rgba(255, 255, 255, 0.11) !important;
+}
+
+.panel-head h1, .panel-head h2 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+  color: #f8fafc !important;
+}
+
+.panel-head .eyebrow {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #64748b !important;
+}
+
+/* Master Call Panel (Center Stage) */
+.call-panel {
+  background: linear-gradient(180deg, rgba(16, 20, 29, 0.85) 0%, rgba(10, 12, 18, 0.9) 100%) !important;
+  border: 1px solid var(--line-glass) !important;
+}
+
+.call-title span {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+}
+
+.call-sub span {
+  font-size: 11.5px !important;
+  color: #94a3b8 !important;
+}
+
+.duration {
+  font-family: var(--mono) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #f8fafc !important;
+}
+
+.duration-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #64748b !important;
+}
+
+/* Master Waveform & Audio Panel (DAW Hardware Feel) */
+.wave-panel {
+  border: 1px solid var(--line-glass) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(16, 20, 29, 0.8) 0%, rgba(9, 11, 16, 0.9) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+.wave-wrap {
+  background: #050608 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
+  background-size: 40px 16px, 40px 16px !important;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7) !important;
+}
+
+.play-btn {
+  background: linear-gradient(145deg, #ffffff, #e2e8f0) !important;
+  color: #090a0f !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.play-btn:hover {
+  transform: translateY(-50%) scale(1.08) !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Master Urgency Dial */
+.urgency-card {
+  border: 1px solid var(--line-glass) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(18, 22, 33, 0.8) 0%, rgba(10, 12, 18, 0.9) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+.urgency-card svg {
+  filter: drop-shadow(0 0 10px rgba(255, 46, 67, 0.4)) !important;
+}
+
+#rv {
+  font-family: var(--mono) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  fill: #ffffff !important;
+}
+
+#hg {
+  padding: 3px 10px !important;
+  border-radius: 6px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  background: rgba(255, 46, 67, 0.12) !important;
+  border: 1px solid rgba(255, 46, 67, 0.35) !important;
+  color: #ff4d61 !important;
+}
+
+/* Master Call Queue Items */
+.queue-item {
+  background: rgba(18, 22, 33, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  margin-bottom: 7px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.queue-item:hover {
+  background: rgba(25, 31, 46, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.queue-item.active {
+  background: linear-gradient(180deg, rgba(255, 46, 67, 0.15) 0%, rgba(22, 27, 40, 0.75) 100%) !important;
+  border-color: rgba(255, 46, 67, 0.45) !important;
+  box-shadow: 0 0 20px -3px rgba(255, 46, 67, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Master Right-Side Context Column (Telemetry Deck) */
+.observable-bio-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 12px !important;
+}
+
+.bio-item {
+  background: rgba(18, 22, 33, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 9px !important;
+  padding: 9px 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  transition: border-color 0.18s ease !important;
+}
+
+.bio-item:hover {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+.bio-item span {
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #94a3b8 !important;
+}
+
+.bio-item b {
+  font-family: var(--mono) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #f8fafc !important;
+  margin-top: 2px !important;
+}
+
+/* Master Emotion & Stress Meters */
+.emotion-row .emo-meta {
+  font-size: 10.5px !important;
+  font-weight: 550 !important;
+  color: #cbd5e1 !important;
+}
+
+.emotion-row .emo-meta b {
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+}
+
+.emo-bar {
+  height: 5px !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.emo-bar i {
+  border-radius: 6px !important;
+  background: linear-gradient(90deg, #ff3b50, #ff7582) !important;
+  box-shadow: 0 0 10px rgba(255, 46, 67, 0.5) !important;
+}
+
+/* Master SenseVoice Strip */
+.sensevoice-strip {
+  background: linear-gradient(180deg, rgba(147, 51, 234, 0.12) 0%, rgba(147, 51, 234, 0.03) 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 16px -4px rgba(168, 85, 247, 0.18) !important;
+}
+
+/* Master Investigator Guidance Copilot */
+.copilot-card {
+  padding: 13px 15px !important;
+  border-radius: 11px !important;
+  background: linear-gradient(180deg, rgba(255, 46, 67, 0.1) 0%, rgba(20, 24, 35, 0.65) 100%) !important;
+  border: 1px solid rgba(255, 46, 67, 0.38) !important;
+  box-shadow: 0 0 22px -3px rgba(255, 46, 67, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.copilot-action-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #ff7582 !important;
+}
+
+.copilot-prompt {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  color: #ffffff !important;
+}
+
+.copilot-rationale {
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  color: #94a3b8 !important;
+}
+
+.copilot-checklist {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-top: 8px !important;
+  margin-top: 4px !important;
+}
+
+.chk-item i {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 4px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+.chk-item.checked i {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Master Acoustic Keyword Engine */
+.keyword-focus-card {
+  gap: 10px !important;
+}
+
+.keyword-stat-row {
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(20, 24, 35, 0.65) 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.38) !important;
+  box-shadow: 0 0 18px -3px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.kw-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #fbbf24 !important;
+}
+
+.kw-val {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+}
+
+.kw-reps-badge {
+  padding: 3px 9px !important;
+  border-radius: 6px !important;
+  font-family: var(--mono) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  background: rgba(245, 158, 11, 0.22) !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  color: #fde68a !important;
+}
+
+/* Master Tactical Map Panel */
+.location-panel .map-frame {
+  border-radius: 10px !important;
+  border: 1px solid var(--line-glass) !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7) !important;
+}
+
+.map-telemetry-badge {
+  background: rgba(10, 12, 17, 0.88) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid var(--line-glass) !important;
+  font-family: var(--mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Master Linked Findings Panel */
+.related-panel {
+  background: var(--surface-glass) !important;
+  border: 1px solid var(--line-glass) !important;
+  border-radius: 12px !important;
+}
+
+.related-card {
+  background: rgba(18, 22, 33, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 9px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.related-card:hover {
+  border-color: rgba(255, 46, 67, 0.4) !important;
+  background: rgba(25, 31, 46, 0.8) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DHVANI DEFENSE-GRADE COMMAND CENTER · MASTERPIECE SYSTEM
+   Inspired by Palantir Foundry, Linear, Apple macOS Sequoia & SpaceX Dragon
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-deep-space: #06070a;
+  --bg-obsidian-surface: rgba(11, 14, 21, 0.78);
+  --bg-card-subtle: rgba(17, 22, 33, 0.6);
+  --bg-card-elevated: rgba(22, 28, 42, 0.82);
+  --border-titanium: rgba(255, 255, 255, 0.07);
+  --border-titanium-hover: rgba(255, 255, 255, 0.14);
+  --border-active-crimson: rgba(255, 46, 67, 0.55);
+  --accent-crimson: #ff2e43;
+  --accent-crimson-glow: rgba(255, 46, 67, 0.35);
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #6366f1;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(6, 7, 10, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Deep Canvas Atmosphere */
+body, .auth-view {
+  background-color: var(--bg-deep-space) !important;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(20, 26, 42, 0.45) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(15, 20, 32, 0.3) 0%, transparent 50%) !important;
+  color: #e2e8f0 !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   1. TOP NAVIGATION BAR (DEFENSE OPERATIONS HEADER)
+   ────────────────────────────────────────────────────────────────────────── */
+.topbar {
+  height: 56px !important;
+  background: rgba(8, 10, 15, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  border-bottom: 1px solid var(--border-titanium) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  z-index: 99 !important;
+}
+
+/* Brand Insignia */
+.brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.brand-mark {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg, rgba(255, 46, 67, 0.22) 0%, rgba(15, 18, 27, 0.9) 100%) !important;
+  border: 1px solid rgba(255, 46, 67, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 0 14px rgba(255, 46, 67, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.brand-mark svg {
+  filter: drop-shadow(0 0 4px rgba(255, 46, 67, 0.6)) !important;
+}
+
+.brand-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.15 !important;
+}
+
+.brand-copy b {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+}
+
+.brand-copy small {
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+}
+
+/* Search Bar */
+.searchbar {
+  background: rgba(14, 18, 28, 0.75) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 9px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s ease !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+}
+
+.searchbar:focus-within {
+  border-color: rgba(255, 46, 67, 0.5) !important;
+  box-shadow: 0 0 12px rgba(255, 46, 67, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  background: rgba(18, 23, 35, 0.9) !important;
+}
+
+.searchbar input {
+  color: #f1f5f9 !important;
+  font-size: 11.5px !important;
+}
+
+.searchbar input::placeholder {
+  color: #64748b !important;
+}
+
+.searchbar kbd {
+  font-family: var(--font-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  color: #94a3b8 !important;
+}
+
+/* Tactical Pills in Topbar */
+.tactical-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 33px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  border: 1px solid var(--border-titanium) !important;
+  background: rgba(16, 21, 32, 0.75) !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  cursor: pointer !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: #e2e8f0 !important;
+}
+
+.tactical-pill:hover {
+  transform: translateY(-1px) !important;
+  border-color: var(--border-titanium-hover) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+.tactical-pill.amber-pill {
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.04) 100%) !important;
+}
+.tactical-pill.amber-pill:hover {
+  border-color: rgba(245, 158, 11, 0.7) !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.tactical-pill.indigo-pill {
+  color: #a5b4fc !important;
+  border-color: rgba(129, 140, 248, 0.35) !important;
+  background: linear-gradient(180deg, rgba(129, 140, 248, 0.14) 0%, rgba(129, 140, 248, 0.04) 100%) !important;
+}
+.tactical-pill.indigo-pill:hover {
+  border-color: rgba(129, 140, 248, 0.7) !important;
+  box-shadow: 0 0 14px rgba(129, 140, 248, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* Engine telemetry badge */
+#sys.engine, .tactical-pill.engine-pill {
+  height: 33px !important;
+  border-radius: 8px !important;
+  padding: 0 10px !important;
+  background: rgba(13, 17, 26, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  color: #94a3b8 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#sysDot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  box-shadow: 0 0 8px #10b981 !important;
+  display: inline-block !important;
+}
+
+/* Live broadcast pill */
+#liveBtn, .tactical-pill.live-pill {
+  background: rgba(20, 25, 38, 0.75) !important;
+  border: 1px solid rgba(255, 46, 67, 0.35) !important;
+  color: #ff6b7d !important;
+  font-weight: 600 !important;
+}
+#liveBtn:hover, .tactical-pill.live-pill:hover {
+  background: rgba(255, 46, 67, 0.15) !important;
+  border-color: #ff2e43 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(255, 46, 67, 0.35) !important;
+}
+
+/* Executive Titanium Upload Button */
+#uploadBtn, .tactical-pill.upload-pill {
+  background: linear-gradient(180deg, rgba(255, 46, 67, 0.35) 0%, rgba(200, 20, 40, 0.6) 100%) !important;
+  border: 1px solid rgba(255, 82, 100, 0.75) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 16px rgba(255, 46, 67, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+#uploadBtn:hover, .tactical-pill.upload-pill:hover {
+  background: linear-gradient(180deg, rgba(255, 60, 80, 0.5) 0%, rgba(220, 30, 50, 0.75) 100%) !important;
+  box-shadow: 0 0 24px rgba(255, 46, 67, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Telephony Extension Radio Pill */
+.telephony-ext-badge {
+  background: rgba(14, 18, 28, 0.85) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 12px rgba(16, 185, 129, 0.15) !important;
+  height: 33px !important;
+  border-radius: 8px !important;
+  padding: 0 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+
+.ext-val {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  color: #4ade80 !important;
+}
+
+.ext-regen-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+.ext-regen-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.ext-phone-btn {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.6) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 3px 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+.ext-phone-btn:hover {
+  background: rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   2. SIDEBAR NAVIGATION
+   ────────────────────────────────────────────────────────────────────────── */
+.sidebar {
+  background: rgba(8, 10, 15, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  border-right: 1px solid var(--border-titanium) !important;
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.4) !important;
+  padding: 14px 10px !important;
+}
+
+.side-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: #475569 !important;
+  margin: 4px 0 10px 8px !important;
+}
+
+.ni {
+  border-radius: 9px !important;
+  padding: 9px 12px !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+  color: #94a3b8 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-bottom: 3px !important;
+  border: 1px solid transparent !important;
+}
+
+.ni:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+  transform: translateX(2px) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.ni.on, .ni.active {
+  background: linear-gradient(90deg, rgba(255, 46, 67, 0.14) 0%, rgba(255, 46, 67, 0.02) 100%) !important;
+  border-left: 2.5px solid #ff2e43 !important;
+  border-color: rgba(255, 46, 67, 0.25) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: inset 1px 0 10px rgba(255, 46, 67, 0.15) !important;
+}
+
+.ni.quick-demo-nav {
+  border-radius: 9px !important;
+  border: 1px solid rgba(255, 46, 67, 0.3) !important;
+  background: linear-gradient(135deg, rgba(255, 46, 67, 0.1) 0%, rgba(18, 22, 33, 0.7) 100%) !important;
+  margin-bottom: 8px !important;
+}
+
+.ni.quick-demo-nav:hover {
+  border-color: rgba(255, 46, 67, 0.6) !important;
+  box-shadow: 0 0 16px rgba(255, 46, 67, 0.25) !important;
+}
+
+.tactical-badge.live {
+  margin-left: auto !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  background: rgba(255, 46, 67, 0.25) !important;
+  border: 1px solid rgba(255, 46, 67, 0.5) !important;
+  color: #ff6b7d !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  text-transform: uppercase !important;
+}
+
+.helpline {
+  background: rgba(14, 18, 28, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   3. CALL QUEUE COLUMN (LEFT COLUMN)
+   ────────────────────────────────────────────────────────────────────────── */
+.panel.queue-panel {
+  background: var(--bg-obsidian-surface) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  padding: 14px !important;
+}
+
+.queue-title-row h1 {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #f8fafc !important;
+}
+
+.count-pill {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 5px !important;
+  padding: 2px 6px !important;
+  color: #94a3b8 !important;
+}
+
+/* Tactical Queue Filter */
+.queue-filter {
+  background: rgba(14, 18, 28, 0.85) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 8px !important;
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
+  font-weight: 550 !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+}
+.queue-filter:focus, .queue-filter:hover {
+  border-color: rgba(255, 46, 67, 0.4) !important;
+  background: rgba(18, 23, 35, 0.95) !important;
+}
+
+/* Call Cards in Queue */
+.cr {
+  background: rgba(16, 21, 32, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 5px !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cr:hover {
+  background: rgba(22, 28, 44, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+.cr.on {
+  background: linear-gradient(90deg, rgba(255, 46, 67, 0.14) 0%, rgba(20, 25, 40, 0.85) 100%) !important;
+  border-color: rgba(255, 46, 67, 0.5) !important;
+  border-left: 3px solid #ff2e43 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.cr-title {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #f1f5f9 !important;
+}
+
+.cr-meta {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  color: #94a3b8 !important;
+  margin-top: 3px !important;
+}
+
+.bg.hi {
+  background: rgba(255, 46, 67, 0.22) !important;
+  border: 1px solid rgba(255, 46, 67, 0.55) !important;
+  color: #ff6b7d !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  text-transform: uppercase !important;
+}
+
+.bg.med {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  color: #fbbf24 !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  text-transform: uppercase !important;
+}
+
+.bg.low {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  color: #34d399 !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  text-transform: uppercase !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   4. ACTIVE CALL COLUMN & FORENSIC AUDIO PANEL (CENTER)
+   ────────────────────────────────────────────────────────────────────────── */
+.panel.call-panel {
+  background: var(--bg-obsidian-surface) !important;
+  backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  padding: 16px !important;
+}
+
+/* Priority Pills Semantic Fix */
+.priority-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 22px !important;
+  padding: 0 9px !important;
+  border-radius: 5px !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s ease !important;
+}
+
+.priority-pill.high, .priority-pill.critical {
+  background: rgba(255, 46, 67, 0.2) !important;
+  border: 1px solid rgba(255, 46, 67, 0.55) !important;
+  color: #ff6b7d !important;
+  box-shadow: 0 0 12px rgba(255, 46, 67, 0.25) !important;
+}
+
+.priority-pill.medium {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border: 1px solid rgba(245, 158, 11, 0.55) !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2) !important;
+}
+
+.priority-pill.low {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border: 1px solid rgba(16, 185, 129, 0.55) !important;
+  color: #34d399 !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+.call-title h2, .call-title span {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.duration b {
+  font-family: var(--font-mono) !important;
+  font-size: 16px !important;
+  color: #f8fafc !important;
+}
+
+/* DAW Audio Signal Box */
+.wave-panel {
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  background: rgba(10, 13, 20, 0.85) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+  padding: 12px !important;
+}
+
+.wave-wrap {
+  background-color: #06080c !important;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) !important;
+  background-size: 100% 24px, 48px 100% !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+}
+
+/* Anodized CNC Titanium Play Button */
+.play-btn {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(180deg, #1b202e 0%, #0e111a 100%) !important;
+  border: 1.5px solid rgba(255, 46, 67, 0.5) !important;
+  color: #ff4d5e !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 14px rgba(255, 46, 67, 0.3) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  z-index: 10 !important;
+}
+
+.play-btn:hover {
+  transform: translateY(-50%) scale(1.08) !important;
+  border-color: #ff2e43 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(255, 46, 67, 0.6), 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+}
+
+.play-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Play Marker Playhead */
+.play-marker {
+  font-family: var(--font-mono) !important;
+  font-size: 9.5px !important;
+  background: rgba(15, 20, 30, 0.95) !important;
+  border: 1px solid rgba(255, 46, 67, 0.5) !important;
+  color: #ff6b7d !important;
+  box-shadow: 0 0 8px rgba(255, 46, 67, 0.3) !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+}
+
+/* Audio Stat Strip Below Waveform */
+#mt {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+
+.mc {
+  background: rgba(14, 18, 28, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.mc span {
+  font-size: 10px !important;
+  color: #94a3b8 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.2 !important;
+}
+
+.mc b {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  color: #f1f5f9 !important;
+  margin-top: 2px !important;
+}
+
+/* High-Precision Urgency Dial */
+.urgency-card {
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(16, 20, 30, 0.8) 0%, rgba(10, 13, 20, 0.9) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#rv {
+  font-family: var(--font-mono) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+#hg {
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  margin-top: 4px !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   5. SEGMENTED TABS & TRANSCRIPT POLISH
+   ────────────────────────────────────────────────────────────────────────── */
+#transcriptPanel {
+  background: var(--bg-obsidian-surface) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  margin-top: 10px !important;
+  overflow: hidden !important;
+}
+
+.transcript-head {
+  height: 44px !important;
+  padding: 0 14px !important;
+  border-bottom: 1px solid var(--border-titanium) !important;
+  background: rgba(12, 16, 24, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.tab {
+  color: #94a3b8 !important;
+  font-size: 11.5px !important;
+  font-weight: 550 !important;
+  padding: 8px 12px !important;
+  position: relative !important;
+  transition: all 0.16s ease !important;
+  cursor: pointer !important;
+}
+
+.tab:hover {
+  color: #ffffff !important;
+}
+
+.tab.active, .tab.on {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.tab.active::after, .tab.on::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 10px !important;
+  right: 10px !important;
+  height: 2px !important;
+  background: #ff2e43 !important;
+  border-radius: 2px 2px 0 0 !important;
+  box-shadow: 0 0 10px rgba(255, 46, 67, 0.8) !important;
+}
+
+/* Spoken Transcript Segment Cards */
+.seg {
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  background: rgba(15, 20, 30, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  margin-bottom: 7px !important;
+  transition: all 0.18s ease !important;
+}
+
+.seg:hover {
+  background: rgba(22, 28, 44, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.seg.on, .seg.live-speaking {
+  border-color: rgba(255, 46, 67, 0.5) !important;
+  border-left: 3px solid #ff2e43 !important;
+  background: linear-gradient(90deg, rgba(255, 46, 67, 0.12) 0%, rgba(18, 22, 33, 0.65) 100%) !important;
+  box-shadow: 0 0 16px rgba(255, 46, 67, 0.2) !important;
+}
+
+.st {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  color: #64748b !important;
+}
+
+.spk {
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+}
+
+.txt {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #f1f5f9 !important;
+  margin-top: 3px !important;
+}
+
+.trline {
+  margin-top: 4px !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  color: #a7f3d0 !important;
+  font-size: 12px !important;
+}
+
+.tr-badge {
+  font-family: var(--font-mono) !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  background: #10b981 !important;
+  color: #064e3b !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+  margin-right: 5px !important;
+}
+
+/* Audio Player Bar */
+.player-row {
+  height: 42px !important;
+  padding: 0 14px !important;
+  border-top: 1px solid var(--border-titanium) !important;
+  background: rgba(10, 13, 20, 0.8) !important;
+}
+
+#pt {
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  color: #94a3b8 !important;
+}
+
+/* Linked Findings Drawer */
+.panel.related-panel {
+  background: var(--bg-obsidian-surface) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  margin-top: 10px !important;
+  padding: 12px 14px !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   6. RIGHT CONTEXT COLUMN (TELEMETRY DECK)
+   ────────────────────────────────────────────────────────────────────────── */
+.panel.emotion-panel,
+.panel.copilot-panel,
+.panel.keyword-panel,
+.panel.location-panel,
+.panel.audio-panel {
+  background: var(--bg-obsidian-surface) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-titanium) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
+  margin-bottom: 10px !important;
+  padding: 14px !important;
+}
+
+/* Observable Biometrics Grid */
+.observable-bio-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+  margin: 10px 0 !important;
+}
+
+.bio-item {
+  background: rgba(14, 18, 28, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+}
+
+.bio-item span {
+  font-size: 9.5px !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.bio-item b {
+  font-family: var(--font-mono) !important;
+  font-size: 13.5px !important;
+  color: #f8fafc !important;
+  margin-top: 2px !important;
+}
+
+/* Emotion Meter Progress Bars */
+.emo-bar {
+  background: rgba(255, 255, 255, 0.08) !important;
+  height: 5px !important;
+  border-radius: 3px !important;
+  overflow: hidden !important;
+}
+
+.emo-bar i {
+  background: linear-gradient(90deg, #f59e0b 0%, #ff2e43 100%) !important;
+  box-shadow: 0 0 8px rgba(255, 46, 67, 0.5) !important;
+  border-radius: 3px !important;
+  height: 100% !important;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Copilot Card */
+.copilot-card {
+  background: rgba(14, 18, 28, 0.75) !important;
+  border: 1px solid rgba(255, 46, 67, 0.3) !important;
+  border-left: 3px solid #ff2e43 !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.copilot-action-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  color: #ff6b7d !important;
+  text-transform: uppercase !important;
+}
+
+.copilot-prompt {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  line-height: 1.45 !important;
+  margin: 4px 0 8px 0 !important;
+}
+
+.copilot-rationale {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.4 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Custom Tactical Checkmarks */
+.chk-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 10.5px !important;
+  color: #94a3b8 !important;
+  margin-bottom: 5px !important;
+}
+
+.chk-item i {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 4px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(10, 13, 20, 0.8) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex: none !important;
+}
+
+.chk-item.checked {
+  color: #f1f5f9 !important;
+}
+
+.chk-item.checked i {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+}
+
+.chk-item.checked i::after {
+  content: "" !important;
+  width: 4px !important;
+  height: 7px !important;
+  border: solid #042f1a !important;
+  border-width: 0 1.5px 1.5px 0 !important;
+  transform: rotate(45deg) !important;
+  margin-top: -1.5px !important;
+}
+
+/* Acoustic Keyword Card */
+.keyword-focus-card {
+  background: rgba(14, 18, 28, 0.7) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+}
+
+.keyword-stat-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 8px !important;
+}
+
+.kw-val {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  color: #fbbf24 !important;
+}
+
+.kw-reps-badge {
+  font-family: var(--font-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  background: rgba(245, 158, 11, 0.2) !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  color: #fbbf24 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+}
+
+.kw-chip.active {
+  background: rgba(255, 46, 67, 0.2) !important;
+  border: 1px solid rgba(255, 46, 67, 0.5) !important;
+  color: #ff6b7d !important;
+  border-radius: 4px !important;
+  padding: 2px 7px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+}
+
+/* Tactical Dispatch Banner */
+#tacticalDispatchBox {
+  margin-top: 10px !important;
+  padding: 12px 18px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(90deg, rgba(255, 46, 67, 0.18) 0%, rgba(20, 24, 35, 0.9) 100%) !important;
+  border: 1px solid rgba(255, 46, 67, 0.6) !important;
+  box-shadow: 0 0 24px rgba(255, 46, 67, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+#tacticalDispatchBtn {
+  background: linear-gradient(180deg, #ff2e43 0%, #c41224 100%) !important;
+  border: 1px solid rgba(255, 82, 100, 0.8) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 7px 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(255, 46, 67, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+}
+
+#tacticalDispatchBtn:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 0 24px rgba(255, 46, 67, 0.7) !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   7. MODAL DIALOGS (AI INSPECTOR & DIALER)
+   ────────────────────────────────────────────────────────────────────────── */
+.ai-inspector-card, .modal-card {
+  background: rgba(11, 14, 22, 0.96) !important;
+  backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+}
+
+.ai-inspector-box {
+  background: rgba(16, 21, 33, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+}
+
+.math-stat-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 10px !important;
+  margin: 10px 0 !important;
+}
+
+.math-stat {
+  background: rgba(12, 16, 26, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  min-height: 48px !important;
+}
+
+.m-label {
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #94a3b8 !important;
+  white-space: nowrap !important;
+}
+
+.m-val {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  white-space: nowrap !important;
+}
+/* ──────────────────────────────────────────────────────────────────────────
+   EXPANDED RIGHT TELEMETRY COLUMN & 100% REAL GIS MAP OVERHAUL
+   ────────────────────────────────────────────────────────────────────────── */
+.workspace {
+  grid-template-columns: 280px minmax(0, 1fr) 420px !important;
+  gap: 14px !important;
+  padding: 14px !important;
+}
+
+@media (min-width: 1600px) {
+  .workspace {
+    grid-template-columns: 290px minmax(0, 1fr) 440px !important;
+  }
+}
+
+/* Hide AI Radar Overlays completely for Authentic Real Map Look */
+.map-radar-overlay, .radar-scanner, .radar-target-reticle {
+  display: none !important;
+}
+
+.location-panel .map-frame {
+  height: 210px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-titanium) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: #080a0f !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+}
+
+.map-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.map-telemetry-badge {
+  background: rgba(10, 13, 20, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  top: 8px !important;
+  bottom: auto !important;
+  left: 8px !important;
+  right: auto !important;
+  height: auto !important;
+  max-height: 24px !important;
+  width: fit-content !important;
+  max-width: calc(100% - 70px) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  z-index: 600 !important;
+}
+
+/* Ensure Bio cards have comfortable width in 420px deck */
+.observable-bio-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+}
+
+.bio-item {
+  padding: 9px 12px !important;
+}
+
+.bio-item b {
+  font-size: 14px !important;
+}
+
+/* Live interim speech strip (phone caller speaking right now) */
+.live-interim {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 8px;
+  padding: 9px 14px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #a7f3d0;
+  animation: liveInterimPulse 1.4s ease-in-out infinite;
+}
+
+.live-interim i {
+  font-style: italic;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70vw;
+}
+
+@keyframes liveInterimPulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}

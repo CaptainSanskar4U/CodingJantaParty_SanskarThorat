@@ -1393,8 +1393,14 @@
       } else if (msg.type === 'webrtc_offer') {
         this.handleWebRTCOffer(msg.sdp);
       } else if (msg.type === 'webrtc_ice_candidate') {
-        if (this.pc && this.pc.signalingState !== 'closed' && msg.candidate) {
-          this.pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(console.warn);
+        var iceCand = msg.candidate;
+        if (!iceCand) return;
+        if (this.pc && this.pc.signalingState !== 'closed' && this.pc.remoteDescription) {
+          this.pc.addIceCandidate(new RTCIceCandidate(iceCand)).catch(console.warn);
+        } else {
+          // Peer connection not ready yet (answer is async) - buffer instead of dropping
+          this.pendingIce = this.pendingIce || [];
+          this.pendingIce.push(iceCand);
         }
       } else if (msg.type === 'live_intelligence_update') {
         if (msg.intelligence) {
@@ -1405,6 +1411,17 @@
           if (msg.translation) msg.entry.translation = msg.translation;
           this.appendTranscript(msg.entry);
         }
+      } else if (msg.type === 'audio_level') {
+        // Caller mic level (phone dialer) -> live caller waveform
+        var targetId = this.activeSimCall && this.activeSimCall.id;
+        if (typeof msg.level === 'number' && msg.call_id === targetId) {
+          var hist = this.levelHistory || (this.levelHistory = []);
+          hist.push(Math.max(0, Math.min(1, msg.level)));
+          if (hist.length > 48) hist.shift();
+          this.lastLevelAt = Date.now();
+        }
+      } else if (msg.type === 'covert_signal') {
+        Telephony.showCovertSignal(msg);
       }
     },
 
@@ -1816,6 +1833,7 @@
       }
 
       this.setupWebRTC();
+      this.startCallerWave();
       this.callStartTime = Date.now();
       this.latestServerIntelligence = null;
       this.startLiveTelemetry();
@@ -1873,6 +1891,13 @@
     appendTranscript: function (entry) {
       var isCaller = entry.speaker === 'caller';
 
+      // Interim (partial) speech: show as a live "speaking now" strip, never as a card
+      if (entry.interim) {
+        this.showInterimText(entry, isCaller);
+        return;
+      }
+      this.clearInterimText();
+
       // 1. Append to transcript tab if visible
       var txscroll = document.querySelector('#tx .txscroll');
       if (txscroll) {
@@ -1918,6 +1943,7 @@
 
         var card = document.createElement('div');
         card.className = 'translation-card active-seek';
+        var sameLang = trData.pass_through || (trData.source_lang && trData.target_lang && trData.source_lang === trData.target_lang);
         card.innerHTML = '<div class="tr-card-header">' +
           '<div class="tr-speaker">' +
             '<span class="tr-spk-tag ' + (isCaller ? 'caller' : 'operator') + '">' + (isCaller ? 'Caller (Mobile)' : 'Operator') + '</span>' +
@@ -1925,6 +1951,7 @@
           '</div>' +
           '<div class="tr-meta">' +
             '<span class="lang-tag">' + (trData.source_flag || '🇮🇳') + ' ' + esc(trData.source_lang_name || 'Detected') + '</span>' +
+            '<span class="lang-tag">' + (trData.target_flag || '🌐') + ' ' + esc(trData.target_lang_name || (S.targetLang || 'EN')) + '</span>' +
             '<span class="latency-tag">⚡ ' + (trData.latency_ms || 32) + 'ms</span>' +
           '</div>' +
         '</div>' +
@@ -1935,13 +1962,35 @@
           '</div>' +
           '<div class="tr-arrow">➔</div>' +
           '<div class="tr-box target">' +
-            '<span class="tr-box-label">TRANSLATED (' + esc((S.targetLang || 'EN').toUpperCase()) + '):</span>' +
+            '<span class="tr-box-label">' + (sameLang ? 'SAME LANGUAGE · ' : '') + 'TRANSLATED (' + esc((trData.target_lang || S.targetLang || 'EN').toUpperCase()) + '):</span>' +
             '<div class="tr-box-text">' + esc(trData.translated_text || entry.text) + '</div>' +
+            (trData.engine ? '<span class="latency-tag" style="margin-top:4px;display:inline-block">🧠 ' + esc(trData.engine) + '</span>' : '') +
           '</div>' +
         '</div>';
         trFeed.appendChild(card);
         trFeed.scrollTop = trFeed.scrollHeight;
       }
+    },
+
+    showInterimText: function (entry, isCaller) {
+      // Replace (not append) so partial speech updates in place while the caller speaks
+      var interim = el('liveInterimText');
+      if (!interim) {
+        var host = document.querySelector('#tx');
+        if (!host) return;
+        interim = document.createElement('div');
+        interim.id = 'liveInterimText';
+        host.appendChild(interim);
+      }
+      interim.className = 'live-interim';
+      interim.innerHTML = '<span class="pulse-dot green"></span> ' +
+        (isCaller ? 'Caller speaking…' : 'Operator speaking…') +
+        ' <i>' + esc(entry.text.slice(-120)) + '</i>';
+    },
+
+    clearInterimText: function () {
+      var interim = el('liveInterimText');
+      if (interim) interim.remove();
     },
 
     setupWebRTC: async function () {
@@ -2020,6 +2069,12 @@
         await this.pc.setRemoteDescription(new RTCSessionDescription(sdp));
         var answer = await this.pc.createAnswer();
         await this.pc.setLocalDescription(answer);
+        // Flush buffered remote ICE candidates now that the remote description exists
+        var pendingIce = this.pendingIce || [];
+        this.pendingIce = [];
+        pendingIce.forEach(function (cand) {
+          self.pc.addIceCandidate(new RTCIceCandidate(cand)).catch(console.warn);
+        });
         if (this.ws && this.ws.readyState === WebSocket.OPEN && this.activeSimCall) {
           this.ws.send(JSON.stringify({
             type: 'webrtc_answer',
@@ -2033,46 +2088,122 @@
     },
 
     startOscilloscope: function (stream) {
+      // Real WebRTC remote audio path; falls back to / blends with WS level telemetry
       var canvas = el('liveAudioOscilloscope');
       if (!canvas) return;
       canvas.style.display = 'block';
+      var self = this;
       try {
         var ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
         var source = ctx.createMediaStreamSource(stream);
         var analyser = ctx.createAnalyser();
-        analyser.fftSize = 64;
+        analyser.fftSize = 128;
         source.connect(analyser);
-        var dataArray = new Uint8Array(analyser.frequencyBinCount);
-        var cctx = canvas.getContext('2d');
-        var self = this;
-
-        function drawFrame() {
-          if (!self.activeSimCall) {
-            canvas.style.display = 'none';
-            return;
-          }
-          requestAnimationFrame(drawFrame);
-          analyser.getByteFrequencyData(dataArray);
-          cctx.fillStyle = '#07080c';
-          cctx.fillRect(0, 0, canvas.width, canvas.height);
-          var barWidth = (canvas.width / dataArray.length);
-          var x = 0;
-          for (var i = 0; i < dataArray.length; i++) {
-            var barHeight = (dataArray[i] / 255) * (canvas.height - 12);
-            var grad = cctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-            grad.addColorStop(0, '#10b981');
-            grad.addColorStop(0.6, '#38bdf8');
-            grad.addColorStop(1, '#ff2e43');
-            cctx.fillStyle = grad;
-            cctx.fillRect(x, canvas.height - barHeight, barWidth - 3, Math.max(3, barHeight));
-            x += barWidth;
-          }
-        }
-        drawFrame();
+        self.waveAnalyser = analyser;
+        self.waveFreqData = new Uint8Array(analyser.frequencyBinCount);
       } catch (e) {
-        console.warn('Oscilloscope error:', e);
+        console.warn('Oscilloscope analyser unavailable, using caller level telemetry:', e);
+        self.waveAnalyser = null;
       }
+      self.ensureCallerWave();
+    },
+
+    startCallerWave: function () {
+      // Pulls the caller's voice wave from WebSocket level telemetry (always available)
+      var canvas = el('liveAudioOscilloscope');
+      if (!canvas) return;
+      canvas.style.display = 'block';
+      this.ensureCallerWave();
+    },
+
+    ensureCallerWave: function () {
+      var self = this;
+      var canvas = el('liveAudioOscilloscope');
+      if (!canvas || self.waveLoopRunning) return;
+      self.waveLoopRunning = true;
+      if (!self.levelHistory) self.levelHistory = [];
+      var cctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+      var mainCanvas = el('wv');
+      var mctx = mainCanvas ? mainCanvas.getContext('2d') : null;
+
+      function drawMainLive() {
+        if (!mctx || !mainCanvas) return;
+        var mw = mainCanvas.width, mh = mainCanvas.height;
+        mctx.fillStyle = '#070709';
+        mctx.fillRect(0, 0, mw, mh);
+        var recent = (Date.now() - (self.lastLevelAt || 0)) < 900;
+        var hist = self.levelHistory || [];
+        var secs = self.activeSimCall ? Math.max(0, Math.round((Date.now() - (self.callStartTime || Date.now())) / 1000)) : 0;
+        var dur = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+        var barCount = Math.max(hist.length, 64);
+        var barW = mw / barCount;
+        var mid = mh * 0.52;
+        var idleT = Date.now() / 240;
+        for (var i = 0; i < barCount; i++) {
+          var raw = recent ? (hist[i] || 0) : 0;
+          var idle = Math.abs(Math.sin(idleT + i * 0.28)) * (mh * 0.018);
+          var amp = Math.max(1.5 + idle, raw * mh * 0.42);
+          mctx.fillStyle = i / barCount > 0.94 ? '#ff2e43' : 'rgba(16,185,129,0.85)';
+          mctx.fillRect(i * barW, mid - amp, Math.max(1, barW - 1.5), amp * 2);
+        }
+        mctx.fillStyle = '#070709';
+        mctx.fillRect(0, mid - 1, mw, 2);
+        mctx.fillStyle = '#10b981';
+        mctx.font = '600 20px Inter, sans-serif';
+        mctx.textAlign = 'left';
+        mctx.fillText('LIVE CALL · ' + dur, 14, 26);
+        mctx.fillStyle = '#8c8c98';
+        mctx.font = '500 15px Inter, sans-serif';
+        mctx.textAlign = 'right';
+        mctx.fillText('Caller voice telemetry · listening', mw - 14, 26);
+      }
+
+      function drawFrame() {
+        if (!self.activeSimCall) {
+          canvas.style.display = 'none';
+          self.waveLoopRunning = false;
+          if (mctx && mainCanvas && !S.playing) {
+            // Hand the main panel back to the recording renderer
+            mctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+            if (S.detail) renderWaveform(S.detail.waveform || []);
+          }
+          return;
+        }
+        requestAnimationFrame(drawFrame);
+        drawMainLive();
+
+        var useAnalyser = !!self.waveAnalyser;
+        var recent = (Date.now() - (self.lastLevelAt || 0)) < 900;
+        var hist = self.levelHistory || [];
+        var idleT = Date.now() / 260;
+        var barCount = useAnalyser ? (self.waveFreqData ? self.waveFreqData.length : 48) : Math.max(hist.length, 40);
+        var barW = W / barCount;
+
+        cctx.fillStyle = '#07080c';
+        cctx.fillRect(0, 0, W, H);
+
+        for (var i = 0; i < barCount; i++) {
+          var h = 0;
+          if (useAnalyser) {
+            var v = self.waveFreqData ? (self.waveFreqData[Math.floor(i * self.waveFreqData.length / barCount)] || 0) : 0;
+            h = Math.max(3, (v / 255) * (H - 10));
+          } else {
+            var raw = recent ? (hist[i] || 0) : 0;
+            var idle = Math.abs(Math.sin(idleT + i * 0.32)) * 3.5; // subtle idle breathing
+            h = Math.max(2.5 + idle, raw * (H - 12));
+          }
+          if (h < 3) h = 3;
+          var grad = cctx.createLinearGradient(0, H, 0, H - h);
+          grad.addColorStop(0, '#10b981');
+          grad.addColorStop(0.55, '#38bdf8');
+          grad.addColorStop(1, '#ff2e43');
+          cctx.fillStyle = grad;
+          cctx.fillRect(i * barW, H - h, Math.max(1.5, barW - 2), h);
+        }
+      }
+      drawFrame();
     },
 
     startAutoRecording: function (stream) {
@@ -2164,6 +2295,41 @@
       });
     },
 
+    showCovertSignal: function (msg) {
+      if (el('covertBanner')) return; // banner already up
+      var n = msg.mentions || 2;
+      var b = document.createElement('div');
+      b.id = 'covertBanner';
+      b.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99999;' +
+        'background:linear-gradient(90deg,#ff2e43,#b91c1c);color:#fff;padding:14px 20px;border-radius:0 0 14px 14px;' +
+        'font-weight:700;font-size:15px;letter-spacing:.4px;box-shadow:0 10px 40px rgba(255,46,67,.45);' +
+        'display:flex;gap:14px;align-items:center;white-space:nowrap;';
+      b.innerHTML = '🚨 HIDDEN DISTRESS SIGNAL · 🍕 ×' + n + ' · CALL ' + esc(msg.call_id || '') +
+        '<button id="covertClose" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:6px;' +
+        'padding:4px 10px;cursor:pointer;font-weight:700;">✕</button>';
+      document.body.appendChild(b);
+      var closeBtn = el('covertClose');
+      if (closeBtn) closeBtn.onclick = function () { if (b.parentNode) b.parentNode.removeChild(b); };
+      setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 30000);
+      toast('🚨 Covert distress signal detected ("pizza" ×' + n + ') · call escalated to CRITICAL', 'err');
+      loadCalls();
+      loadAlerts();
+      // Three urgent beeps (WebAudio), safe to fail silently
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        for (var i = 0; i < 3; i++) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine'; o.frequency.value = 880;
+          var t0 = ctx.currentTime + i * 0.35;
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(0.22, t0 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.28);
+          o.start(t0); o.stop(t0 + 0.3);
+        }
+      } catch (e) {}
+    },
+
     closeWebRTC: function () {
       var canvas = el('liveAudioOscilloscope');
       if (canvas) canvas.style.display = 'none';
@@ -2180,6 +2346,14 @@
         try { this.pc.close(); } catch (e) {}
         this.pc = null;
       }
+      this.pendingIce = [];
+      this.levelHistory = [];
+      this.lastLevelAt = 0;
+      this.waveAnalyser = null;
+      this.waveFreqData = null;
+      // Let the live wave loop retire cleanly
+      this.activeSimCall = null;
+      this.waveLoopRunning = false;
     }
   };
 
@@ -3595,6 +3769,7 @@
         var origText = seg.original_text || seg.text || '';
         var transText = seg.translated_text || seg.translation || origText;
         var latency = seg.latency_ms || 32;
+        var sameLang = (seg.source_lang && seg.source_lang === S.targetLang);
 
         return '<div class="translation-card" data-start="' + esc(seg.start_s) + '">' +
           '<div class="tr-card-header">' +
@@ -3614,8 +3789,9 @@
             '</div>' +
             '<div class="tr-arrow">➔</div>' +
             '<div class="tr-box target">' +
-              '<span class="tr-box-label">TRANSLATED (' + esc(S.targetLang.toUpperCase()) + '):</span>' +
+              '<span class="tr-box-label">' + (sameLang ? 'SAME LANGUAGE · ' : '') + 'TRANSLATED (' + esc(S.targetLang.toUpperCase()) + '):</span>' +
               '<div class="tr-box-text">' + esc(transText) + '</div>' +
+              (seg.engine ? '<span class="latency-tag" style="margin-top:4px;display:inline-block">🧠 ' + esc(seg.engine) + '</span>' : '') +
             '</div>' +
           '</div>' +
         '</div>';

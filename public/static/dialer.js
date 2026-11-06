@@ -52,7 +52,22 @@
   var ws = null;
   var dialerId = 'dialer_' + Math.random().toString(36).slice(2, 9);
   var recognition = null;
+  var recognitionLang = 'hi-IN';
+  var speechRestartTimer = null;
+  var recognitionErrorCount = 0;
   var visualizerActive = false;
+  var lastLevelSentMs = 0;
+  var pendingIce = [];
+  // Server-side live ASR: the phone uploads its real mic audio so the control room always
+  // gets transcripts + translation even if phone voice recognition or WebRTC hiccups.
+  var callAudioRecorder = null;
+  var callAudioChunks = [];
+  var asrSendTimer = null;
+  var asrSendBusy = false;
+  var asrSaveQueued = false;
+  var lastRecognitionResultAt = 0;
+  var recognitionSilentFlag = false;
+  var srWatchdogTimer = null;
 
   // DOM
   var dialScreen = document.getElementById('dialScreen');
@@ -178,11 +193,21 @@
       if (pc && pc.signalingState !== 'closed') {
         pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).then(function () {
           console.log('[WebRTC Dialer] Remote description set');
+          // Flush buffered candidates that arrived before the remote description
+          var pending = pendingIce.slice();
+          pendingIce = [];
+          pending.forEach(function (cand) {
+            try { pc.addIceCandidate(new RTCIceCandidate(cand)); } catch (e) {}
+          });
         }).catch(console.warn);
       }
     } else if (msg.type === 'webrtc_ice_candidate') {
-      if (pc && pc.signalingState !== 'closed' && msg.candidate) {
-        pc.addIceCandidate(new RTCIceCandidate(msg.candidate)).catch(console.warn);
+      if (msg.candidate && pc && pc.signalingState !== 'closed') {
+        if (pc.remoteDescription) {
+          try { pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch (e) {}
+        } else {
+          pendingIce.push(msg.candidate);
+        }
       }
     }
   }
@@ -341,57 +366,266 @@
       console.warn('SpeechRecognition API not available in this browser');
       return;
     }
+    stopSpeechRestartTimer();
     try {
       if (recognition) {
-        try { recognition.stop(); } catch (e) {}
+        try { recognition.onend = null; recognition.stop(); } catch (e) {}
+        recognition = null;
       }
       recognition = new SpeechRec();
       recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = 'en-IN';
+      recognition.interimResults = true;
+      recognition.lang = recognitionLang;
 
       recognition.onresult = function (ev) {
+        recognitionErrorCount = 0;
+        lastRecognitionResultAt = Date.now();
+        if (recognitionSilentFlag) {
+          // Speech resumed after the "not hearing" hint - restore normal status
+          recognitionSilentFlag = false;
+          if (micStatusText) micStatusText.textContent = '2-Way Audio Live';
+        }
+        var interimText = '';
         for (var i = ev.resultIndex; i < ev.results.length; ++i) {
+          var chunk = ev.results[i][0].transcript.trim();
           if (ev.results[i].isFinal) {
-            var text = ev.results[i][0].transcript.trim();
+            var text = chunk.replace(/\s+/g, ' ');
             if (text && activeCall && ws && ws.readyState === WebSocket.OPEN) {
-              console.log('[Phone Voice Transcribed]:', text);
+              console.log('[Phone Voice Transcribed] (' + recognitionLang + '):', text);
               ws.send(JSON.stringify({
                 type: 'transcript_utterance',
                 call_id: activeCall.id,
                 speaker: 'caller',
-                text: text
+                text: text,
+                lang: recognitionLang
               }));
             }
+          } else {
+            interimText = (interimText + ' ' + chunk).trim();
           }
+        }
+        if (interimText && activeCall && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: 'transcript_utterance',
+            call_id: activeCall.id,
+            speaker: 'caller',
+            text: interimText.slice(-160),
+            lang: recognitionLang,
+            interim: true
+          }));
         }
       };
 
       recognition.onerror = function (e) {
-        console.warn('SpeechRecognition error:', e.error);
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          console.warn('[Dialer] Speech recognition permission blocked. Mic audio continues, no transcript.');
+          if (micStatusText) micStatusText.textContent = 'Voice transcript blocked · audio still live';
+          stopSpeechRecognition();
+        } else if (e.error === 'not-found') {
+          console.warn('[Dialer] Speech recognition language not supported on this device:', recognitionLang);
+          if (micStatusText) micStatusText.textContent = 'Language not supported · try another';
+          stopSpeechRecognition();
+        } else if (e.error === 'audio-capture') {
+          console.warn('[Dialer] Speech recognition cannot capture mic (busy). Retrying…');
+          if (micStatusText && activeCall) micStatusText.textContent = 'Mic busy · audio live';
+        } else {
+          recognitionErrorCount++;
+          if (recognitionErrorCount > 6 && recognition) {
+            console.warn('[Dialer] Speech recognition failing repeatedly - stopping auto-restart.');
+            stopSpeechRecognition();
+          }
+        }
       };
 
       recognition.onend = function () {
-        if (activeCall && !isMuted) {
-          try { recognition.start(); } catch (e) {}
+        if (activeCall && !isMuted && recognition) {
+          speechRestartTimer = setTimeout(function () {
+            if (activeCall && !isMuted && ws && ws.readyState === WebSocket.OPEN && recognition) {
+              try { recognition.start(); } catch (e) {}
+            }
+          }, 350);
         }
       };
 
       recognition.start();
-      console.log('[Dialer] Continuous speech recognition started');
+      console.log('[Dialer] Continuous speech recognition started (' + recognitionLang + ')');
+      clearInterval(srWatchdogTimer);
+      lastRecognitionResultAt = Date.now();
+      recognitionSilentFlag = false;
+      srWatchdogTimer = setInterval(function () {
+        if (!activeCall || isMuted || !recognition) {
+          clearInterval(srWatchdogTimer);
+          srWatchdogTimer = null;
+          return;
+        }
+        if (Date.now() - lastRecognitionResultAt > 8000 && !recognitionSilentFlag) {
+          recognitionSilentFlag = true;
+          if (micStatusText) micStatusText.textContent = '🎙 Not catching speech · server transcript active';
+          console.warn('[Dialer] No speech results for 8s while recognition is running');
+        }
+      }, 2000);
     } catch (e) {
       console.warn('Failed to start speech recognition:', e);
     }
   }
 
+  function stopSpeechRestartTimer() {
+    if (speechRestartTimer) {
+      clearTimeout(speechRestartTimer);
+      speechRestartTimer = null;
+    }
+  }
+
   function stopSpeechRecognition() {
+    stopSpeechRestartTimer();
+    clearInterval(srWatchdogTimer);
+    srWatchdogTimer = null;
+    recognitionSilentFlag = false;
     if (recognition) {
-      try { recognition.stop(); } catch (e) {}
+      try { recognition.onend = null; recognition.stop(); } catch (e) {}
       recognition = null;
     }
   }
 
-  // Visualizer for Caller Voice Waves
+  function setRecognitionLanguage(lang, label) {
+    recognitionLang = lang || 'hi-IN';
+    console.log('[Dialer] Speech recognition language set to', recognitionLang);
+    if (micStatusText) {
+      micStatusText.textContent = 'Listening in ' + (label || recognitionLang);
+      setTimeout(function () {
+        if (micStatusText && activeCall && micStatusText.textContent.indexOf('Listening in') !== -1) {
+          micStatusText.textContent = '2-Way Audio Live';
+        }
+      }, 1200);
+    }
+    if (activeCall && !isMuted) startSpeechRecognition();
+  }
+
+  var callLangSelect = document.getElementById('callLanguageSelect');
+  if (callLangSelect) {
+    var defaultLang = callLangSelect.value || 'hi-IN';
+    recognitionLang = defaultLang;
+    callLangSelect.addEventListener('change', function () {
+      var opt = callLangSelect.options[callLangSelect.selectedIndex];
+      setRecognitionLanguage(callLangSelect.value, opt ? opt.text.split('·')[0].trim() : callLangSelect.value);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Server-ASR mic recorder: records the caller's mic, uploads cumulative
+  // audio every ~10 s (server transcribes only the new tail), and saves
+  // the recording at call end as a fallback when console WebRTC fails.
+  // ------------------------------------------------------------------
+  function startCallMicRecorder() {
+    if (!window.MediaRecorder || !localStream || callAudioRecorder) return;
+    try {
+      callAudioChunks = [];
+      var mime = '';
+      if (typeof MediaRecorder.isTypeSupported === 'function') {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) mime = 'audio/webm;codecs=opus';
+        else if (MediaRecorder.isTypeSupported('audio/webm')) mime = 'audio/webm';
+      }
+      callAudioRecorder = new MediaRecorder(localStream, mime ? { mimeType: mime } : {});
+      callAudioRecorder.ondataavailable = function (e) {
+        if (e.data && e.data.size > 0) callAudioChunks.push(e.data);
+      };
+      callAudioRecorder.start(250);
+      console.log('[Server-ASR] Mic recorder started on phone');
+      // Steady ~10 s upload cadence; first upload comes sooner so short calls still transcript
+      clearTimeout(asrSendTimer);
+      asrSendTimer = setInterval(sendMicChunkForASR, 10000);
+      setTimeout(sendMicChunkForASR, 6000);
+    } catch (err) {
+      console.warn('[Server-ASR] Mic recorder unavailable:', err);
+    }
+  }
+
+  function sendMicChunkForASR() {
+    if (asrSendBusy || !activeCall || !callAudioChunks.length || !callAudioRecorder) return;
+    if (callAudioRecorder.state !== 'recording') return;
+    asrSendBusy = true;
+    var callId = activeCall.id;
+    var blob = null;
+    try {
+      blob = new Blob(callAudioChunks, { type: callAudioRecorder.mimeType || 'audio/webm' });
+    } catch (e) { asrSendBusy = false; return; }
+    if (!blob || blob.size < 4000) { asrSendBusy = false; return; }
+
+    var fd = new FormData();
+    fd.append('call_id', callId);
+    fd.append('audio', blob, callId + '.webm');
+    fetch('/api/telephony/live_transcribe', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.ok && data.text) {
+          console.log('[Server-ASR] Server heard:', data.text);
+          if (micStatusText) {
+            micStatusText.textContent = 'Server heard: "' + data.text.slice(0, 26) + (data.text.length > 26 ? '…' : '') + '"';
+            setTimeout(function () {
+              if (micStatusText && micStatusText.textContent.indexOf('Server heard') !== -1) {
+                micStatusText.textContent = '2-Way Audio Live';
+              }
+            }, 1600);
+          }
+        } else if (data && data.ok === false) {
+          console.warn('[Server-ASR] Chunk failed:', data.error);
+        }
+      })
+      .catch(function (e) { console.warn('[Server-ASR] Upload error:', e); })
+      .finally(function () { asrSendBusy = false; });
+  }
+
+  function stopCallMicRecorder() {
+    clearTimeout(asrSendTimer);
+    asrSendTimer = null;
+    if (!callAudioRecorder) return;
+
+    var recorder = callAudioRecorder;
+    callAudioRecorder = null;
+
+    if (asrSaveQueued) return; // a save upload is already in flight
+    var flushSave = function (finalBlob) {
+      asrSaveQueued = true;
+      var callId = activeCall ? activeCall.id : null;
+      if (!callId || !finalBlob || finalBlob.size < 4000) {
+        callAudioChunks = [];
+        asrSaveQueued = false;
+        return;
+      }
+      var fd2 = new FormData();
+      fd2.append('call_id', callId);
+      fd2.append('audio', finalBlob, callId + '_phone.webm');
+      fd2.append('skip_if_saved', '1'); // console recording wins when it already saved
+      fetch('/api/telephony/save_recording', { method: 'POST', body: fd2 })
+        .then(function () {
+          console.log('[Server-ASR] Phone-side call recording backed up to server');
+        })
+        .catch(function (e) { console.warn('[Server-ASR] Recording backup failed:', e); })
+        .finally(function () {
+          callAudioChunks = [];
+          asrSaveQueued = false;
+        });
+    };
+
+    var buildBlob = function () {
+      try {
+        return new Blob(callAudioChunks, { type: recorder.mimeType || 'audio/webm' });
+      } catch (e) {
+        return null;
+      }
+    };
+
+    if (recorder.state && recorder.state !== 'inactive') {
+      recorder.onstop = function () {
+        flushSave(buildBlob());
+      };
+      recorder.stop(); // final ondataavailable fires into callAudioChunks before onstop
+    } else {
+      flushSave(buildBlob());
+    }
+  }
+
+  // Visualizer for Caller Voice Waves (+ live mic-level telemetry to the console)
   function startVisualizer(stream) {
     if (visualizerActive) return;
     try {
@@ -405,11 +639,32 @@
       visualizerActive = true;
 
       function renderFrame() {
-        if (!activeCall || !visualizerActive) return;
+        if (!visualizerActive) return;
         analyser.getByteFrequencyData(dataArray);
+        var sum = 0, peak = 0;
+        for (var j = 0; j < dataArray.length; j++) {
+          sum += dataArray[j];
+          if (dataArray[j] > peak) peak = dataArray[j];
+        }
+        var avg = dataArray.length ? sum / dataArray.length : 0;
+        // Smoothed 0..1 voice level streamed to the control-room console (throttled to ~5/s)
+        var level = Math.min(1, (avg / 255) * 1.9 + (peak / 255) * 0.2);
+        var now = Date.now();
+        if (now - lastLevelSentMs > 180) {
+          lastLevelSentMs = now;
+          if (activeCall && ws && ws.readyState === WebSocket.OPEN && !isMuted) {
+            ws.send(JSON.stringify({
+              type: 'audio_level',
+              call_id: activeCall.id,
+              level: Math.round(level * 100) / 100,
+              ts: now
+            }));
+          }
+        }
         bars.forEach(function (bar, idx) {
           var val = dataArray[idx % dataArray.length] || 0;
-          var h = Math.max(4, Math.min(26, (val / 255) * 30));
+          var h = Math.max(4, Math.min(26, (val / 255) * 34));
+          if (val < 8) h = 5 + Math.abs(Math.sin(now / 420 + idx * 0.9)) * 3; // subtle idle motion
           bar.style.height = h + 'px';
         });
         requestAnimationFrame(renderFrame);
@@ -449,6 +704,7 @@
             pc.addTrack(track, localStream);
           });
           startVisualizer(localStream);
+          startCallMicRecorder();
           if (micStatusText) micStatusText.textContent = 'Phone Mic Active';
         } catch (err) {
           console.warn('Microphone permission denied or unavailable:', err.message);
@@ -521,6 +777,9 @@
 
   function closeWebRTC() {
     visualizerActive = false;
+    lastLevelSentMs = 0;
+    pendingIce = [];
+    stopCallMicRecorder(); // stop the phone mic recorder + flush its call recording
     if (localStream) {
       localStream.getTracks().forEach(function (t) { t.stop(); });
       localStream = null;

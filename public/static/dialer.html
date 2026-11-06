@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dhvani | Mobile Telephone Dialer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #060709;
+      color: #f1f1f6;
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .phone-shell {
+      width: 100%;
+      max-width: 360px;
+      height: 720px;
+      background: #0f1015;
+      border: 3px solid #232530;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+    /* Dynamic Island / Notch */
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notch-camera {
+      width: 9px;
+      height: 9px;
+      background: #111420;
+      border-radius: 50%;
+      border: 1px solid #1e2230;
+    }
+    /* Status bar */
+    .status-bar {
+      padding: 14px 24px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #a1a1b0;
+      z-index: 5;
+    }
+    .status-icons { display: flex; gap: 6px; align-items: center; font-size: 10px; }
+    
+    /* Display Area */
+    .dial-display {
+      text-align: center;
+      padding: 24px 20px 10px;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .dial-number {
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 46px;
+    }
+    .dial-sub {
+      font-size: 11px;
+      color: #7d7e8f;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .dial-error {
+      color: #ff4d5e;
+      font-size: 11px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Keypad Grid */
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 32px;
+      margin: auto 0;
+    }
+    .key-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #191b24;
+      border: 1px solid #282a38;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin: 0 auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      outline: none;
+    }
+    .key-btn:active {
+      background: #2e3144;
+      transform: scale(0.94);
+    }
+    .key-digit {
+      font-size: 26px;
+      font-weight: 500;
+      line-height: 1;
+    }
+    .key-sub {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #8c8d9e;
+      margin-top: 3px;
+      line-height: 1;
+    }
+
+    /* Bottom Actions */
+    .call-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      padding: 10px 32px 24px;
+    }
+    .btn-call {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin: 0 auto;
+      grid-column: 2;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    }
+    .btn-call:active {
+      transform: scale(0.92);
+      background: #059669;
+    }
+    .btn-backspace {
+      background: transparent;
+      border: none;
+      color: #7d7e8f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      grid-column: 3;
+      padding: 12px;
+      font-size: 18px;
+    }
+    .btn-backspace:active { color: #fff; }
+
+    /* In-Call Screen */
+    .incall-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px 24px 28px;
+      text-align: center;
+    }
+    .incall-avatar {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: #1e2130;
+      border: 2px solid #373b52;
+      margin: 16px auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #818cf8;
+      font-size: 32px;
+      font-weight: 700;
+      position: relative;
+    }
+    .incall-avatar.calling { animation: pulseAvatar 1.5s infinite; }
+    @keyframes pulseAvatar {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+      70% { box-shadow: 0 0 0 16px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+    .incall-title { font-size: 24px; font-weight: 700; color: #fff; }
+    .incall-status { font-size: 13px; color: #f59e0b; margin-top: 4px; font-weight: 600; }
+    .incall-status.connected { color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+    
+    .incall-prompts-box {
+      margin: auto 0;
+      background: #141620;
+      border: 1px solid #232738;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: left;
+      max-height: 210px;
+      overflow-y: auto;
+    }
+    .incall-prompts-box h4 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #818cf8;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .phrase-chip {
+      background: #1e2130;
+      border: 1px solid #2e334a;
+      color: #e2e8f0;
+      font-size: 11px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+    .phrase-chip:hover { background: #282d42; color: #fff; }
+    .phrase-chip:active { transform: scale(0.98); }
+
+    .incall-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+    .incall-row {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+    .circle-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #1b1e2c;
+      border: 1px solid #2a2f44;
+      color: #d1d5db;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .circle-btn.active { background: #f59e0b; color: #000; }
+    .btn-hangup {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #ff2e43;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255, 46, 67, 0.4);
+      font-size: 26px;
+    }
+    .btn-hangup:active { transform: scale(0.92); }
+
+    /* Home Indicator */
+    .home-indicator {
+      width: 120px;
+      height: 4px;
+      background: #373b52;
+      border-radius: 4px;
+      margin: 8px auto 10px;
+    }
+    .top-back-btn {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      background: transparent;
+      border: none;
+      color: #8c8d9e;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 15;
+    }
+    .top-back-btn:hover { color: #fff; }
+    .mic-live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+    .mic-live-indicator.inactive {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .audio-wave-bars {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 24px;
+      margin: 8px 0;
+    }
+    .audio-wave-bars span {
+      display: block;
+      width: 4px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 2px;
+      transition: height 0.08s ease;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+        background: #0f1015;
+      }
+      .phone-shell {
+        max-width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .notch {
+        display: none;
+      }
+      .status-bar {
+        padding: 10px 16px 4px;
+      }
+      .dial-display {
+        padding: 16px 16px 8px;
+        min-height: 70px;
+      }
+      .dial-number {
+        font-size: 32px;
+      }
+      .keypad-grid {
+        gap: 12px;
+        padding: 0 20px;
+      }
+      .key-btn {
+        width: 62px;
+        height: 62px;
+      }
+      .key-digit {
+        font-size: 24px;
+      }
+      .btn-call {
+        width: 64px;
+        height: 64px;
+      }
+      .incall-screen {
+        padding: 16px 16px 20px;
+      }
+      .incall-avatar {
+        width: 72px;
+        height: 72px;
+        margin: 8px auto 10px;
+      }
+      .incall-title {
+        font-size: 20px;
+      }
+      .incall-prompts-box {
+        max-height: 190px;
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-shell">
+    <a href="/console" class="top-back-btn">← Console</a>
+    <div class="notch"><div class="notch-camera"></div></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="statusBarTime">09:41</span>
+      <div class="status-icons">
+        <span>5G</span>
+        <span>Wi-Fi</span>
+        <span>100%</span>
+      </div>
+    </div>
+
+    <!-- 1. Dialpad Screen -->
+    <div id="dialScreen" style="display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+      <div class="dial-display">
+        <div class="dial-number" id="dialNumber"><span style="color:#4a4d60; font-weight:400">Dial Ext</span></div>
+        <div class="dial-sub" id="dialSub">Enter active extension (e.g. 966)</div>
+        <div class="dial-error" id="dialError"></div>
+      </div>
+
+      <div class="keypad-grid" id="keypadGrid">
+        <button class="key-btn" data-key="1"><span class="key-digit">1</span><span class="key-sub"></span></button>
+        <button class="key-btn" data-key="2"><span class="key-digit">2</span><span class="key-sub">A B C</span></button>
+        <button class="key-btn" data-key="3"><span class="key-digit">3</span><span class="key-sub">D E F</span></button>
+        <button class="key-btn" data-key="4"><span class="key-digit">4</span><span class="key-sub">G H I</span></button>
+        <button class="key-btn" data-key="5"><span class="key-digit">5</span><span class="key-sub">J K L</span></button>
+        <button class="key-btn" data-key="6"><span class="key-digit">6</span><span class="key-sub">M N O</span></button>
+        <button class="key-btn" data-key="7"><span class="key-digit">7</span><span class="key-sub">P Q R S</span></button>
+        <button class="key-btn" data-key="8"><span class="key-digit">8</span><span class="key-sub">T U V</span></button>
+        <button class="key-btn" data-key="9"><span class="key-digit">9</span><span class="key-sub">W X Y Z</span></button>
+        <button class="key-btn" data-key="*"><span class="key-digit">*</span><span class="key-sub"></span></button>
+        <button class="key-btn" data-key="0"><span class="key-digit">0</span><span class="key-sub">+</span></button>
+        <button class="key-btn" data-key="#"><span class="key-digit">#</span><span class="key-sub"></span></button>
+      </div>
+
+      <div class="call-actions">
+        <div></div>
+        <button class="btn-call" id="btnCall" aria-label="Call">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </button>
+        <button class="btn-backspace" id="btnBackspace" aria-label="Backspace">⌫</button>
+      </div>
+    </div>
+
+    <!-- 2. Active In-Call Screen -->
+    <div id="incallScreen" class="incall-screen" style="display:none;">
+      <div>
+        <div class="incall-avatar calling" id="incallAvatar">966</div>
+        <div class="incall-title" id="incallTitle">Extension 966</div>
+        <div class="incall-status" id="incallStatus">Calling…</div>
+        <div class="audio-wave-bars" id="audioWaveBars" style="display:none;">
+          <span style="height:6px"></span>
+          <span style="height:14px"></span>
+          <span style="height:22px"></span>
+          <span style="height:18px"></span>
+          <span style="height:10px"></span>
+          <span style="height:5px"></span>
+        </div>
+        <div id="micStatus" class="mic-live-indicator">
+          <span>●</span> <span id="micStatusText">Voice Call Active</span>
+        </div>
+      </div>
+
+      <!-- Quick Conversation Prompts -->
+      <div class="incall-prompts-box">
+        <h4>⚡ Emergency Voice Presets (Tap to transmit live):</h4>
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 2px;">
+          <label for="callLanguageSelect" style="font-size:11px;color:#8c8c98;white-space:nowrap;">🎙️ You speak:</label>
+          <select id="callLanguageSelect" style="flex:1;max-width:62%;background:#14161f;color:#e5e7eb;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 10px;font-size:13px;">
+            <option value="en-IN" selected>English (India)</option>
+            <option value="hi-IN">Hindi (हिन्दी)</option>
+            <option value="mr-IN">Marathi (मराठी)</option>
+            <option value="ta-IN">Tamil (தமிழ்)</option>
+            <option value="te-IN">Telugu (తెలుగు)</option>
+            <option value="bn-IN">Bengali (বাংলা)</option>
+            <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+            <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+            <option value="ml-IN">Malayalam (മലയാളം)</option>
+            <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="ur-IN">Urdu (اردو)</option>
+          </select>
+        </div>
+        <button class="phrase-chip emergency-preset" data-phrase="कृपया मला वाचवा, दरवाजा उघडत नाहीये आणि धोका आहे!" style="border-left: 3px solid #ff4d5e; background: rgba(255, 77, 94, 0.1);">🔴 [मराठी] कृपया मला वाचवा, दरवाजा उघडत नाहीये!</button>
+        <button class="phrase-chip emergency-preset" data-phrase="தயவுசெய்து என்னை காப்பாற்றுங்கள், கதவு திறக்கவில்லை!" style="border-left: 3px solid #f59e0b; background: rgba(245, 158, 11, 0.1);">🟠 [தமிழ்] தயவுசெய்து என்னை காப்பாற்றுங்கள்!</button>
+        <button class="phrase-chip emergency-preset" data-phrase="कृपया मुझे बचाओ, दरवाजा नहीं खुल रहा है और बहुत खतरा है!" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.1);">🟢 [हिंदी] कृपया मुझे बचाओ, दरवाजा नहीं खुल रहा है!</button>
+        <button class="phrase-chip emergency-preset" data-phrase="Hello, I would like to order a large pepperoni pizza to apartment 302." style="border-left: 3px solid #ec4899; background: rgba(236, 72, 153, 0.1);">🍕 [Pizza 1] Order large pepperoni pizza to apartment 302</button>
+        <button class="phrase-chip emergency-preset" data-phrase="Yes I understand... Please send the pizza fast, there are two people here." style="border-left: 3px solid #ec4899; background: rgba(236, 72, 153, 0.1);">🍕 [Pizza 2] Send pizza fast, two people are here</button>
+        <button class="phrase-chip emergency-preset" data-phrase="When will you deliver the pizza? My house is near Dadar station, 3rd floor apartment 302." style="border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.15); font-weight: 600;">🚨 [Pizza 3] Dadar station Apt 302, deliver pizza immediately!</button>
+        <button class="phrase-chip" data-phrase="Bhaiya emergency hai, Dadar station ke pass pizza jaldi bhej do.">🇮🇳 Hinglish: "Dadar station pizza jaldi bhej do"</button>
+        <button class="phrase-chip" data-phrase="Sir, CBI officer on video call saying I am under digital arrest for illegal parcel.">🛡️ Scam: Digital Arrest / CBI Extortion</button>
+      </div>
+
+      <!-- Controls -->
+      <div class="incall-controls">
+        <div class="incall-row">
+          <button class="circle-btn" id="btnMute" title="Mute">🎤</button>
+          <button class="circle-btn" id="btnKeypad" title="Keypad">⌨️</button>
+          <button class="circle-btn" id="btnSpeaker" title="Speaker">🔊</button>
+        </div>
+        <button class="btn-hangup" id="btnHangup" title="End Call">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <audio id="remoteAudio" autoplay playsinline style="display:none"></audio>
+  <script src="/static/dialer.js?v=4"></script>
+</body>
+</html>
+

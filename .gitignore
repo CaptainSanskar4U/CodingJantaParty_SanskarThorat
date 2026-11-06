@@ -31,3 +31,6 @@ deliverables/raw_recordings/
 deliverables/Dhvani_Cinematic_Demo_1080p.mp4
 deliverables/assets/
 deliverables/voiceover/
+
+.vercel
+.env*
