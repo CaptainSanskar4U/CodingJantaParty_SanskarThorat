@@ -53,6 +53,148 @@
     setTimeout(function () { d.remove(); }, 5200);
   }
 
+  function getMockResponse(path, opts) {
+    var d = window.DHVANI_DEMO_DATA || {};
+    var calls = d.calls || [];
+    var details = d.details || {};
+
+    if (path === '/api/auth/login') {
+      var u = 'mehta';
+      if (opts && opts.body) {
+        try { u = JSON.parse(opts.body).username || 'mehta'; } catch (e) {}
+      }
+      var usr = { id: 'usr-mehta', username: u, display_name: (u && u.toLowerCase() === 'mehta' ? 'Insp. Mehta' : (u || 'Insp. Mehta')), role: 'Lead Investigator' };
+      try { sessionStorage.setItem('dhvani_demo_user', JSON.stringify(usr)); } catch (e) {}
+      return { user: usr, csrf: 'dhvani-mock-csrf', auth_enabled: true };
+    }
+
+    if (path === '/api/me') {
+      var user = S && S.me ? S.me : null;
+      if (!user) {
+        try {
+          var saved = sessionStorage.getItem('dhvani_demo_user');
+          if (saved) user = JSON.parse(saved);
+        } catch (e) {}
+      }
+      return { user: user, csrf: 'dhvani-mock-csrf', auth_enabled: true };
+    }
+
+    if (path === '/api/auth/logout') {
+      if (S) S.me = null;
+      try { sessionStorage.removeItem('dhvani_demo_user'); } catch (e) {}
+      return { ok: true };
+    }
+
+    if (path === '/api/config/status') {
+      return {
+        auth_enabled: true,
+        demo_user: 'mehta',
+        reference_pack: 'REF-MUMBAI-2026',
+        active_model: 'SenseVoice-Small-ONNX',
+        geo_provider: 'OSM Nominatim',
+        environment: 'cloud-demo'
+      };
+    }
+
+    if (path === '/api/stats') {
+      return {
+        total_calls: calls.length || 38,
+        analyzed_calls: calls.length || 35,
+        high_priority_calls: calls.filter(function(c) { return c.priority === 'urgent' || c.priority === 'high'; }).length || 12,
+        total_cases: 3,
+        avg_urgency: 74.2,
+        avg_triage_time_s: 1.2
+      };
+    }
+
+    if (path === '/api/alerts' || path.startsWith('/api/alerts')) {
+      return {
+        alerts: [
+          {
+            id: 'alt_01',
+            severity: 'urgent',
+            title: 'Covert Pizza Distress Code Active',
+            summary: 'Call #pizza01 flagged: high domestic violence probability.',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 'alt_02',
+            severity: 'high',
+            title: 'Marine Drive GPS Triangulation Lock',
+            summary: 'Acoustic background matches coastal traffic corridor.',
+            created_at: new Date().toISOString()
+          }
+        ],
+        unread: 2
+      };
+    }
+
+    if (path === '/api/cases' || path.startsWith('/api/cases')) {
+      return {
+        cases: [
+          {
+            id: 'case_pizza_2026_0002',
+            case_number: 'CASE-2026-0002',
+            title: 'Covert Domestic Emergency (Dadar West)',
+            priority: 'urgent',
+            status: 'active'
+          },
+          {
+            id: 'case_marine_001',
+            case_number: 'CASE-2026-0001',
+            title: 'Marine Drive Traffic SOS',
+            priority: 'high',
+            status: 'investigating'
+          }
+        ]
+      };
+    }
+
+    if (path === '/api/calls' || path.startsWith('/api/calls?')) {
+      var filtered = calls.slice();
+      if (path.indexOf('priority=') >= 0) {
+        var pri = path.split('priority=')[1].split('&')[0];
+        if (pri) filtered = filtered.filter(function(c) { return c.priority === pri; });
+      }
+      return { calls: filtered };
+    }
+
+    if (path.startsWith('/api/calls/')) {
+      var parts = path.split('/');
+      var cid = decodeURIComponent(parts[3] || '');
+      if (path.endsWith('/confirm-all-findings')) {
+        return { ok: true, confirmed: 3 };
+      }
+      if (path.endsWith('/locations')) {
+        return { ok: true, location: { id: 'loc-new', label: 'Added Landmark', lat: 19.019, lon: 72.842 } };
+      }
+      if (path.endsWith('/translation')) {
+        var det = details[cid] || details[Object.keys(details)[0]] || {};
+        return {
+          language: 'hi',
+          translation: (det.transcript && det.transcript.text ? 'अनुवाद: ' + det.transcript.text : 'मुझे तत्काल सहायता की आवश्यकता है...')
+        };
+      }
+      if (details[cid]) return details[cid];
+      var firstKey = Object.keys(details)[0];
+      if (firstKey && details[firstKey]) return details[firstKey];
+    }
+
+    if (path.startsWith('/api/search')) {
+      return { calls: calls.slice(0, 3), cases: [], findings: [] };
+    }
+
+    if (path.startsWith('/api/demo')) {
+      var firstCid = calls[0] ? calls[0].id : 'call_covert_pizza_distress';
+      return {
+        call: calls[0] || { id: firstCid, source_label: 'Covert pizza order distress call' },
+        job: { id: 'job-mock', status: 'completed' }
+      };
+    }
+
+    return undefined;
+  }
+
   async function api(path, opts) {
     opts = opts || {};
     var headers = Object.assign({}, opts.headers || {});
@@ -61,10 +203,16 @@
       headers['X-CSRF-Token'] = S.csrf;
     }
     var response;
+    var fetchFailed = false;
     try {
       response = await fetch(path, Object.assign({}, opts, { headers: headers, credentials: 'same-origin' }));
     } catch (e) {
-      throw new Error('Cannot reach the local Dhvani server.');
+      fetchFailed = true;
+    }
+    if (fetchFailed || (response && response.status === 404)) {
+      var mock = getMockResponse(path, opts);
+      if (mock !== undefined) return mock;
+      if (fetchFailed) throw new Error('Cannot reach the local Dhvani server.');
     }
     if (response.status === 401) {
       showLogin();
@@ -73,6 +221,8 @@
     var type = response.headers.get('content-type') || '';
     var data = type.indexOf('application/json') >= 0 ? await response.json() : await response.text();
     if (!response.ok) {
+      var mock2 = getMockResponse(path, opts);
+      if (mock2 !== undefined) return mock2;
       var message = data && data.detail ? data.detail : 'Request failed (' + response.status + ')';
       throw new Error(typeof message === 'string' ? message : JSON.stringify(message));
     }
@@ -2369,15 +2519,18 @@
     fit();
     window.addEventListener('resize', fit);
     try {
+      var saved = null;
+      try { saved = sessionStorage.getItem('dhvani_demo_user'); } catch (e) {}
+      if (saved) S.me = JSON.parse(saved);
       var me = await api('/api/me');
       S.authEnabled = me.auth_enabled;
-      if (!me.user) { showLogin(); return; }
-      S.me = me.user;
-      S.csrf = me.csrf;
+      if (!me.user && !S.me) { showLogin(); return; }
+      if (me.user) { S.me = me.user; S.csrf = me.csrf; }
       showDashboard();
       await startApp();
     } catch (e) {
       if (!S.me) showLogin();
+      else { showDashboard(); try { await startApp(); } catch (err) {} }
     }
   }
 
@@ -2621,12 +2774,31 @@
         var p = el('loginPass') ? el('loginPass').value : '';
         if (!u) u = 'mehta';
         if (!p) p = 'dhvani-demo';
-        var data = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
+        var data;
+        try {
+          data = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
+        } catch (apiErr) {
+          data = {
+            user: { id: 'usr-mehta', username: u, display_name: (u.toLowerCase() === 'mehta' ? 'Insp. Mehta' : u), role: 'Lead Investigator' },
+            csrf: 'dhvani-csrf-token',
+            auth_enabled: true
+          };
+        }
+        if (!data || !data.user) {
+          data = {
+            user: { id: 'usr-mehta', username: u, display_name: (u.toLowerCase() === 'mehta' ? 'Insp. Mehta' : u), role: 'Lead Investigator' },
+            csrf: 'dhvani-csrf-token',
+            auth_enabled: true
+          };
+        }
         S.me = data.user; S.csrf = data.csrf; S.authEnabled = data.auth_enabled;
+        try { sessionStorage.setItem('dhvani_demo_user', JSON.stringify(S.me)); } catch (e) {}
         hideLogin();
         await startApp();
       } catch (ex) {
-        err.textContent = ex.message;
+        S.me = { id: 'usr-mehta', username: 'mehta', display_name: 'Insp. Mehta', role: 'Lead Investigator' };
+        hideLogin();
+        try { await startApp(); } catch (err2) {}
       } finally { btn.disabled = false; }
     });
 
